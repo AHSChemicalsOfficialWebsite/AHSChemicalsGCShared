@@ -25,4 +25,5 @@ func main(){
 		log.Print("Initialized firebase prod admin sdk")
 	}
 
+	//Call any functions to test here locally
 }
