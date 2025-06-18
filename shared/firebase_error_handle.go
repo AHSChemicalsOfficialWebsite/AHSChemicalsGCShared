@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type FirebaseErrorResponse struct {
@@ -16,6 +17,22 @@ type FirebaseErrorResponse struct {
 			Reason  string `json:"reason"`
 		} `json:"errors"`
 	} `json:"error"`
+}
+
+func ExtractFirebaseErrorFromResponse(err error) *FirebaseErrorResponse {
+	errString := err.Error()
+	start := strings.Index(errString, "{")
+	var firebaseError FirebaseErrorResponse
+
+	if start == -1 {
+		return nil
+	}
+
+	jsonPart := errString[start:]
+	if unmarshalErr := json.Unmarshal([]byte(jsonPart), &firebaseError); unmarshalErr != nil {
+		return &firebaseError
+	}
+	return &firebaseError
 }
 
 func WriteJSONError(response http.ResponseWriter, statusCode int, message string) {
