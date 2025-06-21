@@ -9,48 +9,66 @@ import (
 	"sync"
 )
 
+// maxConcurrentUploads controls the number of concurrent Firestore write operations
 const maxConcurrentUploads = 100
 
+// UploadCaCountyCsvToFirestore uploads California county tax rate data from a CSV file to Firestore.
+//
+// The CSV file should be located at "./extras/ca_county_details.csv" and must have the following structure:
+//   - Expected columns: [irrelevant,..., irrelevant, county, city, irrelevant, irrelevant, rate, ...]
+//     where 'county' is at index 3, 'city' at index 4, and 'rate' at index 6.
+//
+// Behavior:
+//   - Reads the CSV file from disk.
+//   - Parses each record, converting the tax rate to a float.
+//   - Uploads each record as a document to the "tax_rates" collection in Firestore.
+//   - Uses concurrency with a limit of maxConcurrentUploads to optimize upload performance.
+//   - Logs progress and errors encountered during the process.
+//
+// Logs:
+//   - Logs start and completion of upload.
+//   - Logs individual record errors if upload fails.
+//
+// Panics:
+//   - If the CSV file cannot be opened or read, or if any tax rate cannot be converted to float.
 func UploadCaCountyCsvToFirestore() {
-
 	file, err := os.Open("./extras/ca_county_details.csv")
 	if err != nil {
 		log.Fatal("Error occurred reading the file, please try again")
 	}
-
 	defer file.Close()
 
 	reader := csv.NewReader(file)
 
-	// Read all records
+	// Read all records from the CSV file.
 	records, err := reader.ReadAll()
 	if err != nil {
-		log.Fatalf("Error reading CSV:", err)
+		log.Fatal("Error reading CSV:", err)
 		return
 	}
 
-	log.Print("Uploading the county csv data to firestore...")
+	log.Print("Uploading the county CSV data to Firestore...")
 
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, maxConcurrentUploads)
 
-	// Read through the list of records
+	// Iterate over the CSV records (skipping the header row).
 	for i, row := range records {
 		if i == 0 {
-			continue
+			continue // Skip header
 		}
 
 		wg.Add(1)
-		sem <- struct{}{} //Get a spot
+		sem <- struct{}{} // Acquire a slot in the semaphore for concurrency control
 
 		go func(row []string) {
 			defer wg.Done()
-			defer func() { <-sem }() // release spot
+			defer func() { <-sem }() // Release the semaphore slot
 
-			//Convert the rate to float
+			// Convert the tax rate (string) to float64.
 			rate, err := strconv.ParseFloat(row[6], 64)
 			if err != nil {
-				log.Fatal("Error converting the rate to float")
+				log.Fatalf("Error converting rate to float for row (%s - %s): %v", row[3], row[4], err)
 			}
 
 			countyObject := map[string]any{
@@ -59,6 +77,8 @@ func UploadCaCountyCsvToFirestore() {
 				"city":   row[4],
 				"rate":   rate,
 			}
+
+			// Upload the document to Firestore.
 			_, _, err = FirestoreClient.Collection("tax_rates").Add(context.Background(), countyObject)
 			if err != nil {
 				log.Printf("Error uploading record (%s - %s): %v", row[3], row[4], err)
@@ -67,6 +87,5 @@ func UploadCaCountyCsvToFirestore() {
 	}
 
 	wg.Wait()
-	log.Print("Added all the county data to firestore.")
-
+	log.Print("Added all the county data to Firestore.")
 }

@@ -14,50 +14,70 @@ import (
 )
 
 var (
-	App             *firebase.App
-	AuthClient      *auth.Client
-	StorageClient   *storage.Client
+	// App holds the initialized Firebase App instance.
+	App *firebase.App
+
+	// AuthClient provides access to Firebase Authentication features.
+	AuthClient *auth.Client
+
+	// StorageClient provides access to Firebase Cloud Storage features.
+	StorageClient *storage.Client
+
+	// FirestoreClient provides access to Firestore database features.
 	FirestoreClient *firestore.Client
-	RealtimeClient  *db.Client
-	initOnce        sync.Once
+
+	// RealtimeClient provides access to Firebase Realtime Database features.
+	RealtimeClient *db.Client
+
+	// initOnce ensures Firebase initialization occurs only once.
+	initOnce sync.Once
 )
 
+// InitFirebaseDebug initializes Firebase clients for the debug environment.
+//
+// Parameters:
+//   - keyPath: Path to the Firebase Admin SDK service account JSON file.
+//
+// Behavior:
+//   - Initializes the Firebase App with the specified debug Realtime Database URL.
+//   - Sets up AuthClient, FirestoreClient, RealtimeClient, and StorageClient for subsequent usage.
+//   - Uses sync.Once to ensure initialization happens only once during the application lifecycle.
+//
+// Logs:
+//   - Calls log.Fatalf() and exits the application if initialization of any service fails.
 func InitFirebaseDebug(keyPath string) {
 	initOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 
-		//Realtime database url
+		// Debug Realtime Database URL.
 		conf := &firebase.Config{
 			DatabaseURL: "https://ahschemicalsdebug-default-rtdb.firebaseio.com/",
 		}
 
+		// Initialize Firebase App with credentials file.
 		opt := option.WithCredentialsFile(keyPath)
 		App, err = firebase.NewApp(ctx, conf, opt)
-
 		if err != nil {
-			log.Fatalf("Error occurred intializing firebase: %v", err)
+			log.Fatalf("Error occurred initializing Firebase: %v", err)
 		}
 
-		//Initialize the Auth Client
+		// Initialize individual Firebase service clients.
 		AuthClient, err = App.Auth(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Auth client: %v", err)
 		}
 
-		//Initialize the Firestore Client
 		FirestoreClient, err = App.Firestore(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Firestore client: %v", err)
 		}
 
-		//Initialize the RealtimeDb Client
 		RealtimeClient, err = App.Database(ctx)
 		if err != nil {
-			log.Fatalf("Failed to initialize Realtime db client: %v", err)
+			log.Fatalf("Failed to initialize Realtime Database client: %v", err)
 		}
 
-		//Initialize the Storage Client
 		StorageClient, err = App.Storage(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Storage client: %v", err)
@@ -65,51 +85,58 @@ func InitFirebaseDebug(keyPath string) {
 	})
 }
 
+// InitFirebaseProd initializes Firebase clients for the production environment.
+//
+// Parameters:
+//   - keyPath: Optional pointer to the path of the Firebase Admin SDK service account JSON file.
+//              If nil, the default credentials will be used.
+//
+// Behavior:
+//   - Initializes the Firebase App with the specified production Realtime Database URL.
+//   - Sets up AuthClient, FirestoreClient, RealtimeClient, and StorageClient for subsequent usage.
+//   - Uses sync.Once to ensure initialization happens only once during the application lifecycle.
+//
+// Logs:
+//   - Calls log.Fatalf() and exits the application if initialization of any service fails.
 func InitFirebaseProd(keyPath *string) {
 	initOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 
-		//Realtime db url
+		// Production Realtime Database URL.
 		conf := &firebase.Config{
 			DatabaseURL: "https://ahschemicalsprod-default-rtdb.firebaseio.com",
 		}
 
-		//Initialize the Firebase App
+		// Initialize Firebase App with provided credentials or fallback to default.
 		var app *firebase.App
 		if keyPath != nil {
 			opt := option.WithCredentialsFile(*keyPath)
 			app, err = firebase.NewApp(ctx, conf, opt)
 		} else {
-			// Use default credentials
 			app, err = firebase.NewApp(ctx, conf)
 		}
-
 		if err != nil {
-			log.Fatalf("Error initializing firebase: %v", err)
+			log.Fatalf("Error initializing Firebase: %v", err)
 		}
-
 		App = app
 
-		//Initialize the Auth Client
+		// Initialize individual Firebase service clients.
 		AuthClient, err = App.Auth(ctx)
 		if err != nil {
-			log.Fatalf("Error initializing auth client: %v", err)
+			log.Fatalf("Failed to initialize Auth client: %v", err)
 		}
 
-		//Initialize the Firestore Client
 		FirestoreClient, err = App.Firestore(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Firestore client: %v", err)
 		}
 
-		//Initialize the Realtime Cleint
 		RealtimeClient, err = App.Database(ctx)
 		if err != nil {
-			log.Fatalf("Failed to initialize realtime db: %v", err)
+			log.Fatalf("Failed to initialize Realtime Database client: %v", err)
 		}
 
-		//Initialize the Storage Client
 		StorageClient, err = App.Storage(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Storage client: %v", err)
