@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
+	"cloud.google.com/go/firestore"
 )
 
 // ExchangeTokenForAuthCode exchanges an OAuth 2.0 authorization code for access and refresh tokens
@@ -92,4 +92,39 @@ func ExchangeTokenForAuthCode(ctx context.Context, receivedData map[string]strin
 	}
 
 	return tokenResp, nil
+}
+
+// SaveTokenToFirestore saves the provided token data to Firestore with calculated expiration timestamps.
+//
+// Parameters:
+//   - ctx: Context for request lifetime
+//   - tokenData: Token response data from QuickBooks (access_token, refresh_token, etc.)
+//   - authData: Metadata map including "uid" and "state"
+//   - firestoreClient: Firestore client instance
+//
+// Returns:
+//   - error: Non-nil if an error occurs during Firestore save operation
+func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authData map[string]string, firestoreClient *firestore.Client) (error){
+	uid, ok := authData["uid"]
+	if !ok || uid == "" {
+		return fmt.Errorf("missing UID in authData")
+	}
+	// Calculate expiration timestamp
+	obtainedAt := time.Now()
+	expiresInSec := int64(tokenData["expires_in"].(float64))
+	expiresAt := obtainedAt.Add(time.Duration(expiresInSec) * time.Second)
+
+	firestoreData := map[string]any{
+		"access_token":  tokenData["access_token"],
+		"refresh_token": tokenData["refresh_token"],
+		"expires_in":    expiresInSec,
+		"obtained_at":   obtainedAt,
+		"expires_at":    expiresAt,
+		"token_type":    tokenData["token_type"],
+		"scope":         tokenData["scope"],
+		"state":         authData["state"],
+	}
+
+	_ , err := firestoreClient.Collection("quickbooks_tokens").Doc(authData["uid"]).Set(ctx, firestoreData)
+	return err
 }
