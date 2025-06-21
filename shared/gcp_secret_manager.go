@@ -2,10 +2,26 @@ package shared
 
 import (
 	"context"
+	"sync"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 )
+
+var (
+	secretManagerClient *secretmanager.Client
+	secretManagerOnce   sync.Once
+	secretManagerErr    error
+)
+
+// getSecretManagerClient initializes the Secret Manager client once.
+func getSecretManagerClient(ctx context.Context) (*secretmanager.Client, error) {
+	secretManagerOnce.Do(func() {
+		secretManagerClient, secretManagerErr = secretmanager.NewClient(ctx)
+	})
+	return secretManagerClient, secretManagerErr
+}
+
 // GetSecretFromGCP retrieves the latest version of a secret from Google Cloud Secret Manager.
 // 
 // Parameters:
@@ -20,11 +36,10 @@ func GetSecretFromGCP(secretName string) (string, error) {
 	ctx := context.Background()
 
 	// Initialize the Secret Manager client.
-	client, err := secretmanager.NewClient(ctx)
+	client, err := getSecretManagerClient(ctx)
 	if err != nil {
 		return "", err
 	}
-	defer client.Close()
 
 	// Build the request to access the secret version.
 	req := &secretmanagerpb.AccessSecretVersionRequest{
