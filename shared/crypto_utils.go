@@ -13,7 +13,7 @@ import (
 //
 // Example:
 //   secret := generateRandomSecret()
-func generateRandomSecret() (string, error) {
+func GenerateRandomSecret() (string, error) {
 	b := make([]byte, 32) //32 byte slice
 	if _, err := rand.Read(b); err != nil {
 		return "", err
