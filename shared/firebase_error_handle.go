@@ -71,7 +71,6 @@ func WriteJSONError(response http.ResponseWriter, statusCode int, message string
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(statusCode)
 
-	// Attempt to encode and write the error response in JSON format.
 	if err := json.NewEncoder(response).Encode(map[string]any{"code": statusCode, "message": message}); err != nil {
 		log.Printf("Error writing the error response: %v", err)
 	}

@@ -53,14 +53,16 @@ import (
 func ExchangeTokenForAuthCode(ctx context.Context, receivedData map[string]string) (map[string]any, error) {
 	tokenURL := "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
 
+	//Set the url values 
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
 	data.Set("code", receivedData["code"])
 	data.Set("redirect_uri", receivedData["redirect_uri"])
 
-	authStr := fmt.Sprintf("%s:%s", receivedData["client_id"], receivedData["client_secret"])
+	authStr := fmt.Sprintf("%s:%s", receivedData["client_id"], receivedData["client_secret"]) 
 	baseAuth := base64.StdEncoding.EncodeToString([]byte(authStr))
 
+	//Create a new request with encoded url as the body
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, tokenURL, bytes.NewBufferString(data.Encode()))
 	if err != nil {
 		return nil, err
@@ -85,7 +87,7 @@ func ExchangeTokenForAuthCode(ctx context.Context, receivedData map[string]strin
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("token exchange failed: %s", body)
 	}
-
+	//Get the token response 
 	var tokenResp map[string]any
 	if err := json.Unmarshal(body, &tokenResp); err != nil {
 		return nil, err
@@ -125,6 +127,6 @@ func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authDat
 		"state":         authData["state"],
 	}
 
-	_ , err := firestoreClient.Collection("quickbooks_tokens").Doc(authData["uid"]).Set(ctx, firestoreData)
+	_ , err := firestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData)
 	return err
 }

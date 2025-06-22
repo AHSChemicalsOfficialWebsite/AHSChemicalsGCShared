@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -31,7 +32,7 @@ const maxConcurrentUploads = 100
 //
 // Panics:
 //   - If the CSV file cannot be opened or read, or if any tax rate cannot be converted to float.
-func UploadCaCountyCsvToFirestore() {
+func UploadTaxRatesInBulkToFirestore() {
 	file, err := os.Open("./extras/ca_county_details.csv")
 	if err != nil {
 		log.Fatal("Error occurred reading the file, please try again")
@@ -88,4 +89,58 @@ func UploadCaCountyCsvToFirestore() {
 
 	wg.Wait()
 	log.Print("Added all the county data to Firestore.")
+}
+
+func UploadPropertiesDetailsInBulkToFirestore(){
+	file, err := os.Open("./extras/property_details.csv")
+	if err != nil {
+		log.Fatal("Error occurred reading the file, please try again")
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+
+	// Read all records from the CSV file.
+	records, err := reader.ReadAll()
+	if err != nil {
+		log.Fatal("Error reading CSV:", err)
+		return
+	}
+
+	log.Print("Uploading the property details to firestore...")
+
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, maxConcurrentUploads)
+
+	// Iterate over the CSV records (skipping the header row).
+	for i, row := range records {
+		if i == 0 {
+			continue // Skip the first row 
+		}
+
+		wg.Add(1)
+		sem <- struct{}{} // Acquire a slot in the semaphore for concurrency control
+
+		go func(row []string) {
+			defer wg.Done()
+			defer func() { <-sem }() // Release the semaphore slot
+
+			property := map[string]any{
+				"name":  strings.ToUpper(row[0]),
+				"street_address": strings.ToUpper(row[2]),
+				"city": strings.ToUpper(row[3]),
+				"state": "CALIFORNIA", 
+				"country": "UNITED STATES", 
+				"postal_code": row[6],
+			}
+			// Upload the document to Firestore.
+			_, _, err = FirestoreClient.Collection("properties").Add(context.Background(), property)
+			if err != nil {
+				log.Printf("Error uploading the record: %s", err)
+			}
+		}(row)
+	}
+
+	wg.Wait()
+	log.Print("Added all the properties have been uploaded to Firestore.")
 }

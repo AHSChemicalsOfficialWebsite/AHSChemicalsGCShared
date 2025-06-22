@@ -11,7 +11,7 @@ import (
 func main(){
 
 	//Load the env file
-	err := godotenv.Load("keys/.env")
+	err := godotenv.Load("./keys/.env")
 	if err != nil{
 		log.Fatalf("Error occurred loading the env file %v", err)
 	}
@@ -26,4 +26,6 @@ func main(){
 	}
 
 	//Call any functions to test here locally
+
+	//shared.UploadPropertiesDetailsInBulkToFirestore()
 }

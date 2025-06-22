@@ -8,7 +8,6 @@ import (
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
-	"firebase.google.com/go/v4/db"
 	"firebase.google.com/go/v4/storage"
 	"google.golang.org/api/option"
 )
@@ -25,9 +24,6 @@ var (
 
 	// FirestoreClient provides access to Firestore database features.
 	FirestoreClient *firestore.Client
-
-	// RealtimeClient provides access to Firebase Realtime Database features.
-	RealtimeClient *db.Client
 
 	// initOnce ensures Firebase initialization occurs only once.
 	initOnce sync.Once
@@ -50,14 +46,9 @@ func InitFirebaseDebug(keyPath string) {
 		ctx := context.Background()
 		var err error
 
-		// Debug Realtime Database URL.
-		conf := &firebase.Config{
-			DatabaseURL: "https://ahschemicalsdebug-default-rtdb.firebaseio.com/",
-		}
-
 		// Initialize Firebase App with credentials file.
 		opt := option.WithCredentialsFile(keyPath)
-		App, err = firebase.NewApp(ctx, conf, opt)
+		App, err = firebase.NewApp(ctx, nil, opt)
 		if err != nil {
 			log.Fatalf("Error occurred initializing Firebase: %v", err)
 		}
@@ -73,11 +64,6 @@ func InitFirebaseDebug(keyPath string) {
 			log.Fatalf("Failed to initialize Firestore client: %v", err)
 		}
 
-		RealtimeClient, err = App.Database(ctx)
-		if err != nil {
-			log.Fatalf("Failed to initialize Realtime Database client: %v", err)
-		}
-
 		StorageClient, err = App.Storage(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Storage client: %v", err)
@@ -89,7 +75,7 @@ func InitFirebaseDebug(keyPath string) {
 //
 // Parameters:
 //   - keyPath: Optional pointer to the path of the Firebase Admin SDK service account JSON file.
-//              If nil, the default credentials will be used.
+//     If nil, the default credentials will be used.
 //
 // Behavior:
 //   - Initializes the Firebase App with the specified production Realtime Database URL.
@@ -103,18 +89,13 @@ func InitFirebaseProd(keyPath *string) {
 		ctx := context.Background()
 		var err error
 
-		// Production Realtime Database URL.
-		conf := &firebase.Config{
-			DatabaseURL: "https://ahschemicalsprod-default-rtdb.firebaseio.com",
-		}
-
 		// Initialize Firebase App with provided credentials or fallback to default.
 		var app *firebase.App
 		if keyPath != nil {
 			opt := option.WithCredentialsFile(*keyPath)
-			app, err = firebase.NewApp(ctx, conf, opt)
+			app, err = firebase.NewApp(ctx, nil, opt)
 		} else {
-			app, err = firebase.NewApp(ctx, conf)
+			app, err = firebase.NewApp(ctx, nil)
 		}
 		if err != nil {
 			log.Fatalf("Error initializing Firebase: %v", err)
@@ -130,11 +111,6 @@ func InitFirebaseProd(keyPath *string) {
 		FirestoreClient, err = App.Firestore(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Firestore client: %v", err)
-		}
-
-		RealtimeClient, err = App.Database(ctx)
-		if err != nil {
-			log.Fatalf("Failed to initialize Realtime Database client: %v", err)
 		}
 
 		StorageClient, err = App.Storage(ctx)
