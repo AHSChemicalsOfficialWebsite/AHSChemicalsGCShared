@@ -20,16 +20,16 @@ import (
 // Parameters:
 //   - ctx: Context for controlling request lifetime (e.g., timeouts, cancellation).
 //   - receivedData: A map of required input values:
-//       • "code"          → Authorization code received from QuickBooks authorization redirect
-//       • "redirect_uri"  → The same redirect URI used in the authorization request
-//       • "client_id"     → QuickBooks OAuth 2.0 Client ID
-//       • "client_secret" → QuickBooks OAuth 2.0 Client Secret
+//   - "code"          → Authorization code received from QuickBooks authorization redirect
+//   - "redirect_uri"  → The same redirect URI used in the authorization request
+//   - "client_id"     → QuickBooks OAuth 2.0 Client ID
+//   - "client_secret" → QuickBooks OAuth 2.0 Client Secret
 //
 // Returns:
 //   - A map[string]any representing the JSON response, typically containing:
-//       • "access_token"  → Token to authenticate API requests
-//       • "refresh_token" → Token to obtain new access tokens
-//       • "expires_in"    → Lifetime of the access token (seconds)
+//   - "access_token"  → Token to authenticate API requests
+//   - "refresh_token" → Token to obtain new access tokens
+//   - "expires_in"    → Lifetime of the access token (seconds)
 //   - An error, if any occurred during the request, response handling, or decoding.
 //
 // Example usage:
@@ -51,13 +51,13 @@ import (
 func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (map[string]any, error) {
 	tokenURL := "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
 
-	//Set the url values 
+	//Set the url values
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
 	data.Set("code", authCode)
 	data.Set("redirect_uri", QUICKBOOKS_AUTH_CALLBACK_URL)
 
-	authStr := fmt.Sprintf("%s:%s", QUICKBOOKS_CLIENT_ID, QUICKBOOKS_CLIENT_SECRET) 
+	authStr := fmt.Sprintf("%s:%s", QUICKBOOKS_CLIENT_ID, QUICKBOOKS_CLIENT_SECRET)
 	baseAuth := base64.StdEncoding.EncodeToString([]byte(authStr))
 
 	//Create a new request with encoded url as the body
@@ -102,9 +102,9 @@ func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (map[string]
 // Parameters:
 //   - ctx (context.Context): Context for controlling request lifetime (timeouts, cancellations, etc.).
 //   - refreshTokenData (map[string]string): Map containing:
-//       - "refresh_token": The refresh token obtained from the initial authorization code exchange.
-//       - "client_id": QuickBooks application's Client ID.
-//       - "client_secret": QuickBooks application's Client Secret.
+//   - "refresh_token": The refresh token obtained from the initial authorization code exchange.
+//   - "client_id": QuickBooks application's Client ID.
+//   - "client_secret": QuickBooks application's Client Secret.
 //
 // Returns:
 //   - (map[string]any): The response from QuickBooks containing the new access token and related metadata.
@@ -127,7 +127,7 @@ func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (map[string]
 //	  "token_type": "bearer",
 //	  "x_refresh_token_expires_in": 8726400
 //	}
-func RefreshToken(ctx context.Context, refreshToken string) (map[string]any, error){
+func RefreshToken(ctx context.Context, refreshToken string) (map[string]any, error) {
 	tokenURL := "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
 
 	data := url.Values{}
@@ -168,6 +168,7 @@ func RefreshToken(ctx context.Context, refreshToken string) (map[string]any, err
 
 	return tokenResp, nil
 }
+
 // SaveTokenToFirestore saves the provided token data to Firestore with calculated expiration timestamps.
 //
 // Parameters:
@@ -178,7 +179,7 @@ func RefreshToken(ctx context.Context, refreshToken string) (map[string]any, err
 //
 // Returns:
 //   - error: Non-nil if an error occurs during Firestore save operation
-func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authData map[string]string) error{
+func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authData map[string]string) error {
 	uid, ok := authData["uid"]
 	if !ok || uid == "" {
 		return fmt.Errorf("missing UID in authData")
@@ -199,6 +200,70 @@ func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authDat
 		"state":         authData["state"],
 	}
 
-	_ , err := FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData)
+	_, err := FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData)
 	return err
+}
+
+// EnsureValidAccessToken retrieves and validates the QuickBooks access token for the specified user.
+//
+// If the access token is expired, it automatically refreshes the token using the stored refresh token,
+// updates Firestore with the new token data, and returns the new access token.
+//
+// Parameters:
+//   - ctx (context.Context): Context for request-scoped deadlines, cancellation, and logging.
+//   - uid (string): The user ID whose QuickBooks token should be retrieved and validated.
+//
+// Returns:
+//   - string: A valid (non-expired) QuickBooks access token.
+//   - error: An error if the token does not exist, cannot be refreshed, or there are issues reading/writing Firestore.
+//
+// Behavior:
+//  1. Retrieves the QuickBooks token document for the given user (`uid`) from Firestore.
+//  2. If the document does not exist, returns an error indicating authentication is required.
+//  3. If the token has expired:
+//     - Attempts to refresh it using the stored `refresh_token`.
+//     - Saves the new token details to Firestore.
+//     - Returns the refreshed `access_token`.
+//  4. If the token is still valid, returns the current `access_token`.
+//
+// Example Usage:
+//
+//	accessToken, err := shared.EnsureValidAccessToken(ctx, userID)
+//	if err != nil {
+//	    // Handle error, potentially requiring the user to re-authenticate
+//	}
+//
+// Notes:
+//   - Ensure that `FirestoreClient` has been properly initialized before calling this function.
+//   - This function should typically be called before making authenticated requests to the QuickBooks API.
+func EnsureValidAccessToken(ctx context.Context, uid string) (string, error) {
+	docSnapshot, err := FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Get(ctx)
+	if err != nil || !docSnapshot.Exists() {
+		return "", fmt.Errorf("quickbooks authentication required")
+	}
+
+	docData := docSnapshot.Data()
+	expiresAt, ok := docData["expires_at"].(time.Time)
+	if !ok {
+		return "", fmt.Errorf("invalid expires_at in token data")
+	}
+
+	//If the token is expired, generate a new one
+	if time.Now().After(expiresAt) {
+		refreshToken := docData["refresh_token"].(string)
+		tokenResponse, err := RefreshToken(ctx, refreshToken)
+		if err != nil {
+			return "", err
+		}
+		authData := map[string]string{
+			"uid":   docData["uid"].(string),
+			"state": docData["state"].(string),
+		}
+		err = SaveTokenToFirestore(ctx, tokenResponse, authData)
+		if err != nil {
+			return "", err
+		}
+		return tokenResponse["access_token"].(string), nil
+	}
+	return docData["access_token"].(string), nil
 }
