@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"cloud.google.com/go/compute/metadata"
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -46,11 +45,6 @@ var (
 //	shared.InitQuickBooksDebug()
 func InitQuickBooksDebug() {
 	initOnce.Do(func() {
-		err := godotenv.Load("./keys/.env")
-		if err != nil {
-			log.Fatalf("Error loading the env file: %v", err)
-		}
-
 		QUICKBOOKS_CLIENT_ID = os.Getenv("QUICKBOOKS_DEBUG_CLIENT_ID")
 		QUICKBOOKS_CLIENT_SECRET = os.Getenv("QUICKBOOKS_DEBUG_CLIENT_SECRET")
 		QUICKBOOKS_AUTH_BEGIN_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_BEGIN_URL")

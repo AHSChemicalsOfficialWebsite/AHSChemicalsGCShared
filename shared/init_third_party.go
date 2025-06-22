@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"cloud.google.com/go/compute/metadata"
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -33,10 +32,6 @@ var (
 */
 func InitThirdPartyDebug() {
 	initOnce.Do(func() {
-		err := godotenv.Load("./keys/.env")
-		if err != nil {
-			log.Fatalf("Error loading the env file: %v", err)
-		}
 		TWILIO_ACCOUNT_SID = os.Getenv("TWILIO_ACCOUNT_SID")
 		TWILIO_AUTH_TOKEN = os.Getenv("TWILIO_AUTH_TOKEN")
 		TWILIO_FROM_PHONE = os.Getenv("TWILIO_FROM_PHONE")
