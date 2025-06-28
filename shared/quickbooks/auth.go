@@ -261,7 +261,7 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (map[string]any, er
 		}
 
 		authData := map[string]string{
-			"uid":   docData["uid"].(string),
+			"uid":   uid,
 			"state": docData["state"].(string),
 		}
 		err = SaveTokenToFirestore(ctx, tokenResponse, authData)
