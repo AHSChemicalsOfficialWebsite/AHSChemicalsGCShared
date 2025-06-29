@@ -28,7 +28,10 @@ func ParseProductName(productName string) string {
 	brand := ParseBrandName(productName)
 	if brand != "" {
 		// Remove brand name from product name (case-insensitive)
-		re := regexp.MustCompile(`(?i)` + regexp.QuoteMeta(brand))
+		re, err := regexp.Compile(`(?i)` + regexp.QuoteMeta(brand))
+		if err != nil{
+			return productName
+		}
 		productName = re.ReplaceAllString(productName, "")
 	}
 	return strings.TrimSpace(productName)
