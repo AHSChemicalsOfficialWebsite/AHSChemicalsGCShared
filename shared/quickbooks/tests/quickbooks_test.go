@@ -100,3 +100,40 @@ func TestParseSKU(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateProductSlugWithNameKey(t *testing.T) {
+	testCases := []struct {
+		name        string
+		productName string
+		productID   string
+		expected    map[string]string
+	}{
+		{
+			name:        "First Test Case",
+			productName: "Pest Control",
+			productID:   "10",
+			expected: map[string]string{
+				"Slug":    "pest-control-10",
+				"NameKey": "pest-control",
+			},
+		},
+		{
+			name:        "Second Test Case",
+			productName: "Pest@#@!!@#!@#@Control@!#OSADKLN DSAKLD",
+			productID:   "10",
+			expected: map[string]string{
+				"Slug":    "pest-control-osadkln-dsakld-10",
+				"NameKey": "pest-control-osadkln-dsakld",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			productSlugWithNameKey := quickbooks.CreateProductSlugWithNameKey(tc.productName, tc.productID)
+			if !reflect.DeepEqual(productSlugWithNameKey, tc.expected) {
+				t.Errorf("Error occurred, expected value: %s, got: %s", tc.expected, productSlugWithNameKey)
+			}
+		})
+	}
+}

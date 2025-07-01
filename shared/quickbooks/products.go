@@ -1,6 +1,7 @@
 package quickbooks
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -72,4 +73,41 @@ func ParseSKU(productSKU string) map[string]any {
 		"SizeUnit": "",
 		"PackOf":   0,
 	}
+}
+
+// CreateProductSlugWithNameKey generates a URL-friendly slug and a normalized name key
+// for a product, using its name and unique product ID.
+//
+// The slug is created by:
+// - Converting the product name to lowercase
+// - Replacing all non-alphanumeric characters with hyphens
+// - Trimming leading/trailing hyphens
+// - Appending the product ID to ensure uniqueness
+//
+// The function returns a map with:
+// - "Slug": the full slug string (e.g., "super-cleaner-500ml-abc123")
+// - "NameKey": the normalized product name key (e.g., "super-cleaner-500ml")
+//   which can be used to group product variants.
+//
+// Parameters:
+// - productName: the name of the product (e.g., "Super Cleaner 500ml")
+// - productID: the unique ID of the product (e.g., "abc123")
+//
+// Returns:
+// - map[string]string with keys "Slug" and "NameKey"
+func CreateProductSlugWithNameKey(productName string, productID string) map[string]string{
+	
+	slug := strings.ToLower(productName)
+	re := regexp.MustCompile(`[^a-z0-9]+`) //Only lowercase letters and numbers in a slug
+
+	slug = re.ReplaceAllString(slug, "-") //Replace everthing with a hyphen
+	slug = strings.Trim(slug, "-") //Cleaning any leading or trailing spaces if any present
+	nameKey := slug
+	slug = fmt.Sprintf("%s-%s",slug, productID)
+	
+	productSlugWithNameKey := map[string]string{
+		"Slug": slug, 
+		"NameKey": nameKey,
+	}
+	return productSlugWithNameKey
 }
