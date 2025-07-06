@@ -1,3 +1,4 @@
+//package cors implements Cross-Origin Resource Sharing (CORS) for HTTP requests.
 package cors
 
 import (
@@ -21,22 +22,19 @@ import (
 func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) bool {
 	allowedOrigins := map[string]bool{
 		"http://localhost:3000":              true,
-		"https://ahschemicalsdebug.web.app":  true,
 		"https://azurehospitalitysupply.com": true,
 	}
 
-	// Extract the Origin header from the request.
 	var origin string
 	if allowedOrigins[request.Header.Get("Origin")] {
 		origin = request.Header.Get("Origin")
 	}
 
-	// Set CORS headers if the origin is in the allowed list.
+	// if the request's Origin header is in the list of allowed origins, set appropriate CORS headers
 	if allowedOrigins[origin] {
 		response.Header().Set("Access-Control-Allow-Origin", origin)
 		response.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
 		response.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		response.Header().Set("Access-Control-Allow-Credentials", "true")
 		response.Header().Set("Access-Control-Max-Age", "3600")
 	}
 

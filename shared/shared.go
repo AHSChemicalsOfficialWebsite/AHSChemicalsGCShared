@@ -5,8 +5,9 @@ import "sync"
 var (
 	InitFirebaseOnce   sync.Once
 	InitQuickBooksOnce sync.Once
-	InitThirdPartyOnce sync.Once
 	InitGCPOnce        sync.Once
+	InitSendGridOnce   sync.Once
+	InitTwilioOnce     sync.Once
 )
 
 // Reference represents a reference to another QuickBooks entity.

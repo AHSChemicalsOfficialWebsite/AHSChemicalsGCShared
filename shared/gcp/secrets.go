@@ -1,7 +1,10 @@
+//package gcp is a helper package for loading secrets from GCP
 package gcp
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
@@ -54,4 +57,14 @@ func GetSecretFromGCP(secretName string) (string, error) {
 	// Convert the payload from bytes to string and return.
 	secretData := string(result.Payload.Data)
 	return secretData, nil
+}
+
+//Helper function to load secrets from the path
+func LoadSecretsHelper(projectID string, secretName string) string {
+	path := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", projectID, secretName)
+	secret, err := GetSecretFromGCP(path)
+	if err != nil {
+		log.Fatalf("Error fetching secret %s: %v", secretName, err)
+	}
+	return secret
 }
