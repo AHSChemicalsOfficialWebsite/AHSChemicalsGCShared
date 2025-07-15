@@ -18,9 +18,6 @@ type Order struct {
 	SubTotal            float64            `json:"SubTotal"`
 	Total               float64            `json:"Total"`
 	Status              string             `json:"Status"`
-	PurchaseOrderUrl    string             `json:"PurchaseOrderURL"`
-	ShippingManifest    string             `json:"ShippingManifestURL"`
-	Invoice             string             `json:"InvoiceURL"`
 	CreatedAt           time.Time          `json:"CreatedAt"`
 	UpdatedAt           time.Time          `json:"UpdatedAt"`
 }

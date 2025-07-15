@@ -36,6 +36,9 @@ func ValidateOrder(order *Order) error {
 	if order.TaxRate == 0 {
 		return errors.New("validation failed: tax rate must be provided")
 	}
+	if len(order.SpecialInstructions) > 200 {
+		return errors.New("validation failed: special instructions must be less than 200 characters")
+	}
 	for _, item := range order.Items {
 		if err := ValidateOrderItems(&item); err != nil {
 			return err

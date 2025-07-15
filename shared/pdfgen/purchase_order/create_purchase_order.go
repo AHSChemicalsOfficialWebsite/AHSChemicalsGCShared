@@ -1,13 +1,14 @@
 package purchase_order
 
 import (
+
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/orders"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 
-func CreatePurchaseOrderPDF(order *orders.Order) *gofpdf.Fpdf {
+func CreatePurchaseOrderPDF(order *orders.Order) (string, error) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
@@ -49,12 +50,10 @@ func CreatePurchaseOrderPDF(order *orders.Order) *gofpdf.Fpdf {
 	c.MoveTo(c.MarginLeft, tablePos+10)
 	DrawCommentsorSpecialInstructions(order.SpecialInstructions, c)
 
-	c.MoveTo(c.BorderWidth - 58, tablePos+5)
+	c.MoveTo(c.BorderWidth-58, tablePos+5)
 	c.DrawBill(order)
 
 	c.DrawFooter("purchase order")
-	if err := utils.GeneratePDFFileInPath(pdf, "purchase_order"); err != nil {
-		panic(err)
-	}
-	return pdf
+
+	return utils.GeneratePDFBase64(pdf)
 }

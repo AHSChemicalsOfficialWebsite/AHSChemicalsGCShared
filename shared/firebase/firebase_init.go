@@ -3,12 +3,15 @@ package firebase_shared
 import (
 	"context"
 	"log"
+	"os"
 
+	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 	"firebase.google.com/go/v4/storage"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 	"google.golang.org/api/option"
 )
 
@@ -17,6 +20,7 @@ var (
 	AuthClient *auth.Client
 	StorageClient *storage.Client
 	FirestoreClient *firestore.Client
+	StorageBucket string
 )
 
 // InitFirebaseDebug initializes Firebase clients for the debug environment.
@@ -57,6 +61,10 @@ func InitFirebaseDebug(keyPath string) {
 		StorageClient, err = App.Storage(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Storage client: %v", err)
+		}
+		StorageBucket = os.Getenv("STORAGE_BUCKET")
+		if StorageBucket == "" {
+			log.Fatalf("STORAGE_BUCKET environment variable not set")
 		}
 	})
 }
@@ -105,6 +113,15 @@ func InitFirebaseProd(keyPath *string) {
 
 		StorageClient, err = App.Storage(ctx)
 		if err != nil {
+			log.Fatalf("Failed to initialize Storage client: %v", err)
+		}
+		//Get the storage bucket url from gcp secret manager
+		projectID, err := metadata.ProjectIDWithContext(ctx)
+		if err != nil {
+			log.Fatalf("Error loading Google Cloud project ID: %v", err)
+		}
+		StorageBucket = gcp.LoadSecretsHelper(projectID,"STORAGE_BUCKET")
+		if StorageBucket == "" {
 			log.Fatalf("Failed to initialize Storage client: %v", err)
 		}
 	})
