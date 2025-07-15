@@ -2,9 +2,9 @@ package company_details
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"os"
-	"strings"
 
 	"cloud.google.com/go/compute/metadata"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
@@ -23,7 +23,7 @@ var (
 	COMPANYPHONE           string
 	COMPANYADDRESSLINE1    string
 	COMPANYADDRESSLINE2    string
-	EMAILINTERNALRECIPENTS []string
+	EMAILINTERNALRECIPENTS map[string]string
 	LOGOPATH               string
 )
 
@@ -32,7 +32,11 @@ func InitCompanyDetailsDebug() {
 	COMPANYEMAIL = os.Getenv("COMPANYEMAIL")
 	COMPANYADDRESSLINE1 = os.Getenv("COMPANYADDRESSLINE1")
 	COMPANYADDRESSLINE2 = os.Getenv("COMPANYADDRESSLINE2")
-	EMAILINTERNALRECIPENTS = strings.Split(os.Getenv("EMAILINTERNALRECIPENTS"), ";")
+	rawEmailRecipients := os.Getenv("EMAILINTERNALRECIPIENTS")
+	err := json.Unmarshal([]byte(rawEmailRecipients), &EMAILINTERNALRECIPENTS)
+	if err != nil {
+		log.Fatal(err)
+	}
 	LOGOPATH = os.Getenv("LOGOPATH")
 	if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" {
 		log.Fatal("Company details not initialized. Please check environment variables.")
@@ -51,7 +55,11 @@ func InitCompanyDetailsProd(ctx context.Context) {
 		COMPANYEMAIL = gcp.LoadSecretsHelper(projectID, "COMPANYEMAIL")
 		COMPANYADDRESSLINE1 = gcp.LoadSecretsHelper(projectID, "COMPANYADDRESSLINE1")
 		COMPANYADDRESSLINE2 = gcp.LoadSecretsHelper(projectID, "COMPANYADDRESSLINE2")
-		EMAILINTERNALRECIPENTS = strings.Split(gcp.LoadSecretsHelper(projectID, "EMAILINTERNALRECIPENTS"), ";")
+		rawEmailRecipients := gcp.LoadSecretsHelper(projectID, "EMAILINTERNALRECIPIENTS")
+		err = json.Unmarshal([]byte(rawEmailRecipients), &EMAILINTERNALRECIPENTS)
+		if err != nil {
+			log.Fatal(err)
+		}
 		LOGOPATH = gcp.LoadSecretsHelper(projectID, "LOGOPATH")
 		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" {
 			log.Fatal("Company details not initialized. Please check environment variables.")

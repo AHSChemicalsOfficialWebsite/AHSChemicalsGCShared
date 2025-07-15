@@ -108,7 +108,6 @@ func FormatOrderForFirestore(order *Order) map[string]any {
 		"SubTotal":            order.SubTotal,
 		"Total":               order.Total,
 		"Status":              order.Status,
-		"PurchaseOrderURL":    order.PurchaseOrderUrl,
 		"CreatedAt":           order.CreatedAt,
 		"UpdatedAt":           order.UpdatedAt,
 	}
