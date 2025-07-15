@@ -4,12 +4,13 @@ import (
 	"errors"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
+	"github.com/sendgrid/rest"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
 //Sends mail using sendgrid api
-func SendEmail(metaData EmailMetaData) error {
+func SendEmail(metaData EmailMetaData) (*rest.Response, error){
 
 	from := mail.NewEmail("AHSChemicals", company_details.COMPANYEMAIL)
 
@@ -19,11 +20,11 @@ func SendEmail(metaData EmailMetaData) error {
 	}
 
 	if len(recipients) == 0 {
-		return errors.New("No recipents found to send a mail")
+		return nil, errors.New("No recipents found to send a mail")
 	}
 
 	if metaData.TemplateID == "" {
-		return errors.New("No template ID found for sending the mail")
+		return nil, errors.New("No template ID found for sending the mail")
 	}
 
 	// Configure personalization for dynamic template data.
@@ -50,10 +51,10 @@ func SendEmail(metaData EmailMetaData) error {
 	}
 
 	client := sendgrid.NewSendClient(SENDGRID_API_KEY)
-	_, err := client.Send(message)
+	response, err := client.Send(message)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return response, nil
 }
