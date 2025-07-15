@@ -46,7 +46,7 @@ func SendEmail(metaData EmailMetaData) (*rest.Response, error){
 		attachment.SetType(item.MimeType)
 		attachment.SetContent(item.Base64Content)
 		attachment.SetFilename(item.FileName)
-		attachment.SetDisposition("Attachment")
+		attachment.SetDisposition("attachment")
 		message.AddAttachment(attachment)
 	}
 
