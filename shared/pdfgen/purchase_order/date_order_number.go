@@ -22,7 +22,7 @@ func DrawDateAndPONumber(o *orders.Order, c *canvas.Canvas) {
 	label.Draw(c.PDF)
 
 	value := elements.Text{
-		Text:  o.CreatedAt.Format("January 2, 2006"),
+		Text:  o.CreatedAt.Format("January 2, 2006 at 3:04 PM"),
 		Font:  "Arial",
 		Style: "",
 		Size:  10,

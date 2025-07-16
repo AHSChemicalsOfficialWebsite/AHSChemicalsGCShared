@@ -27,6 +27,9 @@ func ValidateOrderItems(item *products.Item) error {
 }
 
 func ValidateOrder(order *Order) error {
+	if order.Uid == "" {
+		return errors.New("validation failed: user id is required")
+	}
 	if order.Customer.ID == "" {
 		return errors.New("validation failed: customer ID is required")
 	}

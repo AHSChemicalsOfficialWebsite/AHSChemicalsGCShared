@@ -25,7 +25,7 @@ func CreatePurchaseOrderPDF(order *orders.Order) (string, error) {
 
 	c.DrawCompanyDetails()
 
-	c.MoveTo(c.BorderWidth-45, 40)
+	c.MoveTo(c.BorderWidth-60, 40)
 
 	DrawDateAndPONumber(order, c)
 

@@ -9,6 +9,7 @@ import (
 	"github.com/phpdave11/gofpdf"
 )
 
+//For debugging purposes
 func GeneratePDFFileInPath(pdf *gofpdf.Fpdf, fileName string) error {
 	err := os.MkdirAll("./shared/pdfgen/generated", os.ModePerm)
 	if err != nil {
