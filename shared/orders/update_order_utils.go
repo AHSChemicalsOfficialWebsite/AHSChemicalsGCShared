@@ -119,7 +119,7 @@ func checkIfOrderItemsChanged(editedOrder *Order, originalOrder *Order) bool {
 }
 
 //GetUpdatableOrder checks if the order has any changes made from the original order before updating.
-//If the order does not any changes, an error is returned, else the modified order is returned
+//If the order does not any changes, an error is returned, else the order object is modified
 //
 // Parameters:
 //   - editedOrder: Pointer to an Order object containing the edited order.
@@ -133,10 +133,13 @@ func GetUpdatableOrder(editedOrder *Order, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if originalOrder.Status == editedOrder.Status || !checkIfOrderItemsChanged(editedOrder, originalOrder) {
+	if originalOrder.Status == editedOrder.Status && !checkIfOrderItemsChanged(editedOrder, originalOrder) {
 		return errors.New("No new changes were detected. Please make changes before updating the order")
 	}
-	//Update the order status
-	updateOrderStatus(editedOrder, originalOrder)
+	//Update the order Status
+	err = updateOrderStatus(editedOrder, originalOrder)
+	if err != nil {
+		return err
+	}
 	return nil
 }

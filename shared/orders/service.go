@@ -122,3 +122,20 @@ func FetchOrderFromFirestore(orderID string, ctx context.Context) (*Order, error
 	}
 	return &order, nil
 }
+
+func CheckIfAlreadyPlacedOrder(orderID, uid string, ctx context.Context) (error) {
+	log.Printf("Checking if an order is already placed")
+
+	docSnapshots, err := firebase_shared.FirestoreClient.Collection("orders").Where("Uid", "==", uid).Documents(ctx).GetAll(
+	)
+	if err != nil {
+		return err
+	}
+
+	for _, docSnapshot := range docSnapshots {
+		if docSnapshot.Data()["Status"] == OrderStatusPending{
+			return fmt.Errorf("You have already placed an order with ID :%s whose status is still PENDING. Contact the admin to get the status APPROVED or REJECTED in order to place a new order", docSnapshot.Ref.ID)
+		}
+	}
+	return nil
+}
