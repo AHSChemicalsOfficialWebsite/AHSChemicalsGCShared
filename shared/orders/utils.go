@@ -10,7 +10,7 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/products"
 )
 
-func ValidateOrderItems(item *products.Item) error {
+func validateOrderItems(item *products.Item) error {
 	if item.ID == "" {
 		return errors.New("validation failed: product ID is required")
 	}
@@ -43,14 +43,14 @@ func ValidateOrder(order *Order) error {
 		return errors.New("validation failed: order must contain at least one item")
 	}
 	for _, item := range order.Items {
-		if err := ValidateOrderItems(&item); err != nil {
+		if err := validateOrderItems(&item); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func GetCorrectOrderPricesForOrder(order *Order) error {
+func getCorrectOrderPricesForOrder(order *Order) error {
 	productPricesMap := make(map[string]float64)
 	for _, item := range order.Items {
 		productPricesMap[item.ID] = item.UnitPrice
@@ -67,7 +67,7 @@ func GetCorrectOrderPricesForOrder(order *Order) error {
 	return nil
 }
 
-func CalculateSubTotal(order *Order) float64 {
+func calculateSubTotal(order *Order) float64 {
 	subTotal := 0.0
 	for _, item := range order.Items {
 		subTotal += float64(item.Quantity) * item.UnitPrice
@@ -76,12 +76,12 @@ func CalculateSubTotal(order *Order) float64 {
 }
 
 func CreateOrder(order *Order) error {
-	err := GetCorrectOrderPricesForOrder(order)
+	err := getCorrectOrderPricesForOrder(order)
 	if err != nil {
 		return err
 	}
 
-	order.SubTotal = CalculateSubTotal(order)
+	order.SubTotal = calculateSubTotal(order)
 	order.TaxAmount = order.TaxRate * order.SubTotal
 	order.Total = order.SubTotal + order.TaxAmount
 	order.Status = "PENDING"
@@ -92,15 +92,21 @@ func CreateOrder(order *Order) error {
 	return nil
 }
 
-func FormatOrderForFirestore(order *Order) map[string]any {
+func GetFormattedOrderItemsForFirestore(order *Order) []map[string]any {
 	formattedItems := make([]map[string]any, 0)
 	for _, item := range order.Items {
-		formattedItems = append(formattedItems, map[string]any{
+		formattedItems = append(formattedItems, map[string]any{
 			"Id":        item.ID,
 			"Quantity":  item.Quantity,
 			"UnitPrice": item.UnitPrice,
 		})
 	}
+	return formattedItems
+}
+
+
+func FormatOrderForFirestore(order *Order) map[string]any {
+	formattedItems := GetFormattedOrderItemsForFirestore(order)
 
 	return map[string]any{
 		"CustomerId":          order.Customer.ID,

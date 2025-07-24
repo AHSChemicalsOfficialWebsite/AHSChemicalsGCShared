@@ -1,7 +1,6 @@
 package orders
 
 import (
-	"context"
 	"errors"
 	"time"
 )
@@ -75,7 +74,7 @@ func deliverOrder(editedOrder *Order, originalOrder *Order) error {
 	}
 }
 
-//updateOrderStatus updates the status of an order based on the edited order
+//GetOrderWithUpdatedStatus updates the status of an order based on the edited order
 //
 //Parameters:
 //  - editedOrder: Pointer to an Order object containing the edited order.
@@ -83,7 +82,7 @@ func deliverOrder(editedOrder *Order, originalOrder *Order) error {
 //
 //Returns:
 //  - error: An error object if edited status is incorrect .
-func updateOrderStatus(editedOrder *Order, originalOrder *Order) error {
+func GetOrderWithUpdatedStatus(editedOrder *Order, originalOrder *Order) error {
 	
 	switch(editedOrder.Status) {
 		case OrderStatusApproved:
@@ -97,7 +96,7 @@ func updateOrderStatus(editedOrder *Order, originalOrder *Order) error {
 	}
 }
 
-//checkIfOrderItemsChanged checks if the items in the order have any changes.
+//CheckIfOrderItemsChanged checks if the items in the order have any changes.
 //
 // Parameters:
 //   - editedOrder: Pointer to an Order object containing the edited order.
@@ -105,7 +104,7 @@ func updateOrderStatus(editedOrder *Order, originalOrder *Order) error {
 //
 // Returns:
 //   - bool: A boolean value indicating whether the items in the order have any changes.
-func checkIfOrderItemsChanged(editedOrder *Order, originalOrder *Order) bool {
+func CheckIfOrderItemsChanged(editedOrder *Order, originalOrder *Order) bool {
 
 	for i, item := range editedOrder.Items {
 		if item.UnitPrice != originalOrder.Items[i].UnitPrice {
@@ -116,30 +115,4 @@ func checkIfOrderItemsChanged(editedOrder *Order, originalOrder *Order) bool {
 		}
 	}
 	return false
-}
-
-//GetUpdatableOrder checks if the order has any changes made from the original order before updating.
-//If the order does not any changes, an error is returned, else the order object is modified
-//
-// Parameters:
-//   - editedOrder: Pointer to an Order object containing the edited order.
-//   - ctx: A context object used for asynchronous operations.
-//
-// Returns
-//   - error: An error object if edited status is incorrect .
-func GetUpdatableOrder(editedOrder *Order, ctx context.Context) error {
-
-	originalOrder, err := FetchOrderFromFirestore(editedOrder.ID, ctx)
-	if err != nil {
-		return err
-	}
-	if originalOrder.Status == editedOrder.Status && !checkIfOrderItemsChanged(editedOrder, originalOrder) {
-		return errors.New("No new changes were detected. Please make changes before updating the order")
-	}
-	//Update the order Status
-	err = updateOrderStatus(editedOrder, originalOrder)
-	if err != nil {
-		return err
-	}
-	return nil
 }
