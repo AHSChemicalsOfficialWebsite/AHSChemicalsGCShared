@@ -8,8 +8,8 @@ import (
 )
 
 //Only adds brands and customers to firestore
-func CreateUserAccountInFirestore(userAccount *models.CreateUserAccount, ctx context.Context) error {
-	_, err := firebase_shared.FirestoreClient.Collection("users").Doc(userAccount.Email).Set(ctx, userAccount.MapToFirestore())
+func CreateUserAccountInFirestore(userAccount *models.UserAccount, ctx context.Context) error {
+	_, err := firebase_shared.FirestoreClient.Collection("users").Doc(userAccount.ID).Set(ctx, userAccount.MapToFirestore())
 	return err
 }
 

@@ -6,15 +6,9 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
-//For better readability, creating a struct to represent the phone number
-type PhoneNumber struct {
-	Code   string `json:"code"`
-	Number string `json:"number"`
-}
-
-// CreateUserAccount represents a new user account created by the admin 
-type CreateUserAccount struct {
-	ID          string            `json:"id" firestore:"id"` //Uid of the user given by firebase when the user is created
+// UserAccount represents a new user account created by the admin 
+type UserAccount struct {
+	ID          string            `json:"id"` //Uid of the user given by firebase when the user is created
 	Name        string            `json:"name"`
 	PhoneNumber PhoneNumber       `json:"phoneNumber"`
 	Email       string            `json:"email"`
@@ -23,21 +17,13 @@ type CreateUserAccount struct {
 	Brands      []string          `json:"brands" firestore:"brands"`
 }
 
-func (c *CreateUserAccount) Validate() error {
+// Validate validates the user account. Email and password are validated by firebase authentication, so only the necessary fields are validated
+func (c *UserAccount) Validate() error {
 	if c.Name == "" {
 		return errors.New("Name of the user cannot be empty")
 	}
-	if c.PhoneNumber.Code == "" {
-		return errors.New("Country code of the user cannot be empty")
-	}
-	if c.PhoneNumber.Number == "" {
-		return errors.New("Phone number of the user cannot be empty")
-	}
-	if c.Email == "" {
-		return errors.New("Email of the user cannot be empty")
-	}
-	if c.Password == "" {
-		return errors.New("Password of the user cannot be empty")
+	if err := c.PhoneNumber.Validate(); err != nil {
+		return err
 	}
 	if len(c.Customers) == 0 {
 		return errors.New("At least one customer is required for the user")
@@ -51,8 +37,18 @@ func (c *CreateUserAccount) Validate() error {
 	return nil
 }
 
-func (c *CreateUserAccount) MapToFirestore() map[string]any {
+func (c *UserAccount) MapToFirestore() map[string]any {
 	return map[string]any{
+		"customers": c.Customers,
+		"brands":    c.Brands,
+	}
+}
+
+func (c *UserAccount) MapForFrontend() map[string]any {
+	return map[string]any{
+		"uid":       c.ID,
+		"name":      c.Name,
+		"email":     c.Email,
 		"customers": c.Customers,
 		"brands":    c.Brands,
 	}
