@@ -7,12 +7,19 @@ import (
 
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func SaveContactUsToFirestore(c *models.ContactUsForm, ip string, ctx context.Context) error {
 
 	docSnapshot, err := firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Get(ctx)
 	if err != nil {
+		// Document does not exist, create it
+		if status.Code(err) == codes.NotFound {
+			_, err = firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Set(ctx, c)
+			return err
+		}
 		return err
 	}
 
