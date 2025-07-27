@@ -13,7 +13,7 @@ func CreateUserAccountInFirestore(userAccount *models.UserAccount, ctx context.C
 	return err
 }
 
-func DeleteUserAccountInFirestore(email string, ctx context.Context) error {
-	_, err := firebase_shared.FirestoreClient.Collection("users").Doc(email).Delete(ctx)
+func DeleteUserAccountInFirestore(id string, ctx context.Context) error {
+	_, err := firebase_shared.FirestoreClient.Collection("users").Doc(id).Delete(ctx)
 	return err
 }
