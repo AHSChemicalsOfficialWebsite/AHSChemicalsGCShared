@@ -30,3 +30,17 @@ func (r *QBReponseToken) SetRealmID(realmID string) {
 func (r *QBReponseToken) SetState(state string) {
 	r.State = state
 }
+func (r *QBReponseToken) ToMap() map[string]any {
+	return map[string]any{
+		"access_token":               r.AccessToken,
+		"refresh_token":              r.RefreshToken,
+		"expires_in":                 r.ExpiresInSec,
+		"obtained_at":                r.ObtainedAt,
+		"x_refresh_token_expires_in": r.RefresTokenExpiresIn,
+		"expires_at":                 r.ExpiresAt,
+		"token_type":                 r.TokenType,
+		"state":                      r.State,
+		"realmId":                    r.RealmId,
+		"scope":                      r.Scope,
+	}
+}

@@ -139,6 +139,6 @@ func SaveTokenToFirestore(ctx context.Context, t *qbmodels.QBReponseToken, uid s
 	t.SetObtainedAt()
 	t.SetExpiresAt()
 
-	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, t, firestore.MergeAll)
+	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, t.ToMap(), firestore.MergeAll)
 	return err
 }
