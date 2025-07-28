@@ -43,7 +43,7 @@ func SaveContactUsToFirestore(c *models.ContactUsForm, ip string, ctx context.Co
 		return err
 	}
 
-	if time.Since(oldContactUs.Timestamp) < time.Hour*24 {
+	if time.Since(oldContactUs.Timestamp) < time.Hour *24 {
 		return errors.New("You need to wait 24 hours before submitting another contact us request")
 	}
 

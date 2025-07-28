@@ -35,7 +35,7 @@ func TestSyncProductsToFirestore(t *testing.T) {
 		t.Error(err)
 	}
 
-	err = repositories.SyncQuickbookResponseToFirestore(&qbItemResponse, context.Background())
+	err = repositories.SyncQuickbookProductRespToFirestore(&qbItemResponse, context.Background())
 
 	if err != nil {
 		t.Error(err)

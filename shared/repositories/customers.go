@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"cloud.google.com/go/firestore"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
 )
 
 // FetchCustomerFromFirestore fetches customer object from firestore collection ('customers')
@@ -31,4 +33,31 @@ func FetchCustomerFromFirestore(id string, ctx context.Context) (*models.Custome
 		return nil, fmt.Errorf("Error getting customer: %v", err)
 	}
 	return &customer, nil
+}
+
+// SyncQuickbookCustomerRespToFirestore syncs quickbook customer response to firestore 
+// collection ('customers')
+//
+// Params:
+// 	- qbItemsResponse: *qbmodels.QBCustomersResponse, a mapped response from quickbooks
+// 	- ctx: context
+//
+// Returns:
+//  - error: error
+func SyncQuickbookCustomerRespToFirestore(qbItemsResponse *qbmodels.QBCustomersResponse, ctx context.Context) error {
+	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Customer == nil {
+		return nil 
+	}
+
+	bulkWriter := firebase_shared.FirestoreClient.BulkWriter(ctx)
+
+	for _, customer := range qbItemsResponse.QueryResponse.Customer {
+		docRef := firebase_shared.FirestoreClient.Collection("customers").Doc(customer.ID)
+		_, err := bulkWriter.Set(docRef, customer.MapToCustomer().ToMap(), firestore.MergeAll)
+		if err != nil {
+			return err
+		}
+	}
+	bulkWriter.Flush()
+	return nil
 }

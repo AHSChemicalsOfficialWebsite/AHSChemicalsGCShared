@@ -25,3 +25,20 @@ type Customer struct {
 func (c *Customer) FormatAddress2() string {
 	return fmt.Sprintf("%s, %s %s", c.City, c.State, c.Zip)
 }
+
+func (c *Customer) ToMap() map[string]any {
+	return map[string]any{
+		"id":        c.ID,
+		"is_active": c.IsActive,
+		"name":      c.Name,
+		"email":     c.Email,
+		"phone":     c.Phone,
+		"address1":  c.Address1,
+		"city":      c.City,
+		"state":     c.State,
+		"zip":       c.Zip,
+		"country":   c.Country,
+		"created_at": c.CreatedAt,
+		"updated_at": c.UpdatedAt,
+	}
+}

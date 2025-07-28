@@ -73,13 +73,12 @@ func (qb *QBItem) parseNameInto(product *models.Product) {
 		product.Name = qb.Name
 		return
 	}
+	parsedBrand := strings.TrimSpace(splitString[0])
+	parsedProductName := strings.TrimSpace(splitString[1])
 
-	brandCandidate := strings.ToLower(strings.TrimSpace(splitString[0]))
-	productName := strings.TrimSpace(splitString[1])
-
-	if _, ok := Brands[brandCandidate]; ok {
-		product.Brand = brandCandidate
-		product.Name = productName
+	if _, ok := Brands[strings.ToLower(parsedBrand)]; ok {
+		product.Brand = parsedBrand
+		product.Name = parsedProductName
 	} else {
 		product.Name = qb.Name
 	}

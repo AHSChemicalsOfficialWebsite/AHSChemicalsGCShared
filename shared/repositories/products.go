@@ -50,17 +50,25 @@ func FetchProductByIDs(ids []string, ctx context.Context) ([]models.Product, err
 	return products, nil
 }
 
-func SyncQuickbookResponseToFirestore(qbItemsResponse *qbmodels.QBItemsResponse, ctx context.Context) error {
+// SyncQuickbookProductRespToFirestore syncs quickbook product response to firestore 
+// collection ('products')
+//
+// Params:
+// 	- qbItemsResponse: *qbmodels.QBItemsResponse, a mapped response from quickbooks
+// 	- ctx: context
+//
+// Returns:
+//  - error: error
+func SyncQuickbookProductRespToFirestore(qbItemsResponse *qbmodels.QBItemsResponse, ctx context.Context) error {
 	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Item == nil {
-		return nil // Nothing to sync
+		return nil 
 	}
 
-	// Save each item to Firestore
 	bulkWriter := firebase_shared.FirestoreClient.BulkWriter(ctx)
 
 	for _, item := range qbItemsResponse.QueryResponse.Item {
 		docRef := firebase_shared.FirestoreClient.Collection("products").Doc(item.ID)
-		_, err := bulkWriter.Set(docRef, item.MapToProduct().MapToFirestore(), firestore.MergeAll) //Only update the changed values.
+		_, err := bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll) 
 		if err != nil {
 			return err
 		}

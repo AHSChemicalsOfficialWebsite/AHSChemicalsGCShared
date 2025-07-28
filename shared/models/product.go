@@ -32,8 +32,8 @@ type Product struct {
 	UpdatedAt time.Time `json:"updatedAt" firestore:"updatedAt"`
 }
 
-func (p *Product) MapToFirestore() map[string]interface{}{
-	return map[string]interface{}{
+func (p *Product) ToMap() map[string]any{
+	return map[string]any{
 		"id":        p.ID,
 		"isActive":  p.IsActive,
 		"brand":     p.Brand,
@@ -53,8 +53,6 @@ func (p *Product) MapToFirestore() map[string]interface{}{
 		"updatedAt": p.UpdatedAt,
 	}
 }
-
-//Format methods
 
 func (p *Product) FormatProductDisplay() string {
 	return fmt.Sprintf("%s - %s %.2f %s (Pack of %d)", p.Brand, p.Name, p.Size, p.SizeUnit, p.PackOf)

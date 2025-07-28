@@ -1,6 +1,11 @@
 package qbmodels
 
-import "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks"
+import (
+	"time"
+
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks"
+)
 
 type QBCustomersResponse struct {
 	QueryResponse struct {
@@ -72,4 +77,44 @@ type QBCustomerAddress struct {
 
 type Web struct {
 	URI string `json:"URI"`
+}
+
+func (qb *QBCustomer) SetEmailInCustomer(c *models.Customer) {
+	if qb.PrimaryEmailAddr == nil{
+		return
+	}
+	c.Email = qb.PrimaryEmailAddr.Address
+}
+
+func (qb *QBCustomer) SetPhoneInCustomer(c *models.Customer) {
+	if qb.PrimaryPhone == nil{
+		return
+	}
+	c.Phone = qb.PrimaryPhone.FreeFormNumber
+}
+
+func (qb *QBCustomer) SetAddressInCustomer(c *models.Customer) {
+	if qb.BillAddr == nil{
+		return
+	}
+	c.Address1 = qb.BillAddr.Line1
+	c.City = qb.BillAddr.City
+	c.State = qb.BillAddr.CountrySubDivisionCode
+	c.Zip = qb.BillAddr.PostalCode
+	c.Country = qb.BillAddr.Country
+}
+
+func (qb *QBCustomer) MapToCustomer() *models.Customer{
+
+	customer := &models.Customer{
+		ID: qb.ID,
+		IsActive: qb.Active,
+		Name: qb.DisplayName,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	qb.SetEmailInCustomer(customer)
+	qb.SetPhoneInCustomer(customer)
+	qb.SetAddressInCustomer(customer)
+	return customer
 }
