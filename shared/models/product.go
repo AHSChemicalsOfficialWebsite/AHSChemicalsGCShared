@@ -9,6 +9,7 @@ import (
 type Product struct {
 	ID        string    `json:"id" firestore:"om"`
 	QBID      string    `json:"qbid" firestore:"qbid"` //quickbooks ID
+	IsActive  bool      `json:"isActive" firestore:"isActive"`
 	Brand     string    `json:"brand" firestore:"brand"`
 	Name      string    `json:"name" firestore:"name"`
 	SKU       string    `json:"sku" firestore:"sku"`

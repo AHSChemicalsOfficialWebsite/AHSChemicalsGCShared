@@ -9,6 +9,7 @@ import (
 type Customer struct {
 	ID        string    `json:"id" firestore:"omitempty"`
 	QBID      string    `json:"qbid" firestore:"qbid"` //quickbooks ID
+	IsActive  bool      `json:"is_active" firestore:"is_active"`
 	Name      string    `json:"name" firestore:"name"`
 	Email     string    `json:"email" firestore:"email"`
 	Phone     string    `json:"phone" firestore:"phone"`
