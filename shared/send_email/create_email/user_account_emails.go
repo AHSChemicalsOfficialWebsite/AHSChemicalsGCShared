@@ -19,12 +19,12 @@ func CreateUserAccountCreatedEmail(createdUser *models.UserAccount) *send_email.
 	return emailData
 }
 
-func CreateDeleteUserAccountEmail(deletedUser *models.UserAccount) *send_email.EmailMetaData {
+func CreateDeleteUserAccountEmail(email, name string) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
-		Recipients: map[string]string{deletedUser.Email: deletedUser.Name},
+		Recipients: map[string]string{email: name},
 		Data: map[string]any{
-			"name": deletedUser.Name,
-			"email": deletedUser.Email,
+			"name": name,
+			"email": email,
 		},
 		TemplateID:  send_email.ACCOUNT_DELETED_USER_TEMPLATE_ID,
 		Attachments: []send_email.Attachment{},

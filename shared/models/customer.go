@@ -8,7 +8,7 @@ import (
 // Customer represents a customer refined and cleaner version of the QBCustomer struct.
 type Customer struct {
 	ID        string    `json:"id" firestore:"id"`
-	IsActive  bool      `json:"isActive" firestore:"isActive"`
+	IsActive  bool      `json:"is_active" firestore:"isActive"`
 	Name      string    `json:"name" firestore:"name"`
 	Email     string    `json:"email" firestore:"email"`
 	Phone     string    `json:"phone" firestore:"phone"`
@@ -17,8 +17,8 @@ type Customer struct {
 	State     string    `json:"state" firestore:"state"`
 	Zip       string    `json:"zip" firestore:"zip"`
 	Country   string    `json:"country" firestore:"country"`
-	CreatedAt time.Time `json:"createdAt" firestore:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" firestore:"updatedAt"`
+	CreatedAt time.Time `json:"created_at" firestore:"createdAt"`
+	UpdatedAt time.Time `json:"updated_at" firestore:"updatedAt"`
 }
 
 // FormatAddress2 returns City, State, Zip

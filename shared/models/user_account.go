@@ -28,7 +28,7 @@ func (c *UserAccount) Validate() error {
 	if len(c.Customers) == 0 {
 		return errors.New("At least one customer is required for the user")
 	}
-	if utils.HasDuplicates(c.Customers) {
+	if utils.HasDuplicateStrings(c.Customers) {
 		return errors.New("Customers of the user cannot have duplicates")
 	}
 	if len(c.Brands) == 0 {
@@ -51,5 +51,37 @@ func (c *UserAccount) MapForFrontend() map[string]any {
 		"email":     c.Email,
 		"customers": c.Customers,
 		"brands":    c.Brands,
+	}
+}
+
+type UpdatedAccount struct {
+	UID          string   `json:"uid"`
+	Brands       []string `json:"brands"`
+	Customers    []string `json:"customers"`
+}
+
+func (u *UpdatedAccount) Validate() error{
+	if u.UID == ""{
+		return errors.New("No uid found for the updated account")
+	}
+	if len(u.Brands) == 0{
+		return errors.New("No brands found for the updated account")
+	}
+	if utils.HasDuplicateStrings(u.Brands){
+		return errors.New("Duplicate brands found for the updated account")
+	}
+	if len(u.Customers) == 0{
+		return errors.New("No customers found for the updated account")
+	}
+	if utils.HasDuplicateStrings(u.Customers){
+		return errors.New("Duplicate customers found for the updated account")
+	}
+	return nil
+}
+
+func (u *UpdatedAccount) ToMap() map[string]any {
+	return map[string]any{
+		"customers": u.Customers,
+		"brands":    u.Brands,
 	}
 }

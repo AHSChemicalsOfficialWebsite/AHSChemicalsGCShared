@@ -1,21 +1,27 @@
 package utils
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
-//HasDuplicates checks if a slice contains any duplicates.
+//HasDuplicateStrings checks if a slice of string contains any duplicates.
 //
 //Parameters:
 // - slice: The slice of type string to check
 //
 //Returns:
 // - bool: True if the slice contains any duplicates, false otherwise
-func HasDuplicates(slice []string) bool {
+//
+func HasDuplicateStrings(slice []string) bool {
 	seen := make(map[string]bool)
 	for _, val := range slice {
-		if seen[val] {
+		formattedVal := strings.ToLower(strings.TrimSpace(val))
+		formattedVal = strings.ReplaceAll(formattedVal, " ", "")
+		if seen[formattedVal] {
 			return true // Duplicate found
 		}
-		seen[val] = true
+		seen[formattedVal] = true
 	}
 	return false
 }

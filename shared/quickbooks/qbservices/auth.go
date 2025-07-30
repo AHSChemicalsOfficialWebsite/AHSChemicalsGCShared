@@ -128,6 +128,10 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBRepons
 		if err != nil {
 			return nil, err
 		}
+		//newToken does not return the realmId and state.
+		newToken.SetRealmID(originalToken.RealmId)
+		newToken.SetState(originalToken.State)
+		
 		err = SaveTokenToFirestore(ctx, newToken, uid)
 		if err != nil {
 			return nil, err
