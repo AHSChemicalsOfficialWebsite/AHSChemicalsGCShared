@@ -1,8 +1,12 @@
 package utils
 
 import (
+	"bytes"
+	"image"
+	"io"
+	"mime/multipart"
+	"os"
 	"strings"
-	"time"
 )
 
 //HasDuplicateStrings checks if a slice of string contains any duplicates.
@@ -51,7 +55,48 @@ func AreEqualStringSlices(a, b []string) bool {
 	return true
 }
 
-//FormatDate formats a time.Time object into a string in the format "January 2, 2006 at 3:04 PM"
-func FormatDate(t time.Time) string {
-	return t.Format("January 2, 2006 at 3:04 PM")
+//DetectImageType detects the type of an image. 
+//
+//Parameters:
+// - imageBytes: The bytes of the image
+//
+//Returns:
+// - string: The type of the image
+func DetectImageType(imageBytes []byte) string {
+	_, format, err := image.DecodeConfig(bytes.NewReader(imageBytes))
+	if err != nil {
+		return "png" 
+	}
+	return format
+}
+
+//GetImageBytesFromMultiPart gets the bytes of an image from a multipart file.
+//
+//Parameters:
+// - file: The multipart file
+//
+//Returns:
+// - []byte: The bytes of the image
+// - error: The error if any
+//
+func GetImageBytesFromMultiPart(file multipart.File) ([]byte, error) {
+	defer file.Close()
+	return io.ReadAll(file)
+}
+
+//CreateMultipartFile creates a multipart file from a file path.
+//
+//Parameters:
+// - path: The path of the file
+//
+//Returns: 
+// - multipart.File: The multipart file
+// - error: The error if any
+//
+func CreateMultipartFile(path string) (multipart.File, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
 }
