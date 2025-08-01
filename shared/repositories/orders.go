@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"log"
 
 	"cloud.google.com/go/firestore"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/services"
 )
 
 // CreateOrderInFirestore creates a new order document in the Firestore "orders" collection.
@@ -25,46 +24,35 @@ import (
 // Returns:
 //   - error: Returns an error if the Firestore insertion fails; otherwise, returns nil.
 func CreateOrderInFirestore(order *models.Order, ctx context.Context) error {
-	log.Printf("Creating an order in firestore for the user: %s", order.Uid)
 
-	docRef, _, err := firebase_shared.FirestoreClient.Collection("orders").Add(ctx, order)
+	docRef, _, err := firebase_shared.FirestoreClient.Collection("orders").Add(ctx, order.ToMap())
 	if err != nil {
 		return err
 	}
-
-	order.ID = docRef.ID // Assign the generated Firestore ID back to the order object
+	order.ID = docRef.ID 
 	return nil
 }
 
-// GetCorrectCustomerPriceForProducts retrieves the custom prices for a specific customer
-// and maps them to the corresponding product IDs.
+// CanPlaceOrder checks if there is already an order pending for the user if the status
+// of any of the existing orders is still 'PENDING'. Firestore custom claims should be checked generally before calling this
+// function to make sure it only checks for user since admins can place as many orders 
+// as they want
 //
-// Parameters:
-//   - order: the order containing the customer information
-//   - ctx: the context for the Firestore operation
-//
-// Returns:
-//   - map[string]float64: a map of product IDs to customer-specific prices
-//   - error: if the Firestore query fails or data is malformed
-func GetCorrectCustomerPriceForProducts(order *models.Order, ctx context.Context) (map[string]float64, error) {
-	log.Printf("Fetching customer-specific prices for customer ID: %v", order.Customer.ID)
-
-	snapshots, err := firebase_shared.FirestoreClient.Collection("product_prices").
-		Where("customer_id", "==", order.Customer.ID).
-		Documents(ctx).GetAll()
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch customer prices: %w", err)
+// Parameters: 
+// - orderUID - user id of of the order
+// - ctx - context for the async function
+// 
+// Returns: 
+// - error if any
+func CanPlaceOrder(orderUID string, ctx context.Context) error {
+	docs, err := firebase_shared.FirestoreClient.Collection("orders").Where("status", "==", constants.OrderStatusPending).Where("uid", "==", orderUID).Documents(ctx).GetAll()
+	if err != nil{
+		return err
 	}
-
-	priceMap := make(map[string]float64)
-	for _, doc := range snapshots {
-		data := doc.Data()
-		productID, _ := data["product_id"].(string)
-		price, _ := data["price"].(float64)
-		priceMap[productID] = price
+	if len(docs) > 0 {
+		return fmt.Errorf("There is already an order pending for your account. Please contact the admin to change the status of the order to either approved or rejected in order to place a new order")
 	}
-
-	return priceMap, nil
+	return nil
 }
 
 // UploadOrderFileToStorage uploads a base64-encoded PDF file to Cloud Storage
@@ -79,11 +67,8 @@ func GetCorrectCustomerPriceForProducts(order *models.Order, ctx context.Context
 // Returns:
 //   - error: if the upload fails at any step
 func UploadOrderFileToStorage(orderID string, base64Str string, fileName string, ctx context.Context) error {
-	log.Printf("Uploading file %s for order %s", fileName, orderID)
-
 	bucket, err := firebase_shared.StorageClient.Bucket(firebase_shared.StorageBucket)
 	if err != nil {
-		log.Printf("Failed to get Cloud Storage bucket: %v", err)
 		return err
 	}
 	object := bucket.Object(fmt.Sprintf("orders/%s/%s", orderID, fileName))
@@ -117,8 +102,6 @@ func UploadOrderFileToStorage(orderID string, base64Str string, fileName string,
 // - Pass only the necessary fields in `details`. Passing the entire order object may cause errors if it includes
 //   fields that are not mapped correctly or are excluded with the `firestore:"-"` tag.
 func UpdateOrderInFirestore(orderID string, details any, ctx context.Context) error {
-	log.Printf("Updating an order in firestore for the admin")
-
 	_, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Set(ctx, details, firestore.MergeAll)
 
 	if err != nil {
@@ -138,8 +121,6 @@ func UpdateOrderInFirestore(orderID string, details any, ctx context.Context) er
 // - An error if the document doesn't exist or the parsing fails.
 func FetchOrderFromFirestore(orderID string, ctx context.Context) (*models.Order, error) {
 
-	log.Printf("Fetching an order from firestore")
-
 	docSnapshot, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Get(ctx)
 	if err != nil {
 		return nil, err
@@ -151,6 +132,7 @@ func FetchOrderFromFirestore(orderID string, ctx context.Context) (*models.Order
 	if err := docSnapshot.DataTo(&order); err != nil {
 		return nil, err
 	}
+	order.ID = docSnapshot.Ref.ID
 	return &order, nil
 }
 
@@ -169,8 +151,6 @@ func FetchOrderFromFirestore(orderID string, ctx context.Context) (*models.Order
 // - A pointer to the enriched `Order` struct containing full customer and product information.
 // - An error if any part of the fetch or conversion fails.
 func FetchDetailedOrderFromFirestore(orderID string, ctx context.Context) (*models.Order, error) {
-	log.Printf("Fetching an order from firestore")
-
 	docSnapshot, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Get(ctx)
 	if err != nil {
 		return nil, err
@@ -190,19 +170,15 @@ func FetchDetailedOrderFromFirestore(orderID string, ctx context.Context) (*mode
 	if err != nil {
 		return nil, err
 	}
+
+	//Set the customer object
 	order.Customer = *customer
 
-	// Assign the order items
-	rawItems, ok := docSnapshot.Data()["items"].([]any)
-	if !ok {
-		return nil, fmt.Errorf("items field not in expected format")
-	}
-	orderIDs := services.ExtractOrderIDsFromFirestoreOrders(rawItems)
-	orderItems, err := FetchProductByIDs(orderIDs, ctx)
-	if err != nil {
+	productMap, err := FetchAllProductsByIDs(ctx, order.ToProductIDs())
+	if err != nil{
 		return nil, err
 	}
-	order.Items = orderItems
+	order.ToCompleteOrderItemsFromMinimal(productMap)
 
 	return &order, nil
 }
