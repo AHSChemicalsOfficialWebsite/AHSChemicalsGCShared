@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Delivery struct {
+type DeliveryInput struct {
 	OrderID     string           `json:"orderId"`
 	ReceivedBy  string           `json:"receivedBy"`  //Name of the person who received the order
 	DeliveredBy string           `json:"deliveredBy"` //Name of the person who delivered the order
@@ -15,7 +15,7 @@ type Delivery struct {
 	DeliveredAt time.Time        `json:"deliveredAt"`
 }
 
-func (d *Delivery) Validate() error {
+func (d *DeliveryInput) Validate() error {
 	if d.OrderID == "" {
 		return errors.New("No order id was found when saving delivery. Please retry submission again")
 	}
@@ -35,4 +35,13 @@ func (d *Delivery) Validate() error {
 		return errors.New("No date was found when saving delivery. Please retry submission again")
 	}
 	return nil
+}
+
+type Delivery struct {
+	Order         Order  
+	ReceivedBy    string 
+	DeliveredBy   string
+	Signature     []byte 
+	DeliveryImages [][]byte
+	DeliveredAt   time.Time
 }
