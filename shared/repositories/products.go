@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"cloud.google.com/go/firestore"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
@@ -11,43 +10,35 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
 )
 
-// FetchProductByIDs returns a list of firestore products from a list of ids
+//FetchAllProductsByIDs fetches all products from firestore from collection ('products')
+//Returns map of product id and the product object in order to search in O(1)
 //
-// Parameters:
-//   - ids []string: List of ids of the products to fetch
-//   - ctx context.Context: context for the request
+//Params:
+//  - ctx: context
+//  - productIDs: []string, product ids
 //
-// Returns:
-//   - []firestore_models.Product: List of products
-//   - error:
-func FetchProductByIDs(ids []string, ctx context.Context) ([]models.Product, error) {
-	var products []models.Product
-
-	// Get all document references for customers collection
-	collection := firebase_shared.FirestoreClient.Collection("customers")
-	refs := make([]*firestore.DocumentRef, 0, len(ids))
-	for _, id := range ids {
-		refs = append(refs, collection.Doc(id))
+//Returns:
+//  - map[string]models.Product. Key is product id
+//  - error
+func FetchAllProductsByIDs(ctx context.Context, productIDs []string) (map[string]models.Product, error) {
+	docRefs := make([]*firestore.DocumentRef, len(productIDs))
+	for i, productID := range productIDs {
+		docRefs[i] = firebase_shared.FirestoreClient.Collection("products").Doc(productID)
+	}
+	docSnapshots, err := firebase_shared.FirestoreClient.GetAll(ctx, docRefs)
+	if err != nil{
+		return nil, err
 	}
 
-	docSnapshots, err := firebase_shared.FirestoreClient.GetAll(ctx, refs)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get documents: %v", err)
-	}
-
-	for _, doc := range docSnapshots {
-		if !doc.Exists() {
-			log.Printf("No document exists for the user when calling FetchProductByIDs: %s", doc.Ref.ID)
-			continue // Moving on to next iteration if the document doesn't exist
+	productMap := make(map[string]models.Product)
+	for i, docSnapshot := range docSnapshots {
+		var product models.Product
+		if err := docSnapshot.DataTo(&product); err != nil {
+			return nil, fmt.Errorf("error decoding product %s: %v", productIDs[i], err)
 		}
-		var item models.Product
-		if err := doc.DataTo(&item); err != nil {
-			return nil, fmt.Errorf("error decoding customer %s: %v", doc.Ref.ID, err)
-		}
-		products = append(products, item)
+		productMap[product.ID] = product
 	}
-
-	return products, nil
+	return productMap, nil
 }
 
 // FetchAllProductsFromFirestore fetches all products from firestore from collection ('products')
