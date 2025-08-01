@@ -111,7 +111,7 @@ func createItemsUpdatedDataForEmail(originalOrder , updatedOrder *models.Order) 
 	for i, item := range originalOrder.Items {
 		mappedItem := make(map[string]any)
 		mappedItem["sku"] = item.SKU
-		mappedItem["description"] = item.FormatProductDisplay()
+		mappedItem["description"] = item.GetFormattedDescription()
 		mappedItem["previous_quantity"] = item.Quantity
 		mappedItem["updated_quantity"] = updatedOrder.Items[i].Quantity
 		orderItems = append(orderItems, mappedItem)
