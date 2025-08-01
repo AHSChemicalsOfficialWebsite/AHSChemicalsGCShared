@@ -1,4 +1,4 @@
-gpackage layout
+package layout
 
 import (
 	"fmt"
