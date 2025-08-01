@@ -15,7 +15,7 @@ func TestProductsPricesPerCustomer(t *testing.T) {
 	}
 }
 
-func TestGetProductsPricesPerCustomer(t *testing.T) {
+func TestGetProductPricesFromCustomerID(t *testing.T) {
 	
 	pricesMap, err := repositories.GetProductPricesFromCustomerID("1",context.Background())
 	if err != nil {
