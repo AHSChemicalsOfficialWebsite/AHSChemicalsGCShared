@@ -62,3 +62,31 @@ func SaveProductsPricesPerCustomerToFirestore(ctx context.Context) error {
 	}
 	return nil
 }
+
+//GetProductPricesFromCustomerID returns a map of product id to price. 
+//Returning a map is done to avoid multiple calls to firestore and to search in O(1)
+//
+//Params:
+//	- customerID: ID of the customer
+//	- ctx: context
+//
+//Returns:
+//	- map of product id to price
+//	- error
+func GetProductPricesFromCustomerID(customerID string, ctx context.Context) (map[string]float64, error){
+
+	docs, err := firebase_shared.FirestoreClient.Collection("products_prices_per_customer").Where("customerId", "==", customerID).Documents(ctx).GetAll()
+	if err != nil {
+		return nil, err
+	}
+	pricesMap := make(map[string]float64) //Map of product id to price
+	for _, doc := range docs {
+		var product models.ProductPricePerCustomer
+		err := doc.DataTo(&product)
+		if err != nil {
+			return nil, err
+		}
+		pricesMap[product.ProductID] = product.Price
+	}
+	return pricesMap, nil
+}
