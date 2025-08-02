@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image"
 	"io"
+	"math"
 	"mime/multipart"
 	"os"
 	"strings"
@@ -99,4 +100,9 @@ func CreateMultipartFile(path string) (multipart.File, error) {
 		return nil, err
 	}
 	return file, nil
+}
+
+//Rounds to a specified number of decimal places.
+func RoundToDecimals(val float64, place float64) float64 {
+	return math.Round(val * 10*(place)) / (10*place)
 }
