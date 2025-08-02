@@ -6,6 +6,12 @@ import (
 	"net/http"
 )
 
+type SuccessPaylod[T any] struct {
+	Message string `json:"message"`
+	Code    int    `json:"code"`
+	Data    T      `json:"data"`
+}
+
 // WriteJSONSuccess sends a standardized JSON success response to the client.
 //
 // This helper function sets the appropriate Content-Type header, writes the specified HTTP status code,
@@ -18,11 +24,12 @@ import (
 //   - data: Optional payload to include in the response body (can be any Go type, or nil).
 //
 // Example JSON Response:
-//   {
-//     "code": 200,
-//     "message": "Operation successful",
-//     "data": {...} // optional
-//   }
+//
+//	{
+//	  "code": 200,
+//	  "message": "Operation successful",
+//	  "data": {...} // optional
+//	}
 //
 // Logs:
 //   - Logs any errors encountered during JSON encoding of the response.
@@ -30,16 +37,13 @@ func WriteJSONSuccess(response http.ResponseWriter, statusCode int, message stri
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(statusCode)
 
-	payload := map[string]any{
-		"code":    statusCode,
-		"message": message,
+	payload := SuccessPaylod[any]{
+		Code:    statusCode,
+		Message: message,
 	}
-
-	// Include optional data in the response if provided.
 	if data != nil {
-		payload["data"] = data
+		payload.Data = data
 	}
-
 	if err := json.NewEncoder(response).Encode(payload); err != nil {
 		log.Printf("JSON encode response error: %v", err)
 	}
@@ -60,7 +64,6 @@ func WriteJSONSuccess(response http.ResponseWriter, statusCode int, message stri
 func WriteJSONError(response http.ResponseWriter, statusCode int, message string) {
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(statusCode)
-
 	if err := json.NewEncoder(response).Encode(map[string]any{"code": statusCode, "message": message}); err != nil {
 		log.Printf("Error writing the error response: %v", err)
 	}
