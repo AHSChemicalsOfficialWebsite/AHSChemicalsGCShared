@@ -7,11 +7,12 @@ import (
 	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
 // Order struct represents an order placed by a user.
 type Order struct {
-	ID                  string    `json:"id" firestore:"omitempty"`
+	ID                  string    `json:"id"`
 	Customer            Customer  `json:"customer" firestore:"customer"`
 	Uid                 string    `json:"uid" firestore:"uid"` // User ID of placed the order
 	SpecialInstructions string    `json:"specialInstructions" firestore:"specialInstructions"`
@@ -66,7 +67,7 @@ func (o *Order) setCreatedAt() {
 }
 
 func (o *Order) SetUpdatedAt() {
-	o.CreatedAt = time.Now()
+	o.UpdatedAt = time.Now()
 }
 
 /* Calculations */
@@ -89,16 +90,15 @@ func (o *Order) calcTotal() {
 
 func (o *Order) ToMap() map[string]any {
 	return map[string]any{
-		"id":                  o.ID,
 		"customerId":          o.Customer.ID,
 		"customerName":        strings.ToLower(o.Customer.Name),
 		"uid":                 o.Uid,
 		"specialInstructions": o.SpecialInstructions,
 		"items":               o.toMapItems(),
 		"taxRate":             o.TaxRate,
-		"taxAmount":           o.TaxAmount,
-		"subTotal":            o.SubTotal,
-		"total":               o.Total,
+		"taxAmount":           utils.RoundToDecimals(o.TaxAmount, 4),
+		"subTotal":            utils.RoundToDecimals(o.SubTotal, 4),
+		"total":               utils.RoundToDecimals(o.SubTotal, 4),
 		"status":              o.Status,
 		"createdAt":           o.CreatedAt,
 		"updatedAt":           o.UpdatedAt,
@@ -163,7 +163,7 @@ func (o *Order) GetFormattedTaxAmount() string {
 }
 
 func (o *Order) GetFormattedTaxRate() string {
-	return fmt.Sprintf("%.2f%%", o.TaxRate)
+	return fmt.Sprintf("%.2f%%", o.TaxRate * 100)
 }
 
 func (o *Order) GetFormattedTotalItems() string {
