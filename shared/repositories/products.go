@@ -86,3 +86,39 @@ func SyncQuickbookProductRespToFirestore(qbItemsResponse *qbmodels.QBItemsRespon
 	bulkWriter.Flush()
 	return nil
 }
+
+//UpdateProductInFirestore updates current product document in firestore. 
+//
+// Params: 
+//  - ctx context of the async function
+//  - productID is the id of the product whose doc is being updated
+//  - details is of type any, the fields that need to be updated
+// 
+// Returns: 
+//  - error: if any 
+// Note: The details is of type any because any field can be updated when called. So its much
+// better to just pass the type any. In Addition to this, before calling this, make sure to always
+// and always double check if the key matches with the `firestore` key in the struct otherwise this
+// will create a new key with that value in document. 
+func UpdateProductInFirestore(ctx context.Context, productID string, details any) error {
+	_, err := firebase_shared.FirestoreClient.Collection("products").Doc(productID).Set(ctx, details, firestore.MergeAll)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
+// CreateProductInFirestore creates new product document in firestore.
+//
+// Params:
+//   - ctx: context
+//   - customer: *models.Customer
+//
+// Returns:
+//   - error: error
+func CreateProductInFirestore(ctx context.Context, product *models.Product) error {
+	_, err := firebase_shared.FirestoreClient.Collection("products").Doc(product.ID).Set(ctx, product.ToMap())
+	return err
+}
