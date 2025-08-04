@@ -1,7 +1,7 @@
 package constants
 
-// Order statuses
 const (
+	// Order statuses
 	OrderStatusPending   = "PENDING"
 	OrderStatusApproved  = "APPROVED"
 	OrderStatusRejected  = "REJECTED"

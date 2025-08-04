@@ -1,7 +1,6 @@
 package create_email
 
 import (
-
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
@@ -65,28 +64,6 @@ func CreateOrderPlacedUserEmail(order *models.Order) *send_email.EmailMetaData {
 	return emailData
 }
 
-// CreateOrderStatusUpdatedUserEmail creates an email payload to notify the customer
-// that their order status has been successfully updated.
-//
-// Parameters:
-//   - order: pointer to the Order object containing order and customer details.
-//
-// Returns:
-//   - *EmailMetaData: a pointer to the populated EmailMetaData object configured for customer notification.
-func CreateOrderStatusUpdatedUserEmail(order *models.Order) *send_email.EmailMetaData {
-	emailData := &send_email.EmailMetaData{
-		Recipients: map[string]string{order.Customer.Email: order.Customer.Name},
-		Data: map[string]any{
-			"order_number":     order.ID,
-			"order_status":     order.Status,
-			"order_updated_at": order.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
-		},
-		TemplateID:  send_email.ORDER_STATUS_UPDATED_USER_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
-	}
-	return emailData
-}
-
 // CreateOrderStatusUpdatedAdminEmail creates an email payload to notify internal admin recipients
 // that an order status status has been successfully updated.
 //
@@ -113,6 +90,28 @@ func CreateOrderStatusUpdatedAdminEmail(order *models.Order) *send_email.EmailMe
 	return emailData
 }
 
+// CreateOrderStatusUpdatedUserEmail creates an email payload to notify the customer
+// that their order status has been successfully updated.
+//
+// Parameters:
+//   - order: pointer to the Order object containing order and customer details.
+//
+// Returns:
+//   - *EmailMetaData: a pointer to the populated EmailMetaData object configured for customer notification.
+func CreateOrderStatusUpdatedUserEmail(order *models.Order) *send_email.EmailMetaData {
+	emailData := &send_email.EmailMetaData{
+		Recipients: map[string]string{order.Customer.Email: order.Customer.Name},
+		Data: map[string]any{
+			"order_number":     order.ID,
+			"order_status":     order.Status,
+			"order_updated_at": order.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
+		},
+		TemplateID:  send_email.ORDER_STATUS_UPDATED_USER_TEMPLATE_ID,
+		Attachments: []send_email.Attachment{},
+	}
+	return emailData
+}
+
 // CreateOrderItemsUpdatedAdminEmail creates an email payload to notify internal admin recipients
 // that an order has been updated.
 //
@@ -122,17 +121,17 @@ func CreateOrderStatusUpdatedAdminEmail(order *models.Order) *send_email.EmailMe
 //
 // Returns:
 //   - *EmailMetaData: a pointer to the populated EmailMetaData object configured for admin notification.
-//
-func CreateOrderItemsUpdatedAdminEmail(original, updated *models.Order) *send_email.EmailMetaData {
+func CreateOrderItemsUpdatedAdminEmail(order *models.Order) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
 		Recipients: company_details.EMAILINTERNALRECIPENTS,
 		Data: map[string]any{
-			"order_number":     updated.ID,
-			"order_updated_at": updated.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
-			"customer_name":    updated.Customer.Name,
-			"customer_email":   updated.Customer.Email,
-			"order_total":      updated.GetFormattedTotal(),
-			"items":            createItemsUpdatedDataForEmail(original, updated),
+			"order_number":     order.ID,
+			"order_updated_at": order.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
+			"order_status":     order.Status,
+			"customer_name":    order.Customer.Name,
+			"customer_email":   order.Customer.Email,
+			"order_total":      order.GetFormattedTotal(),
+			"items":            createItemsDataForAdminEmail(order),
 		},
 		TemplateID:  send_email.ORDER_ITEMS_UPDATED_ADMIN_TEMPLATE_ID,
 		Attachments: []send_email.Attachment{},
@@ -149,15 +148,14 @@ func CreateOrderItemsUpdatedAdminEmail(original, updated *models.Order) *send_em
 //
 // Returns:
 //   - *EmailMetaData: a pointer to the populated EmailMetaData object configured for customer notification.
-//
-func CreateOrderItemsUpdatedUserEmail(original, updated *models.Order) *send_email.EmailMetaData {
+func CreateOrderItemsUpdatedUserEmail(order *models.Order) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
-		Recipients: map[string]string{updated.Customer.Email: updated.Customer.Name},
+		Recipients: map[string]string{order.Customer.Email: order.Customer.Name},
 		Data: map[string]any{
-			"order_number": updated.ID,
-			"order_status": updated.Status,
-			"order_updated_at": updated.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
-			"items":            createItemsUpdatedDataForEmail(original, updated),
+			"customer_name":    order.Customer.Name,
+			"order_number":     order.ID,
+			"order_status":     order.Status,
+			"items":            createItemsDataForUserEmail(order),
 		},
 		TemplateID:  send_email.ORDER_ITEMS_UPDATED_USER_TEMPLATE_ID,
 		Attachments: []send_email.Attachment{},
@@ -174,7 +172,6 @@ func CreateOrderItemsUpdatedUserEmail(original, updated *models.Order) *send_ema
 //
 // Returns:
 //   - *EmailMetaData: a pointer to the populated EmailMetaData object configured for admin notification.
-//
 func CreateOrderDeliveredAdminEmail(order *models.Order, attachments []send_email.Attachment) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
 		Recipients: company_details.EMAILINTERNALRECIPENTS,

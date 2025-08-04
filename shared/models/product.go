@@ -149,6 +149,30 @@ func (p *Product) GetCorrectWeightInGallons() float64 {
 	}
 }
 
+func AreEqualPrices(a, b []Product) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Price != b[i].Price {
+			return false
+		}
+	}
+	return true
+}
+
+func AreEqualQuantities(a, b []Product) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Quantity != b[i].Quantity {
+			return false
+		}
+	}
+	return true
+}
+
 //Format methods
 
 func (p *Product) GetFormattedDescription() string {

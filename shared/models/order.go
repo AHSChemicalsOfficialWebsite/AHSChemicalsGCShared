@@ -49,7 +49,7 @@ func (o *Order) CreateCompleteOrder(correctPrices map[string]float64) {
 func (o *Order) SetID(id string) {
 	o.ID = id
 }
-func (o *Order) SetUID(uid string){
+func (o *Order) SetUID(uid string) {
 	o.Uid = uid
 }
 func (o *Order) SetStatus(status string) {
@@ -94,18 +94,18 @@ func (o *Order) ToMap() map[string]any {
 		"customerName":        strings.ToLower(o.Customer.Name),
 		"uid":                 o.Uid,
 		"specialInstructions": o.SpecialInstructions,
-		"items":               o.toMapItems(),
+		"items":               o.ToMapItems(),
 		"taxRate":             o.TaxRate,
 		"taxAmount":           utils.RoundToDecimals(o.TaxAmount, 4),
 		"subTotal":            utils.RoundToDecimals(o.SubTotal, 4),
-		"total":               utils.RoundToDecimals(o.SubTotal, 4),
+		"total":               utils.RoundToDecimals(o.Total, 4),
 		"status":              o.Status,
 		"createdAt":           o.CreatedAt,
 		"updatedAt":           o.UpdatedAt,
 	}
 }
 
-func (o *Order) toMapItems() []map[string]any {
+func (o *Order) ToMapItems() []map[string]any {
 	minimalItems := make([]map[string]any, 0)
 	for _, items := range o.Items {
 		minimalItems = append(minimalItems, items.ToMinimalMap())
@@ -163,7 +163,7 @@ func (o *Order) GetFormattedTaxAmount() string {
 }
 
 func (o *Order) GetFormattedTaxRate() string {
-	return fmt.Sprintf("%.2f%%", o.TaxRate * 100)
+	return fmt.Sprintf("%.2f%%", o.TaxRate*100)
 }
 
 func (o *Order) GetFormattedTotalItems() string {
@@ -200,4 +200,40 @@ func (o *Order) GetFormattedNetHazardousWeight() string {
 		}
 	}
 	return fmt.Sprintf("%.2f gal", weight)
+}
+
+
+type TrackOrderChange struct {
+	StatusChanged bool
+	ItemsChanged  bool
+}
+
+func NewOrderTracker() *TrackOrderChange {
+	return &TrackOrderChange{
+		StatusChanged: false,
+		ItemsChanged:  false,
+	}
+}
+
+func (t *TrackOrderChange) SetStatusChanged(statusChanged bool) {
+	t.StatusChanged = statusChanged
+}
+func (t *TrackOrderChange) SetItemsChanged(new, old []Product) {
+	if !AreEqualPrices(new, old) || !AreEqualQuantities(new, old) {
+		t.ItemsChanged = true
+	}
+}
+
+func (t *TrackOrderChange) HasChanges() bool {
+	return t.StatusChanged || t.ItemsChanged
+}
+func (t *TrackOrderChange) IsOnlyStatusChanged() bool {
+	return t.StatusChanged && !t.ItemsChanged
+}
+
+func (t *TrackOrderChange) TrackOrderChanges(editedOrder, originalOrder *Order){
+	if editedOrder.Status != originalOrder.Status {
+		t.SetStatusChanged(true)
+	}
+	t.SetItemsChanged(editedOrder.Items, originalOrder.Items)
 }

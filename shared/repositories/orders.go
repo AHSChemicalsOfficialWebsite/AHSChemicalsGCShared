@@ -101,9 +101,8 @@ func UploadOrderFileToStorage(orderID string, base64Str string, fileName string,
 // - This function uses `firestore.MergeAll` to update only the specified fields in the existing document.
 // - Pass only the necessary fields in `details`. Passing the entire order object may cause errors if it includes
 //   fields that are not mapped correctly or are excluded with the `firestore:"-"` tag.
-func UpdateOrderInFirestore(orderID string, details any, ctx context.Context) error {
-	_, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Set(ctx, details, firestore.MergeAll)
-
+func UpdateOrderInFirestore(ctx context.Context,orderID string, updates []firestore.Update,) error {
+	_, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Update(ctx, updates)
 	if err != nil {
 		return err
 	}
