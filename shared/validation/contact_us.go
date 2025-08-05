@@ -37,13 +37,6 @@ func ValidateContactUsForm(c *models.ContactUsForm) error {
 	return nil
 }
 
-// validateEmail checks that the email is non-empty and conforms to a valid email format.
-//
-// Parameters:
-//   - email: The email string to validate.
-//
-// Returns:
-//   - error: If the email is missing or improperly formatted.
 func validateEmail(email string) error {
 	if email == "" {
 		return errors.New("Email is required")
@@ -58,13 +51,6 @@ func validateEmail(email string) error {
 	return nil
 }
 
-// validateName checks that the name is non-empty and consists of two words (first and last name).
-//
-// Parameters:
-//   - name: The full name string to validate.
-//
-// Returns:
-//   - error: If the name is missing or doesn't follow the format "Firstname Lastname".
 func validateName(name string) error {
 	name = strings.TrimSpace(name)
 	if name == "" {
@@ -80,13 +66,6 @@ func validateName(name string) error {
 	return nil
 }
 
-// validatePhone checks that the phone number is exactly 10 digits.
-//
-// Parameters:
-//   - phone: The phone number string to validate.
-//
-// Returns:
-//   - error: If the phone is missing or doesn't contain exactly 10 digits.
 func validatePhone(phone string) error {
 	if phone == "" {
 		return errors.New("Phone number is required")
@@ -101,14 +80,6 @@ func validatePhone(phone string) error {
 	return nil
 }
 
-// validateLocation checks that the location is non-empty and between 10 to 50 characters long,
-// allowing alphanumeric characters, spaces, commas, periods, underscores, and hyphens.
-//
-// Parameters:
-//   - location: The location string to validate.
-//
-// Returns:
-//   - error: If the location is missing or contains disallowed characters.
 func validateLocation(location string) error {
 	if location == "" {
 		return errors.New("Location is required")
@@ -123,14 +94,6 @@ func validateLocation(location string) error {
 	return nil
 }
 
-// validateMessage checks that the message is non-empty and between 10 to 300 characters,
-// allowing letters, numbers, spaces, and selected punctuation characters.
-//
-// Parameters:
-//   - message: The message string to validate.
-//
-// Returns:
-//   - error: If the message is missing or contains disallowed characters.
 func validateMessage(message string) error {
 	if message == "" {
 		return errors.New("Message is required")

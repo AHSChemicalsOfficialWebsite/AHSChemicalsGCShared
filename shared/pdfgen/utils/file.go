@@ -1,3 +1,4 @@
+//package utils contains some basic utility functions for generating pdfs
 package utils
 
 import (

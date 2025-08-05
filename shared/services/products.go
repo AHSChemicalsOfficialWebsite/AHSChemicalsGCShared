@@ -6,6 +6,9 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 )
 
+// GetUpdatedProductDetails is similar to the GetUpdatedCustomerDetails. Returns the updated product details. 
+// Used for creating a map of what has changed when the customer is updated in quickbooks and is detected
+// by the webhook.
 func GetUpdatedProductDetails(newProduct, oldProduct *models.Product) map[string]any {
 	if newProduct == nil || oldProduct == nil {
 		return nil

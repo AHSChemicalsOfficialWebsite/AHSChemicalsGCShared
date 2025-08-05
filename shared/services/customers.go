@@ -1,3 +1,4 @@
+//package services contains the business logic for all models from the models package
 package services
 
 import (
@@ -6,6 +7,12 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 )
 
+// GetUpdatedCustomerDetails returns the updated customer details. Used for creating a map
+// of what has changed when the customer is updated in quickbooks. This is used by the webhook
+// entitiy processor cloud event handler when it receives an update event notificaiton from the 
+// webhook cloud function. The updated customer is fetched via the cloud function to get a single product
+// from quickbooks whereas the old customer is fetched from firestore. Returns a nil map
+// if there is no change in the objects.
 func GetUpdatedCustomerDetails(updated, oldCustomer *models.Customer) map[string]any {
 	if updated == nil || oldCustomer == nil {
 		return nil

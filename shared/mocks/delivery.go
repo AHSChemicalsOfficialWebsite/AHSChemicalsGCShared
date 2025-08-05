@@ -2,7 +2,6 @@ package mocks
 
 import (
 	"mime/multipart"
-	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
@@ -15,7 +14,6 @@ func CreateMockDeliveryInput() *models.DeliveryInput{
 		DeliveredBy: "Harsh",
 		Signature: createMockDeliverySignature(),
 		Images: createMockDeliveryImages(),
-		DeliveredAt: time.Now(),
 	}
 }
 

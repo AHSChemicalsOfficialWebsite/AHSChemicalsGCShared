@@ -36,7 +36,7 @@ func validateSpecialInstructions(specialInstructions string) error {
 	instructions := strings.TrimSpace(specialInstructions)
 
 	// Reject if there are angle brackets (which might indicate HTML tags) or other unusual symbols
-	illegalPattern := regexp.MustCompile(`[<>[\]{}$%^*~|\\]`)
+	illegalPattern := regexp.MustCompile(`[<>[\]{}^*~|\\]`)
 	if illegalPattern.MatchString(instructions) {
 		return errors.New("special instructions contain invalid characters")
 	}
@@ -45,26 +45,4 @@ func validateSpecialInstructions(specialInstructions string) error {
 		return errors.New("special instructions are too long")
 	}
 	return nil
-}
-
-
-// CheckIfOrderItemsChanged checks if the items in the order have any changes.
-//
-// Parameters:
-//   - editedOrder: Pointer to an Order object containing the edited order.
-//   - originalOrder: Pointer to an Order object containing the original order.
-//
-// Returns:
-//   - bool: A boolean value indicating whether the items in the order have any changes.
-func CheckIfOrderItemsChanged(editedOrder, originalOrder *models.Order) bool {
-
-	for i, item := range editedOrder.Items {
-		if item.Price != originalOrder.Items[i].Price {
-			return true
-		}
-		if item.Quantity != originalOrder.Items[i].Quantity {
-			return true
-		}
-	}
-	return false
 }

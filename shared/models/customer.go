@@ -1,3 +1,4 @@
+//package models contains all the models used to represent data stored in firestore.
 package models
 
 import (

@@ -64,8 +64,8 @@ func (o *Order) SetStatus(status string) {
 }
 
 func (o *Order) SetItemPrices(correctPrices map[string]float64) {
-	for _, item := range o.Items {
-		item.SetPrice(correctPrices[item.ID])
+	for i, item := range o.Items {
+		o.Items[i].SetPrice(correctPrices[item.ID])
 	}
 }
 
@@ -112,6 +112,7 @@ func (o *Order) ToMap() map[string]any {
 	}
 }
 
+// Converts the order items array stored in firestore to a minimal item object.
 func (o *Order) ToMapItems() []map[string]any {
 	minimalItems := make([]map[string]any, 0)
 	for _, items := range o.Items {
@@ -155,6 +156,7 @@ func (o *Order) ToCompleteOrderItemsFromMinimal(products map[string]Product) {
 	}
 }
 
+//Converts the order items array to a map of ID:Product
 func (o *Order) ToItemMap() map[string]Product {
 	idMap := make(map[string]Product)
 	for _, item := range o.Items {

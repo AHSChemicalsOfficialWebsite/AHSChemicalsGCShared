@@ -1,3 +1,4 @@
+//package qbmodels contains models for quickbooks. Reference: https://developer.intuit.com/app/developer/qbo/docs/get-started
 package qbmodels
 
 import "time"

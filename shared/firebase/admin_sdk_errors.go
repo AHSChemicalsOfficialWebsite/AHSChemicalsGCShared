@@ -1,3 +1,4 @@
+// package firebase_shared is used to initialize the Firebase Admin SDK, initializations, and utilities.
 package firebase_shared
 
 import (
@@ -6,9 +7,6 @@ import (
 )
 
 // FirebaseErrorResponse represents the structure of an error response returned by Firebase Admin SDK.
-//
-// This struct is used specifically to parse and extract meaningful error details
-// from JSON error responses originating from Firebase services.
 type FirebaseErrorResponse struct {
 	Error struct {
 		Code    int    `json:"code"`    
@@ -38,14 +36,11 @@ func ExtractFirebaseErrorFromResponse(err error) *FirebaseErrorResponse {
 
 	// Locate the start of the JSON object within the error string.
 	start := strings.Index(errString, "{")
-	var firebaseError FirebaseErrorResponse
-
-	// If no JSON object is found, return nil.
 	if start == -1 {
 		return nil
 	}
 
-	// Extract and attempt to unmarshal the JSON portion of the error.
+	var firebaseError FirebaseErrorResponse
 	jsonPart := errString[start:]
 	if unmarshalErr := json.Unmarshal([]byte(jsonPart), &firebaseError); unmarshalErr != nil {
 		return &firebaseError // Return partial object even if unmarshaling fails.

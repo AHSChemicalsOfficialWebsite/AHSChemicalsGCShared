@@ -15,41 +15,26 @@ import (
 	"google.golang.org/api/option"
 )
 
-// Firebase global variables initialized only once at runtime
 var (
-	App              *firebase.App
-	AuthClient       *auth.Client
-	StorageClient    *storage.Client
-	FirestoreClient  *firestore.Client
-	StorageBucket    string
+	App              *firebase.App     //Firestore App
+	AuthClient       *auth.Client      //Auth Client
+	StorageClient    *storage.Client   //Storage Client
+	FirestoreClient  *firestore.Client //Firestore Client
+	StorageBucket    string            //Storage Bucket url
 	initFirebaseOnce sync.Once
 )
 
-// InitFirebaseDebug initializes Firebase clients for the debug environment.
-//
-// Parameters:
-//   - keyPath: Path to the Firebase Admin SDK service account JSON file.
-//
-// Behavior:
-//   - Initializes the Firebase App with the specified debug Realtime Database URL.
-//   - Sets up AuthClient, FirestoreClient, RealtimeClient, and StorageClient for subsequent usage.
-//   - Uses sync.Once to ensure initialization happens only once during the application lifecycle.
-//
-// Logs:
-//   - Calls log.Fatalf() and exits the application if initialization of any service fails.
 func InitFirebaseDebug(keyPath string) {
 	initFirebaseOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 
-		// Initialize Firebase App with credentials file.
 		opt := option.WithCredentialsFile(keyPath)
 		App, err = firebase.NewApp(ctx, nil, opt)
 		if err != nil {
 			log.Fatalf("Error occurred initializing Firebase: %v", err)
 		}
 
-		// Initialize individual Firebase service clients.
 		AuthClient, err = App.Auth(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Auth client: %v", err)
@@ -71,24 +56,15 @@ func InitFirebaseDebug(keyPath string) {
 	})
 }
 
-// InitFirebaseStaging initializes Firebase clients for the staging environment.
-//
-// Parameters:
-//   - keyPath: Optional pointer to the path of the Firebase Admin SDK service account JSON file.
-//     If nil, the default credentials will be used.
-//
-// Behavior:
-//   - Sets up AuthClient, FirestoreClient, and StorageClient for subsequent usage.
-//   - Uses sync.Once to ensure initialization happens only once during the application lifecycle.
-//
-// Logs:
-//   - Calls log.Fatalf() and exits the application if initialization of any service fails.
-func InitFirebaseStaging(keyPath *string) {
+//Initializes firebase production and staging. Key path is optional since google cloud functions 
+//automatically initialize to the correct firebase project they have. When testing in staging 
+//environments, `admin_sdk_json` can be passed to do operations like giving admin privileges, 
+//db migrations etc.
+func InitFirebaseProdFromSecrets(keyPath *string) {
 	initFirebaseOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 
-		// Initialize Firebase App with provided credentials or fallback to default.
 		var app *firebase.App
 		if keyPath != nil {
 			opt := option.WithCredentialsFile(*keyPath)
@@ -101,7 +77,6 @@ func InitFirebaseStaging(keyPath *string) {
 		}
 		App = app
 
-		// Initialize individual Firebase service clients.
 		AuthClient, err = App.Auth(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Auth client: %v", err)
@@ -116,64 +91,7 @@ func InitFirebaseStaging(keyPath *string) {
 		if err != nil {
 			log.Fatalf("Failed to initialize Storage client: %v", err)
 		}
-		//Get the storage bucket url from gcp secret manager
-		projectID, err := metadata.ProjectIDWithContext(ctx)
-		if err != nil {
-			log.Fatalf("Error loading Google Cloud project ID: %v", err)
-		}
-		StorageBucket = gcp.LoadSecretsHelper(projectID, "STORAGE_BUCKET")
-		if StorageBucket == "" {
-			log.Fatalf("Failed to initialize Storage client: %v", err)
-		}
-	})
-}
 
-// InitFirebaseProd initializes Firebase clients for the production environment.
-//
-// Parameters:
-//   - keyPath: Optional pointer to the path of the Firebase Admin SDK service account JSON file.
-//     If nil, the default credentials will be used.
-//
-// Behavior:
-//   - Sets up AuthClient, FirestoreClient, and StorageClient for subsequent usage.
-//   - Uses sync.Once to ensure initialization happens only once during the application lifecycle.
-//
-// Logs:
-//   - Calls log.Fatalf() and exits the application if initialization of any service fails.
-func InitFirebaseProd(keyPath *string) {
-	initFirebaseOnce.Do(func() {
-		ctx := context.Background()
-		var err error
-
-		// Initialize Firebase App with provided credentials or fallback to default.
-		var app *firebase.App
-		if keyPath != nil {
-			opt := option.WithCredentialsFile(*keyPath)
-			app, err = firebase.NewApp(ctx, nil, opt)
-		} else {
-			app, err = firebase.NewApp(ctx, nil)
-		}
-		if err != nil {
-			log.Fatalf("Error initializing Firebase: %v", err)
-		}
-		App = app
-
-		// Initialize individual Firebase service clients.
-		AuthClient, err = App.Auth(ctx)
-		if err != nil {
-			log.Fatalf("Failed to initialize Auth client: %v", err)
-		}
-
-		FirestoreClient, err = App.Firestore(ctx)
-		if err != nil {
-			log.Fatalf("Failed to initialize Firestore client: %v", err)
-		}
-
-		StorageClient, err = App.Storage(ctx)
-		if err != nil {
-			log.Fatalf("Failed to initialize Storage client: %v", err)
-		}
-		//Get the storage bucket url from gcp secret manager
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)

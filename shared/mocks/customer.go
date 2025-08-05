@@ -1,3 +1,4 @@
+//package mocks contains the mock data for the models for testing
 package mocks
 
 import (

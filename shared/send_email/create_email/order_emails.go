@@ -21,7 +21,7 @@ import (
 //	order := &orders.Order{ /* filled order details */ }
 //	attachments := CreateAttachments(base64Contents, mimeTypes, filenames)
 //	emailData := CreateAdminOrderPlacedEmail(order, attachments)
-func CreateOrderPlacedAdminEmail(order *models.Order, attachments []send_email.Attachment) *send_email.EmailMetaData {
+func CreateOrderPlacedAdminEmail(order *models.Order) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
 		Recipients: company_details.EMAILINTERNALRECIPENTS,
 		Data: map[string]any{
@@ -36,7 +36,6 @@ func CreateOrderPlacedAdminEmail(order *models.Order, attachments []send_email.A
 			"special_instructions": order.SpecialInstructions,
 		},
 		TemplateID:  send_email.ORDER_PLACED_ADMIN_TEMPLATE_ID,
-		Attachments: attachments,
 	}
 	return emailData
 }

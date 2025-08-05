@@ -1,3 +1,4 @@
+// package layout contains the layout of any pdf generated. Each layout contains a function RenderToPDF which returns the appropriate structure with a function abiding to the interface defined in package pdfgen
 package layout
 
 import (

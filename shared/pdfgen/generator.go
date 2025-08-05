@@ -1,3 +1,4 @@
+// package pdfgen is used to generate pdfs from the structures defined in layout package
 package pdfgen
 
 import (

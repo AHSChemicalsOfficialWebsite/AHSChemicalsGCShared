@@ -1,3 +1,4 @@
+// package send_mail contains functions to send emails, initializing sendgrid, etc.
 package send_email
 
 import (
@@ -33,40 +34,17 @@ const (
 	QUICKBOOKS_SESSION_EXPIRED_TEMPLATE_ID = "d-5c6a813945bd4669b99225c9f6d13dca"
 )
 
-// InitSendGridDebug initializes SendGrid credentials in debug mode
 func InitSendGridDebug() {
-	SENDGRID_API_KEY = os.Getenv("SENDGRID_API_KEY")
-	if SENDGRID_API_KEY == "" {
-		log.Fatal("SENDGRID_API_KEY is not set")
-	}
-	log.Println("Initialized SendGrid credentials in debug mode")
-}
-
-// InitSendGridStaging initializes SendGrid credentials in staging mode.
-// Only used in the init functions of Google Cloud Functions for staging
-//
-// Parameters:
-//   - context for the function
-func InitSendGridStaging(ctx context.Context) {
 	initSendGridOnce.Do(func() {
-		projectID, err := metadata.ProjectIDWithContext(ctx)
-		if err != nil {
-			log.Fatalf("Error loading Google Cloud project ID: %v", err)
-		}
-		SENDGRID_API_KEY = gcp.LoadSecretsHelper(projectID, "SENDGRID_API_KEY")
+		SENDGRID_API_KEY = os.Getenv("SENDGRID_API_KEY")
 		if SENDGRID_API_KEY == "" {
-			log.Fatal("SENDGRID_API_KEY_STAGING is not set")
+			log.Fatal("SENDGRID_API_KEY is not set")
 		}
-		log.Println("Initialized SendGrid credentials in staging mode")
+		log.Println("Initialized SendGrid credentials in debug mode")
 	})
 }
 
-// InitSendGridProd initializes SendGrid credentials in production mode.
-// Only used in the init functions of google cloud functions
-//
-// Parameters:
-//   - context for the function
-func InitSendGridProd(ctx context.Context) {
+func InitSendGridProdFromSecrets(ctx context.Context) {
 	initSendGridOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {

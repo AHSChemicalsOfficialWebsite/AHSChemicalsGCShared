@@ -48,6 +48,10 @@ func (p *Product) ToMap() map[string]any {
 	}
 }
 
+//ToMinimalMap returns a minimal map of product stored in firestore. 
+//Product objects are very big and can grow in the future, making sure
+//they are stored in a minimal amount of data is important to avoid 
+//big writes to one document
 func (p *Product) ToMinimalMap() map[string]any {
 	return map[string]any{
 		"id":       p.ID,

@@ -19,7 +19,6 @@ var (
 	initPubSubOnce         sync.Once
 )
 
-// Only used for testing locally in this shared package.
 func InitPubSubDebug(ctx context.Context) {
 	initPubSubOnce.Do(func() {
 		projectID := os.Getenv("GCP_PROJECT_ID")
@@ -40,27 +39,7 @@ func InitPubSubDebug(ctx context.Context) {
 	})
 }
 
-func InitPubSubStaging(ctx context.Context) {
-	initPubSubOnce.Do(func() {
-		projectID, err := metadata.ProjectIDWithContext(ctx)
-		if err != nil {
-			log.Fatalf("No project id found for the GCP project: %v", err)
-		}
-		PUBSUB_TOPIC_ID = LoadSecretsHelper(projectID, "PUBSUB_TOPIC_ID")
-		PUBSUB_SUBSCRIPTION_ID = LoadSecretsHelper(projectID, "PUBSUB_SUBSCRIPTION_ID")
-		if PUBSUB_TOPIC_ID == "" || PUBSUB_SUBSCRIPTION_ID == "" {
-			log.Fatalf("PubSub env variables not set")
-		}
-		client, err := pubsub.NewClient(ctx, projectID)
-		if err != nil {
-			log.Fatalf("Failed to create PubSub client: %v", err)
-		}
-		PubSubClient = client
-		log.Println("PubSub initialized")
-	})
-}
-
-func InitPubSubProd(ctx context.Context) {
+func InitPubSubProdFromSecrets(ctx context.Context) {
 	initPubSubOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
@@ -103,6 +82,9 @@ func DecodeSubMessageData[T any](msg *SubMessage) (*T, error) {
 	return &result, nil
 }
 
+//PublishMessage publishes a message to a PubSub topic. Returns an error if
+//failed to publish the message. PubSubClient must be initialized before calling
+//this function.
 func PublishMessage(ctx context.Context, data []byte) error {
 	if PubSubClient == nil {
 		return fmt.Errorf("PubSub client not initialized")

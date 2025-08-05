@@ -14,8 +14,9 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 )
 
-// Company Details loaded at runtime.
 var (
+	COMPANYNAME            string            // Public-facing company name
+	COMPANYURL             string            // Public-facing company URL
 	COMPANYEMAIL           string            // Public-facing company email
 	COMPANYPHONE           string            // Support or inquiry phone number
 	COMPANYADDRESSLINE1    string            // Primary street address
@@ -26,72 +27,40 @@ var (
 	initCompanyDetailsOnce sync.Once
 )
 
-// InitCompanyDetailsDebug initializes company configuration using environment
-// variables for local development or debug environments.
-// It logs fatal errors if any required variable is missing.
 func InitCompanyDetailsDebug() {
-	COMPANYPHONE = os.Getenv("COMPANYPHONE")
-	COMPANYEMAIL = os.Getenv("COMPANYEMAIL")
-	COMPANYADDRESSLINE1 = os.Getenv("COMPANYADDRESSLINE1")
-	COMPANYADDRESSLINE2 = os.Getenv("COMPANYADDRESSLINE2")
-	COMPANY24HOURPHONE = os.Getenv("COMPANY24HOURPHONE")
-	rawEmailRecipients := os.Getenv("EMAILINTERNALRECIPIENTS")
-	err := json.Unmarshal([]byte(rawEmailRecipients), &EMAILINTERNALRECIPENTS)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	LOGOPATH = os.Getenv("LOGOPATH")
-
-	if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANY24HOURPHONE == "" {
-		log.Fatal("Company details not initialized. Please check environment variables.")
-	}
-
-	log.Println("Company details initialized for DEBUG environment.")
-}
-
-// InitCompanyDetailsStaging initializes company configuration using Google Cloud Secret Manager
-// It behaves similarly to InitCompanyDetailsProd and also logs fatal errors if any required variable is missing.
-func InitCompanyDetailsStaging(ctx context.Context) {
 	initCompanyDetailsOnce.Do(func() {
-		projectID, err := metadata.ProjectIDWithContext(ctx)
-		if err != nil {
-			log.Fatalf("Error loading Google Cloud project ID: %v", err)
-		}
-
-		COMPANYPHONE = gcp.LoadSecretsHelper(projectID, "COMPANYPHONE")
-		COMPANYEMAIL = gcp.LoadSecretsHelper(projectID, "COMPANYEMAIL")
-		COMPANYADDRESSLINE1 = gcp.LoadSecretsHelper(projectID, "COMPANYADDRESSLINE1")
-		COMPANYADDRESSLINE2 = gcp.LoadSecretsHelper(projectID, "COMPANYADDRESSLINE2")
-		COMPANY24HOURPHONE = gcp.LoadSecretsHelper(projectID, "COMPANY24HOURPHONE")
-		rawEmailRecipients := gcp.LoadSecretsHelper(projectID, "EMAILINTERNALRECIPIENTS")
-		err = json.Unmarshal([]byte(rawEmailRecipients), &EMAILINTERNALRECIPENTS)
+		COMPANYNAME = os.Getenv("COMPANYNAME")
+		COMPANYURL = os.Getenv("COMPANYURL")
+		COMPANYPHONE = os.Getenv("COMPANYPHONE")
+		COMPANYEMAIL = os.Getenv("COMPANYEMAIL")
+		COMPANYADDRESSLINE1 = os.Getenv("COMPANYADDRESSLINE1")
+		COMPANYADDRESSLINE2 = os.Getenv("COMPANYADDRESSLINE2")
+		COMPANY24HOURPHONE = os.Getenv("COMPANY24HOURPHONE")
+		rawEmailRecipients := os.Getenv("EMAILINTERNALRECIPIENTS")
+		err := json.Unmarshal([]byte(rawEmailRecipients), &EMAILINTERNALRECIPENTS)
 		if err != nil {
 			log.Fatal(err)
 		}
+		LOGOPATH = os.Getenv("LOGOPATH")
 
-		LOGOPATH = gcp.LoadSecretsHelper(projectID, "LOGOPATH")
-
-		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANY24HOURPHONE == "" {
-			log.Fatal("Company details not initialized. Please check secrets.")
+		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANY24HOURPHONE == "" || COMPANYNAME == "" || COMPANYURL == "" {
+			log.Fatal("Company details not initialized. Please check environment variables.")
 		}
 
-		log.Println("Company details initialized for PRODUCTION environment.")
+		log.Println("Company details initialized for DEBUG environment.")
 	})
 }
 
-// InitCompanyDetailsProd initializes company configuration using
-// Google Cloud Secret Manager in a production environment.
-//
-// It uses `gcp.LoadSecretsHelper` to fetch required secrets from GCP
-// based on the current project ID. The values are loaded only once via sync.Once.
-func InitCompanyDetailsProd(ctx context.Context) {
+//For production and staging
+func InitCompanyDetailsFromSecrets(ctx context.Context) {
 	initCompanyDetailsOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)
 		}
 
+		COMPANYNAME = gcp.LoadSecretsHelper(projectID, "COMPANYNAME")
+		COMPANYURL = gcp.LoadSecretsHelper(projectID, "COMPANYURL")
 		COMPANYPHONE = gcp.LoadSecretsHelper(projectID, "COMPANYPHONE")
 		COMPANYEMAIL = gcp.LoadSecretsHelper(projectID, "COMPANYEMAIL")
 		COMPANYADDRESSLINE1 = gcp.LoadSecretsHelper(projectID, "COMPANYADDRESSLINE1")
@@ -102,7 +71,6 @@ func InitCompanyDetailsProd(ctx context.Context) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		LOGOPATH = gcp.LoadSecretsHelper(projectID, "LOGOPATH")
 
 		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANY24HOURPHONE == "" {

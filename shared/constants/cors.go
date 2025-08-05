@@ -1,3 +1,4 @@
+//Contains globally used constants
 package constants
 
 const (

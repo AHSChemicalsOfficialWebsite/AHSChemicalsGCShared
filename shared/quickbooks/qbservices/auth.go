@@ -1,3 +1,4 @@
+// package qbservices contains for core functionality of quickbooks.
 package qbservices
 
 import (

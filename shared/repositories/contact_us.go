@@ -1,3 +1,4 @@
+//package repositories contains all firestore repositories and related functions for models from package models
 package repositories
 
 import (

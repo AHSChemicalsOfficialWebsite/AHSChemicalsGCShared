@@ -1,10 +1,10 @@
+//package canvas contains all the reusable drawing functions used in drawing a pdf
 package canvas
 
 import (
 	"fmt"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/phpdave11/gofpdf"
 )
@@ -90,12 +90,12 @@ func (c *Canvas) DrawCompanyDetails() {
 		text  string
 		style string
 	}{
-		{constants.CompanyName, "B"},
+		{company_details.COMPANYNAME, "B"},
 		{company_details.COMPANYADDRESSLINE1, ""},
 		{company_details.COMPANYADDRESSLINE2, ""},
 		{"Phone: " + company_details.COMPANYPHONE, ""},
 		{"Email: " + company_details.COMPANYEMAIL, ""},
-		{"Website: " + constants.CompanyName, ""},
+		{"Website: " + company_details.COMPANYURL, ""},
 	}
 
 	for _, line := range lines {

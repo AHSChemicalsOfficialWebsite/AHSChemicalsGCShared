@@ -1,3 +1,4 @@
+//package create_email is a utility package for creating custom emails for sendgrid emails
 package create_email
 
 import (
@@ -8,7 +9,7 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
 )
 
-func CreateContactUsAdminEmail(c *models.ContactUsForm, attachments []send_email.Attachment) *send_email.EmailMetaData {
+func CreateContactUsAdminEmail(c *models.ContactUsForm) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
 		Recipients: company_details.EMAILINTERNALRECIPENTS,
 		Data: map[string]any{
@@ -20,12 +21,11 @@ func CreateContactUsAdminEmail(c *models.ContactUsForm, attachments []send_email
 			"year":     time.Now().Year(),
 		},
 		TemplateID:  send_email.CONTACT_US_ADMIN_TEMPLATE_ID,
-		Attachments: attachments,
 	}
 	return emailData
 }
 
-func CreateContactUsUserEmail(c *models.ContactUsForm, attachments []send_email.Attachment) *send_email.EmailMetaData {
+func CreateContactUsUserEmail(c *models.ContactUsForm) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
 		Recipients: map[string]string{c.Email: c.Name},
 		Data: map[string]any{
@@ -36,7 +36,6 @@ func CreateContactUsUserEmail(c *models.ContactUsForm, attachments []send_email.
 			"message":  c.Message,
 		},
 		TemplateID:  send_email.CONTACT_US_USER_TEMPLATE_ID,
-		Attachments: attachments,
 	}
 	return emailData
 }

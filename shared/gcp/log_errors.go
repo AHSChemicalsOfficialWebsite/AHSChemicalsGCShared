@@ -1,3 +1,4 @@
+// package gcp provides initialization and functionality for GCP specifics such as gcp console error logger, pubusub initialization, secrets etc.
 package gcp
 
 import (
