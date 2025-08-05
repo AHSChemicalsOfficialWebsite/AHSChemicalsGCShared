@@ -1,6 +1,7 @@
 package qbmodels
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
@@ -19,6 +20,34 @@ type Invoice struct {
 	Line        []InvoiceLine        `json:"Line"`
 	CustomField []CustomField        `json:"CustomField,omitempty"`
 	MetaData    *quickbooks.MetaData `json:"MetaData,omitempty"`
+}
+
+func NewInvoice(order *models.Order) *Invoice {
+
+	invoice :=  &Invoice{
+		CustomerRef: Reference{Value: order.Customer.ID, Name: order.Customer.Name},
+		TxnDate:     time.Now().Format("2006-01-02"),
+		DueDate:     time.Now().AddDate(0, 0, 30).Format("2006-01-02"),
+		TotalAmt:    order.Total,
+	}
+	invoice.AddLines(order)
+	return invoice
+}
+
+func (i *Invoice) ToBytes() ([]byte, error){
+	return json.Marshal(i)
+}
+
+func (i *Invoice) AddLines(order *models.Order) {
+	invoiceLines := make([]InvoiceLine, 0)
+	for _ , item := range order.Items{
+		line := InvoiceLine{
+			DetailType: "SalesItemLineDetail",
+			Description: item.GetFormattedDescription(),
+			Amount:      item.GetTotalPrice(),
+		}
+		invoiceLines = append(invoiceLines, line)
+	}
 }
 
 type Reference struct {
@@ -57,30 +86,6 @@ type CustomField struct {
 	Name         string `json:"Name,omitempty"`
 	Type         string `json:"Type,omitempty"`
 	StringValue  string `json:"StringValue,omitempty"`
-}
-
-func NewInvoice(order *models.Order) *Invoice {
-
-	invoice :=  &Invoice{
-		CustomerRef: Reference{Value: order.Customer.ID, Name: order.Customer.Name},
-		TxnDate:     time.Now().Format("2006-01-02"),
-		DueDate:     time.Now().AddDate(0, 0, 30).Format("2006-01-02"),
-		TotalAmt:    order.Total,
-	}
-	invoice.AddLines(order)
-	return invoice
-}
-
-func (i *Invoice) AddLines(order *models.Order) {
-	invoiceLines := make([]InvoiceLine, 0)
-	for _ , item := range order.Items{
-		line := InvoiceLine{
-			DetailType: "SalesItemLineDetail",
-			Description: item.GetFormattedDescription(),
-			Amount:      item.GetTotalPrice(),
-		}
-		invoiceLines = append(invoiceLines, line)
-	}
 }
 
 type QBInvoiceResponse struct {
