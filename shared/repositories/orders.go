@@ -189,5 +189,5 @@ func CreateDetailedOrderFromExistingOrder(ctx context.Context, order *models.Ord
 	}
 	order.Customer = fetchedOrder.Customer
 	order.ToCompleteOrderItemsFromMinimal(fetchedOrder.ToItemMap())
-	return order, nil
+	return nil
 }
