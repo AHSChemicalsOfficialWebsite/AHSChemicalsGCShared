@@ -36,7 +36,7 @@ type Invoice struct {
 	ClassRef              *Reference           `json:"ClassRef,omitempty"`
 	DepartmentRef         *Reference           `json:"DepartmentRef,omitempty"`
 	LocationRef           *Reference           `json:"LocationRef,omitempty"`
-	PO                    string               `json:"PO,omitempty"`
+	PurchaseOrderNum      string               `json:"PurchaseOrderNum,omitempty"`
 	ARAccountRef          *Reference           `json:"ARAccountRef,omitempty"`
 	ProjectRef            *Reference           `json:"ProjectRef,omitempty"`
 }
@@ -44,11 +44,11 @@ type Invoice struct {
 func NewInvoice(order *models.Order) *Invoice {
 
 	invoice := &Invoice{
-		CustomerRef: Reference{Value: order.Customer.ID, Name: order.Customer.Name},
-		TxnDate:     time.Now().Format("2006-01-02"),
-		DueDate:     time.Now().AddDate(0, 0, 30).Format("2006-01-02"),
-		TotalAmt:    order.Total,
-		PO:          order.ID,
+		CustomerRef:      Reference{Value: order.Customer.ID, Name: order.Customer.Name},
+		TxnDate:          time.Now().Format("2006-01-02"),
+		DueDate:          time.Now().AddDate(0, 0, 30).Format("2006-01-02"),
+		TotalAmt:         order.Total,
+		PurchaseOrderNum: order.ID,
 	}
 	invoice.AddLines(order)
 	return invoice
