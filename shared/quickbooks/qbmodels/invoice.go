@@ -46,6 +46,7 @@ func (i *Invoice) AddLines(order *models.Order) {
 			Description: item.GetFormattedDescription(),
 			Amount:      item.GetTotalPrice(),
 		}
+		line.SetSalesItemLineDetail(&item)
 		invoiceLines = append(invoiceLines, line)
 	}
 	i.Line = invoiceLines
@@ -63,6 +64,18 @@ type InvoiceLine struct {
 	SalesItemLineDetail *SalesItemLineDetail `json:"SalesItemLineDetail,omitempty"`
 	DiscountLineDetail  *DiscountLineDetail  `json:"DiscountLineDetail,omitempty"`
 	GroupLineDetail     *GroupLineDetail     `json:"GroupLineDetail,omitempty"`
+}
+
+func (i *InvoiceLine) SetSalesItemLineDetail(item *models.Product){
+	detail := &SalesItemLineDetail{
+		ItemRef: Reference{
+			Value: item.ID,
+			Name:  item.Name,
+		},
+		Qty: float64(item.Quantity),
+		UnitPrice: item.Price,
+	}
+	i.SalesItemLineDetail = detail
 }
 
 type SalesItemLineDetail struct {
