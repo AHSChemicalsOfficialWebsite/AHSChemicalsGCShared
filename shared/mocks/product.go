@@ -19,6 +19,7 @@ func CreateMockProduct() models.Product {
 		Hazardous: true,
 		Category:  "Chemicals",
 		Price:     129.99,
+		PurchasePrice: 50.00,
 		Desc:      "Highly effective industrial cleaning solution.",
 		Slug:      "industrial-cleaner-500ml",
 		NameKey:   "industrialcleaner",
@@ -30,7 +31,7 @@ func CreateMockProduct() models.Product {
 
 func CreateMockProducts(val int) []models.Product {
 	products := make([]models.Product, val)
-	for i := 0; i < val; i++ {
+	for i := range val {
 		products[i] = CreateMockProduct()
 	}
 	return products
