@@ -11,7 +11,7 @@ import (
 // approveOrder changes the status of an order to APPROVED
 // An order can only be approved if
 //   - it is in PENDING state
-//   - it is in REJECTED state and no more than 30 days have passed since rejection
+//   - it is in Cancelled state and no more than 30 days have passed since rejection
 //
 // Parameters:
 //   - editedOrder: Pointer to an Order object containing the edited order.
@@ -24,19 +24,19 @@ func approveOrder(editedOrder, originalOrder *models.Order) error {
 	case constants.OrderStatusPending:
 		editedOrder.Status = constants.OrderStatusApproved
 		return nil
-	case constants.OrderStatusRejected:
+	case constants.OrderStatusCancelled:
 		if time.Since(originalOrder.UpdatedAt) > 30*24*time.Hour {
 			return errors.New("Cannot approve: more than 30 days have passed since rejection. Place a new order instead")
 		}
 		editedOrder.Status = constants.OrderStatusApproved
 		return nil
 	default:
-		return errors.New("Order can only be approved if it is in PENDING or REJECTED state")
+		return errors.New("Order can only be approved if it is in PENDING or Cancelled state")
 	}
 }
 
-// rejectOrder changes the status of an order to REJECTED.
-// An order can only be rejected if
+// cancelOrder changes the status of an order to CANCELLED.
+// An order can only be Cancelled if
 //   - it is in PENDING state
 //
 // Parameters:
@@ -45,13 +45,13 @@ func approveOrder(editedOrder, originalOrder *models.Order) error {
 //
 // Returns:
 //   - error: An error object if edited status is incorrect .
-func rejectOrder(editedOrder *models.Order, originalOrderStatus string) error {
+func cancelOrder(editedOrder *models.Order, originalOrderStatus string) error {
 	switch originalOrderStatus {
 	case constants.OrderStatusPending:
-		editedOrder.Status = constants.OrderStatusRejected
+		editedOrder.Status = constants.OrderStatusCancelled
 		return nil
 	default:
-		return errors.New("Order can only be rejected if it is in PENDING state")
+		return errors.New("Order can only be Cancelled if it is in PENDING state")
 	}
 }
 
@@ -91,8 +91,8 @@ func GetOrderWithUpdatedStatus(editedOrder, originalOrder *models.Order) error {
 	switch editedOrder.Status {
 	case constants.OrderStatusApproved:
 		return approveOrder(editedOrder, originalOrder)
-	case constants.OrderStatusRejected:
-		return rejectOrder(editedOrder, originalOrder.Status)
+	case constants.OrderStatusCancelled:
+		return cancelOrder(editedOrder, originalOrder.Status)
 	case constants.OrderStatusDelivered:
 		return deliverOrder(editedOrder, originalOrder)
 	default:
