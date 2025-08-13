@@ -36,29 +36,31 @@ func (o *Order) CreateCompleteOrder(correctPrices map[string]float64) {
 		return
 	}
 	o.SetItemPrices(correctPrices)
-	o.calcSubtotal()
-	o.calcTaxAmount()
-	o.calcTotal()
+	o.getSubTotal()
+	o.getTaxAmount()
+	o.getTotal()
 	o.SetStatus(constants.OrderStatusPending)
 	o.setCreatedAt()
 	o.SetUpdatedAt()
 }
 
 func (o *Order) UpdateOrderBill(){
-	o.calcSubtotal()
-	o.calcTaxAmount()
-	o.calcTotal()
+	o.getSubTotal()
+	o.getTaxAmount()
+	o.getTotal()
 	o.SetUpdatedAt()
 }
 
-/* Setters */
+//Setters
 
 func (o *Order) SetID(id string) {
 	o.ID = id
 }
+
 func (o *Order) SetUID(uid string) {
 	o.Uid = uid
 }
+
 func (o *Order) SetStatus(status string) {
 	o.Status = status
 }
@@ -77,24 +79,92 @@ func (o *Order) SetUpdatedAt() {
 	o.UpdatedAt = time.Now()
 }
 
-/* Calculations */
+//Getters
 
-func (o *Order) calcSubtotal() {
+func (o *Order) getSubTotal() {
 	for _, item := range o.Items {
 		o.SubTotal += item.GetTotalPrice()
 	}
 }
 
-func (o *Order) calcTaxAmount() {
+func (o *Order) getTaxAmount() {
 	o.TaxAmount = o.TaxRate * o.SubTotal
 }
 
-func (o *Order) calcTotal() {
+func (o *Order) getTotal() {
 	o.Total = o.SubTotal + o.TaxAmount
 }
 
-/* Converters */
+//Gets the total cost of goods with their purchase prices * quantity
+func (o *Order) GetTotalCOG() float64 {
+	totalCOG := 0.0
+	for _, item := range o.Items {
+		totalCOG += item.GetTotalPurchasePrice()
+	}
+	return totalCOG
+}
 
+func (o *Order) GetFormattedTotal() string {
+	return fmt.Sprintf("$%.2f", o.Total)
+}
+
+func (o *Order) GetFormattedSubTotal() string {
+	return fmt.Sprintf("$%.2f", o.SubTotal)
+}
+
+func (o *Order) GetFormattedTaxAmount() string {
+	return fmt.Sprintf("$%.2f", o.TaxAmount)
+}
+
+func (o *Order) GetFormattedTaxRate() string {
+	return fmt.Sprintf("%.2f%%", o.TaxRate*100)
+}
+
+func (o *Order) GetFormattedTotalItems() string {
+	totalUnits := 0
+	for _, item := range o.Items {
+		totalUnits += item.Quantity
+	}
+	return strconv.Itoa(totalUnits)
+}
+
+func (o *Order) GetFormattedNetWeight() string {
+	weight := 0.0
+	for _, item := range o.Items {
+		weight += item.GetCorrectWeightInGallons()
+	}
+	return fmt.Sprintf("%.2f gal", weight)
+}
+
+func (o *Order) GetFormattedNetNonHazardousWeight() string {
+	weight := 0.0
+	for _, item := range o.Items {
+		if !item.Hazardous {
+			weight += item.GetCorrectWeightInGallons()
+		}
+	}
+	return fmt.Sprintf("%.2f gal", weight)
+}
+
+func (o *Order) GetFormattedNetHazardousWeight() string {
+	weight := 0.0
+	for _, item := range o.Items {
+		if item.Hazardous {
+			weight += item.GetCorrectWeightInGallons()
+		}
+	}
+	return fmt.Sprintf("%.2f gal", weight)
+}
+
+func (o *Order) GetFormattedCOG() string {
+	return fmt.Sprintf("$%.2f", o.GetTotalCOG())
+}
+
+func (o *Order) GetFormattedTotalRevenue() string {
+	return fmt.Sprintf("$%.2f", o.Total - o.GetTotalCOG())
+}
+
+// Converts the order object to a map that can be stored in firestore.
 func (o *Order) ToMap() map[string]any {
 	return map[string]any{
 		"customerId":          o.Customer.ID,
@@ -165,61 +235,7 @@ func (o *Order) ToItemMap() map[string]Product {
 	return idMap
 }
 
-/* Formatters */
-
-func (o *Order) GetFormattedTotal() string {
-	return fmt.Sprintf("$%.2f", o.Total)
-}
-
-func (o *Order) GetFormattedSubTotal() string {
-	return fmt.Sprintf("$%.2f", o.SubTotal)
-}
-
-func (o *Order) GetFormattedTaxAmount() string {
-	return fmt.Sprintf("$%.2f", o.TaxAmount)
-}
-
-func (o *Order) GetFormattedTaxRate() string {
-	return fmt.Sprintf("%.2f%%", o.TaxRate*100)
-}
-
-func (o *Order) GetFormattedTotalItems() string {
-	totalUnits := 0
-	for _, item := range o.Items {
-		totalUnits += item.Quantity
-	}
-	return strconv.Itoa(totalUnits)
-}
-
-func (o *Order) GetFormattedNetWeight() string {
-	weight := 0.0
-	for _, item := range o.Items {
-		weight += item.GetCorrectWeightInGallons()
-	}
-	return fmt.Sprintf("%.2f gal", weight)
-}
-
-func (o *Order) GetFormattedNetNonHazardousWeight() string {
-	weight := 0.0
-	for _, item := range o.Items {
-		if !item.Hazardous {
-			weight += item.GetCorrectWeightInGallons()
-		}
-	}
-	return fmt.Sprintf("%.2f gal", weight)
-}
-
-func (o *Order) GetFormattedNetHazardousWeight() string {
-	weight := 0.0
-	for _, item := range o.Items {
-		if item.Hazardous {
-			weight += item.GetCorrectWeightInGallons()
-		}
-	}
-	return fmt.Sprintf("%.2f gal", weight)
-}
-
-
+//Tracks changes when updating a particular order
 type TrackOrderChange struct {
 	StatusChanged bool
 	ItemsChanged  bool
@@ -235,6 +251,7 @@ func NewOrderTracker() *TrackOrderChange {
 func (t *TrackOrderChange) SetStatusChanged(statusChanged bool) {
 	t.StatusChanged = statusChanged
 }
+
 func (t *TrackOrderChange) SetItemsChanged(new, old []Product) {
 	if !AreEqualPrices(new, old) || !AreEqualQuantities(new, old) {
 		t.ItemsChanged = true
@@ -244,6 +261,7 @@ func (t *TrackOrderChange) SetItemsChanged(new, old []Product) {
 func (t *TrackOrderChange) HasChanges() bool {
 	return t.StatusChanged || t.ItemsChanged
 }
+
 func (t *TrackOrderChange) IsOnlyStatusChanged() bool {
 	return t.StatusChanged && !t.ItemsChanged
 }
