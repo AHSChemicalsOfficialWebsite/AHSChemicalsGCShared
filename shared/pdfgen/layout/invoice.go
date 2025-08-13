@@ -86,7 +86,7 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 	})
 	c.MoveTo(c.MarginLeft, c.MarginTop+10)
 
-	//Draw the company logo on top left
+	//Draw the pdf title on top left
 	c.DrawSingleLineText(&canvas.Text{
 		Content: "INVOICE",
 		Font:    "Helvetica",
@@ -102,7 +102,7 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 	companyDetailsEndYPos := c.Y
 	c.MoveTo(125, c.MarginTop)
 
-	//Draw the company logo on top left
+	//Draw the company logo on top right
 	c.DrawImageFromURL(canvas.ImageElement{
 		URL:    company_details.LOGOPATH,
 		X:      c.X,
@@ -205,8 +205,8 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 
 	c.AddNewPageIfEnd(10, canvas.PrimaryGreen, 0.8)
 
-	c.IncX(120)
-	c.DrawBillingDetails([]string{i.SubTotal, i.TaxAmount, i.Total}, i.TaxRate)
+	c.IncX(127)
+	c.DrawBillingDetails([]string{"SUBTOTAL", fmt.Sprintf("TAX (%s)", i.TaxRate), "TOTAL"}, []string{i.SubTotal, i.TaxAmount, i.Total}, false, false)
 	c.MoveTo(c.MarginLeft, c.Y+5)
 
 	c.DrawSingleLineText(&canvas.Text{
