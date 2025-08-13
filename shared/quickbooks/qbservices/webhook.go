@@ -28,7 +28,7 @@ func VerifyQuickBooksWebhookSignature(body []byte, signature string) bool {
 	return hmac.Equal([]byte(expectedSignature), []byte(signature))
 }
 
-func CreateQBCustomerFromEntityID(id string) (*qbmodels.QBCustomer, error){
+func GetQBCustomerFromEntityID(id string) (*qbmodels.QBCustomer, error){
 	reqURL := quickbooks.QUICKBOOKS_GET_CUSTOMER_URL
 	params :=  url.Values{}
 	params.Set("id", id)
@@ -63,7 +63,7 @@ func CreateQBCustomerFromEntityID(id string) (*qbmodels.QBCustomer, error){
 	return &quickbooksCustomer.QueryResponse.Customer[0], nil
 }
 
-func CreateQBProductFromEntityID(id string) (*qbmodels.QBItem, error){
+func GetQBProductFromEntityID(id string) (*qbmodels.QBItem, error){
 	reqURL := quickbooks.QUICKBOOKS_GET_PRODUCT_URL
 	params :=  url.Values{}
 	params.Set("id", id)
