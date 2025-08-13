@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 )
 
 // IsAuthorized verifies the Firebase ID token provided in the Authorization header
@@ -80,8 +82,12 @@ func CheckAuthorizationByRoles(request *http.Request, roles ...string) (string, 
 
 	// Check if user has at least one of the allowed roles
 	for _, role := range roles {
-		if claimValue, ok := token.Claims[role].(bool); ok && claimValue {
-			return token.UID, nil
+		claimValue, ok := token.Claims[role].(string)
+		if ok && claimValue != ""{
+			_, ok2 := constants.Roles[claimValue]
+			if ok2 {
+				return token.UID, nil
+			}
 		}
 	}
 
