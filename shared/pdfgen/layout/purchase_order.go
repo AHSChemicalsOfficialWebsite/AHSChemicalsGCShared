@@ -233,13 +233,13 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 		Size:  10,
 		Style: "B",
 	})
-	c.MoveTo(140, tableEndYPos+5)
+	c.MoveTo(147, tableEndYPos+5)
 
 	//Check if new page needs to be drawn before drawing the billing section
 	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
 
 	//Draw the billing section
-	c.DrawBillingDetails([]string{p.SubTotal, p.TaxAmount, p.Total}, p.TaxRate)
+	c.DrawBillingDetails([]string{"SUBTOTAL", fmt.Sprintf("TAX (%s)", p.TaxRate), "TOTAL"}, []string{p.SubTotal, p.TaxAmount, p.Total}, false, false)
 	c.MoveTo(c.MarginLeft, tableEndYPos+5)
 
 	//Comments or Special Instructions label
