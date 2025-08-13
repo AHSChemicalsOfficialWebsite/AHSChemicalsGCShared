@@ -1,9 +1,7 @@
-//package canvas contains all the reusable drawing functions used in drawing a pdf
+// package canvas contains all the reusable drawing functions used in drawing a pdf
 package canvas
 
 import (
-	"fmt"
-
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/phpdave11/gofpdf"
@@ -71,7 +69,7 @@ func (c *Canvas) ResetY()             { c.Y = c.MarginTop }
 /* Reusable Draw Functions */
 
 func (c *Canvas) AddNewPageIfEnd(offest float64, borderColor [3]int, lineWidth float64) {
-	if c.Y + offest > c.BorderHeight{
+	if c.Y+offest > c.BorderHeight {
 		c.PDF.AddPage()
 		c.DrawRectangle(&Rectangle{
 			X:           c.BorderX,
@@ -151,12 +149,13 @@ func (c *Canvas) DrawFooter(text string) {
 	c.DrawMultipleLines(textElement, c.BorderWidth, "C")
 }
 
-func (c *Canvas) DrawBillingDetails(values []string, taxRate string) {
-	labels := []string{"SUBTOTAL", fmt.Sprintf("TAX (%s)", taxRate), "TOTAL"}
+func (c *Canvas) DrawBillingDetails(labels, values []string, allLablesBold, allValuesBold bool) {
 	initialX := c.X
+	var labelStyle = ""
 	var valueStyle = ""
-	for i, label := range labels {
-		c.DrawSingleLineText(&Text{
+	var maxLabelWidth = 0.0
+	for _, label := range labels {
+		labelText := &Text{
 			Content: label,
 			Font:    "Arial",
 			Style:   "",
@@ -164,9 +163,29 @@ func (c *Canvas) DrawBillingDetails(values []string, taxRate string) {
 			X:       c.X,
 			Y:       c.Y,
 			Color:   Black,
+		}
+		labelText.ApplyTextStyle(c.PDF)
+		maxLabelWidth = max(maxLabelWidth, c.PDF.GetStringWidth(label))
+	}
+	if allLablesBold {
+		labelStyle = "B"
+	}
+	if allValuesBold {
+		valueStyle = "B"
+	}
+	for i, label := range labels {
+		c.DrawSingleLineText(&Text{
+			Content: label,
+			Font:    "Arial",
+			Style:   labelStyle,
+			Size:    10,
+			X:       c.X,
+			Y:       c.Y,
+			Color:   Black,
 		})
-		c.IncX(32)
-		if i == 2 {
+		c.IncX(maxLabelWidth + 5)
+		//Last value is always bold
+		if i == len(labels)-1 {
 			valueStyle = "B"
 		}
 		c.DrawSingleLineText(&Text{
@@ -178,6 +197,6 @@ func (c *Canvas) DrawBillingDetails(values []string, taxRate string) {
 			Y:       c.Y,
 			Color:   Black,
 		})
-		c.MoveTo(initialX, c.Y + 5)
+		c.MoveTo(initialX, c.Y+5)
 	}
 }
