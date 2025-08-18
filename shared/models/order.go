@@ -214,6 +214,7 @@ func (o *Order) ToCompleteOrderItemsFromMinimal(products map[string]Product) {
 		o.Items[i].SetName(products[item.ID].Name)
 		o.Items[i].SetSKU(products[item.ID].SKU)
 		o.Items[i].SetSize(products[item.ID].Size)
+		o.Items[i].SetPurchasePrice(products[item.ID].PurchasePrice)
 		o.Items[i].SetSizeUnit(products[item.ID].SizeUnit)
 		o.Items[i].SetPackOf(products[item.ID].PackOf)
 		o.Items[i].SetHazardous(products[item.ID].Hazardous)
