@@ -160,8 +160,9 @@ func (o *Order) GetFormattedCOG() string {
 	return fmt.Sprintf("$%.2f", o.GetTotalCOG())
 }
 
+//Subtracting from subtotal not total because total includes the tax. 
 func (o *Order) GetFormattedTotalRevenue() string {
-	return fmt.Sprintf("$%.2f", o.Total - o.GetTotalCOG())
+	return fmt.Sprintf("$%.2f", o.SubTotal - o.GetTotalCOG())
 }
 
 // Converts the order object to a map that can be stored in firestore.
