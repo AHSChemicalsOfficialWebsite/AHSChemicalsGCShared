@@ -7,11 +7,11 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
 )
 
-func CreateQuickBooksSessionExpiredEmail(reconnectURL string) *send_email.EmailMetaData{
+func CreateQuickBooksSessionExpiredEmail() *send_email.EmailMetaData{
 	emailData := &send_email.EmailMetaData{
 		Recipients: company_details.EMAILINTERNALRECIPENTS,
 		Data: map[string]any{
-			"reconnect_url": reconnectURL,
+			"reconnect_url": company_details.COMPANYURL + "/settings",
 		},
 		TemplateID:  send_email.QUICKBOOKS_SESSION_EXPIRED_TEMPLATE_ID,
 	}
@@ -22,7 +22,7 @@ func CreateQuickBooksInvoiceAdminEmail(order *models.Order, invoice *qbmodels.In
 	emailData := &send_email.EmailMetaData{
 		Recipients: company_details.EMAILINTERNALRECIPENTS,
 		Data: map[string]any{
-			"qb_invoice_id": invoice.ID,
+			"qb_invoice_no": invoice.DocNumber,
 			"order_number": order.ID,
 			"customer_name": order.Customer.Name,
 			"invoice_date": invoice.TxnDate,
