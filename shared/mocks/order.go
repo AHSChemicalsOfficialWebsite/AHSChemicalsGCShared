@@ -10,7 +10,7 @@ func CreateMockOrder() *models.Order{
 	return &models.Order{
 		ID:"1",
 		Customer: CreateMockCustomer(),
-		Items: CreateMockProducts(2),
+		Items: CreateMockProducts(5),
 		SpecialInstructions: "Test instrucitons",
 		Total: 100,
 		SubTotal: 200,
