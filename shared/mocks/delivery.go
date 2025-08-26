@@ -7,9 +7,9 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
-func CreateMockDeliveryInput() *models.DeliveryInput{
+func CreateMockDeliveryInput(orderID string) *models.DeliveryInput{
 	return &models.DeliveryInput{
-		OrderID: "IQVYPdEFfBj6XcB956HD",
+		OrderID: orderID,
 		ReceivedBy: "Harsh Mohan",
 		DeliveredBy: "Harsh",
 		Signature: createMockDeliverySignature(),
