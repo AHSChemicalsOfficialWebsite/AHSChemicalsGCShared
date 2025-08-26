@@ -2,7 +2,6 @@ package qbmodels
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks"
@@ -43,8 +42,8 @@ type Invoice struct {
 func NewInvoice(order *models.Order) *Invoice {
 	invoice := &Invoice{
 		CustomerRef:      Reference{Value: order.Customer.ID, Name: order.Customer.Name},
-		TxnDate:          time.Now().Format("2006-01-02"),
-		DueDate:          time.Now().AddDate(0, 0, 30).Format("2006-01-02"),
+		TxnDate:          order.UpdatedAt.Format("2006-01-02"),
+		DueDate:          order.UpdatedAt.AddDate(0, 0, 30).Format("2006-01-02"),
 		TotalAmt:         order.Total,
 	}
 	invoice.AddLines(order)
@@ -55,6 +54,10 @@ func (i *Invoice) ToBytes() ([]byte, error) {
 	return json.Marshal(i)
 }
 
+func (i *Invoice) GetDocNumber() string {
+	return i.DocNumber
+}
+
 func (i *Invoice) AddLines(order *models.Order) {
 	invoiceLines := make([]InvoiceLine, 0)
 	for _, item := range order.Items {
@@ -63,7 +66,7 @@ func (i *Invoice) AddLines(order *models.Order) {
 			Description: item.GetFormattedDescription(),
 			Amount:      item.GetTotalPrice(),
 		}
-		line.SetSalesItemLineDetail(&item)
+		line.SetSalesItemLineDetail(item)
 		invoiceLines = append(invoiceLines, line)
 	}
 	i.Line = invoiceLines
@@ -145,5 +148,5 @@ type QBInvoiceResponse struct {
 }
 
 func (qb *QBInvoiceResponse) GetDocNumber() string {
-	return qb.Invoice.DocNumber
+	return qb.Invoice.GetDocNumber()
 }
