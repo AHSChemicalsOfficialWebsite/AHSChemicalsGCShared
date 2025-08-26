@@ -204,7 +204,7 @@ func (o *Order) ToProductIDs() []string {
 // the only thing which is not set in the order is the price of the product. The
 // price for each product is always used from the items minimal map which already exists
 // in the order. Only time the price is fetched when the order is created.
-func (o *Order) ToCompleteOrderItemsFromMinimal(products map[string]Product) {
+func (o *Order) ToCompleteOrderItemsFromMinimal(products map[string]*Product) {
 	if products == nil {
 		return
 	}
