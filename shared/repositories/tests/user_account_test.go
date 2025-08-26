@@ -9,7 +9,7 @@ import (
 
 func TestUserAccount(t *testing.T) {
 
-	userAccounts, err := repositories.FetchAdminRecordsFromCustomer(context.Background(), "1")
+	userAccounts, err := repositories.FetchAssignedAdminsForCustomer(context.Background(), "1")
 	if err != nil {
 		t.Errorf("Error fetching user accounts: %v", err)
 		return
