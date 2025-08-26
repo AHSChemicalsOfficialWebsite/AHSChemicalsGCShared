@@ -1,11 +1,13 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/repositories"
 )
 
 // approveOrder changes the status of an order to APPROVED
@@ -57,6 +59,7 @@ func cancelOrder(editedOrder *models.Order, originalOrderStatus string) error {
 
 // deliverOrder changes the status of an order to DELIVERED
 // An order can only be delivered if
+//   - if the shipping manifest has has been generated. 
 //   - it is in APPROVED state.
 //
 // Once changed, the changes are irreverisble to maintain atomicity and consistency everywhere.
@@ -69,6 +72,13 @@ func cancelOrder(editedOrder *models.Order, originalOrderStatus string) error {
 // Returns:
 //   - error: An error object if edited status is incorrect .
 func deliverOrder(editedOrder, originalOrder *models.Order) error {
+	exists, err := repositories.DoesShippingManifestExist(context.Background(), editedOrder.ID)
+	if err != nil {
+		return errors.New("failed to check for a shipping manifest. Please try again")
+	}
+	if !exists {
+		return errors.New("order has not been delivered yet. Please generate a shipping manifest first")
+	}
 	switch originalOrder.Status {
 	case constants.OrderStatusApproved:
 		editedOrder.Status = constants.OrderStatusDelivered
