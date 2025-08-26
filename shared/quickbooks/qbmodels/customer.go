@@ -110,8 +110,8 @@ func (qb *QBCustomer) MapToCustomer() *models.Customer{
 		ID: qb.ID,
 		IsActive: qb.Active,
 		Name: qb.DisplayName,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
 	}
 	qb.SetEmailInCustomer(customer)
 	qb.SetPhoneInCustomer(customer)

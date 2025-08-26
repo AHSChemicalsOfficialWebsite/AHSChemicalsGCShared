@@ -17,27 +17,34 @@ type QBReponseToken struct {
 }
 
 func (r *QBReponseToken) IsExpired() bool {
-	return time.Now().After(r.ExpiresAt)
+	return time.Now().UTC().After(r.ExpiresAt)
 }
+
 func (r *QBReponseToken) SetObtainedAt() {
-	r.ObtainedAt = time.Now()
+	r.ObtainedAt = time.Now().UTC()
 }
+
 func (r *QBReponseToken) SetExpiresAt() {
-	r.ExpiresAt = time.Now().Add(time.Duration(r.ExpiresInSec) * time.Second)
+	r.ExpiresAt = time.Now().UTC().Add(time.Duration(r.ExpiresInSec) * time.Second)
 }
+
 func (r *QBReponseToken) IsRefreshTokenExpired() bool {
 	refreshTokenExpiry := r.ObtainedAt.Add(time.Duration(r.RefresTokenExpiresIn) * time.Second)
-	return time.Now().After(refreshTokenExpiry)
+	return time.Now().UTC().After(refreshTokenExpiry)
 }
+
 func (r *QBReponseToken) SetRealmID(realmID string) {
 	r.RealmId = realmID
 }
+
 func (r *QBReponseToken) SetState(state string) {
 	r.State = state
 }
+
 func (r *QBReponseToken) SetScope(scope string) {
 	r.Scope = scope
 }
+
 func (r *QBReponseToken) ToMap() map[string]any {
 	return map[string]any{
 		"access_token":               r.AccessToken,

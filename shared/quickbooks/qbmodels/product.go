@@ -137,8 +137,8 @@ func (qb *QBItem) MapToProduct() *models.Product {
 	product := &models.Product{
 		ID:            qb.ID,
 		IsActive:      qb.Active,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		CreatedAt:     time.Now().UTC(),
+		UpdatedAt:     time.Now().UTC(),
 		Hazardous:     false,
 		Price:         qb.UnitPrice,
 		PurchasePrice: qb.PurchaseCost,
