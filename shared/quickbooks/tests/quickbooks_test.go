@@ -18,7 +18,7 @@ func TestGetTokenFromFirestore(t *testing.T) {
 
 func TestCreateQBCustomerFromEntityID(t *testing.T){
 
-	customer, err := qbservices.CreateQBCustomerFromEntityID("1")
+	customer, err := qbservices.GetQBCustomerFromEntityID("1")
 	if err != nil{
 		t.Error(err)
 	}
@@ -27,7 +27,7 @@ func TestCreateQBCustomerFromEntityID(t *testing.T){
 
 func TestCreateQBItemFromEntityID(t *testing.T){
 
-	item, err := qbservices.CreateQBProductFromEntityID("68")
+	item, err := qbservices.GetQBProductFromEntityID("68")
 	if err != nil{
 		t.Error(err)
 	}
