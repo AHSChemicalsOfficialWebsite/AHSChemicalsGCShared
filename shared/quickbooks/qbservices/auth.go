@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
@@ -110,7 +111,7 @@ func refreshToken(ctx context.Context, refreshToken string) (*qbmodels.QBReponse
 // EnsureValidAccessToken retrieves and validates the QuickBooks access token and related OAuth data
 // for the specified user from Firestore.
 func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBReponseToken, error) {
-	docSnapshot, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Get(ctx)
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection(constants.QuickBooksTokenCollection).Doc(uid).Get(ctx)
 	if err != nil || !docSnapshot.Exists() {
 		return nil, fmt.Errorf("quickbooks authentication required")
 	}
@@ -151,17 +152,17 @@ func SaveTokenToFirestore(ctx context.Context, t *qbmodels.QBReponseToken, uid s
 	t.SetObtainedAt()
 	t.SetExpiresAt()
 
-	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, t.ToMap(), firestore.MergeAll)
+	_, err := firebase_shared.FirestoreClient.Collection(constants.QuickBooksTokenCollection).Doc(uid).Set(ctx, t.ToMap(), firestore.MergeAll)
 	return err
 }
 
 func SetEmailSentOnSessionExpInFirestore(ctx context.Context, uid string, isExpired bool) error {
-	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Update(ctx, []firestore.Update{{Path: "email_sent_on_session_expiry", Value: isExpired}})
+	_, err := firebase_shared.FirestoreClient.Collection(constants.QuickBooksTokenCollection).Doc(uid).Update(ctx, []firestore.Update{{Path: "email_sent_on_session_expiry", Value: isExpired}})
 	return err
 }
 
 func IsEmailSentOnSessionExpInFirestore(ctx context.Context, uid string) bool {
-	docSnapshot, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Get(ctx)
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection(constants.QuickBooksTokenCollection).Doc(uid).Get(ctx)
 	if err != nil || !docSnapshot.Exists() {
 		return false // Default to false to allow sending email
 	}
@@ -178,7 +179,7 @@ func IsEmailSentOnSessionExpInFirestore(ctx context.Context, uid string) bool {
 //Only used in webhooks since there is no way to pass the user uid when making changes in quickbooks.
 //So this fetches the uid from the first document found in the quickbooks_tokens.
 func GetTokenUIDFromFirestore(ctx context.Context) (string, error) {
-	docRefs, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Documents(ctx).GetAll()
+	docRefs, err := firebase_shared.FirestoreClient.Collection(constants.QuickBooksTokenCollection).Documents(ctx).GetAll()
 	if err != nil{
 		return "", err
 	}
