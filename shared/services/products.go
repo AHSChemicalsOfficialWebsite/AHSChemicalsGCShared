@@ -58,6 +58,9 @@ func GetUpdatedProductDetails(newProduct, oldProduct *models.Product) map[string
 	if newProduct.Quantity != oldProduct.Quantity {
 		changedValues["quantity"] = newProduct.Quantity
 	}
+	if newProduct.PurchasePrice != oldProduct.PurchasePrice {
+		changedValues["purchasePrice"] = newProduct.PurchasePrice
+	}
 
 	if len(changedValues) == 0 {
 		return nil
