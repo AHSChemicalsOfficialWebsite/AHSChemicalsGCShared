@@ -18,7 +18,7 @@ func CreateContactUsAdminEmail(c *models.ContactUsForm) *send_email.EmailMetaDat
 			"phone":    c.Location,
 			"location": c.Location,
 			"message":  c.Message,
-			"year":     time.Now().Year(),
+			"year":     time.Now().UTC().Year(),
 		},
 		TemplateID:  send_email.CONTACT_US_ADMIN_TEMPLATE_ID,
 	}
