@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/firestore"
 )
 
 type Product struct {
@@ -45,8 +47,8 @@ func (p *Product) ToMap() map[string]any {
 		"slug":          p.Slug,
 		"nameKey":       p.NameKey,
 		"quantity":      p.Quantity,
-		"createdAt":     p.CreatedAt,
-		"updatedAt":     p.UpdatedAt,
+		"createdAt":     firestore.ServerTimestamp,
+		"updatedAt":     firestore.ServerTimestamp,
 	}
 }
 
@@ -63,6 +65,7 @@ func (p *Product) ToMinimalMap() map[string]any {
 }
 
 /* Setters */
+
 func (p *Product) SetID(id string) {
 	p.ID = id
 }
@@ -140,12 +143,15 @@ func (p *Product) SetUpdatedAt(updatedAt time.Time) {
 func (p *Product) GetTotalPrice() float64 {
 	return p.Price * float64(p.Quantity)
 }
+
 func (p *Product) GetTotalPurchasePrice() float64 {
 	return p.PurchasePrice * float64(p.Quantity)
 }
+
 func (p *Product) GetTotalRevenue() float64 {
 	return p.GetTotalPrice() - p.GetTotalPurchasePrice()
 }
+
 func (p *Product) GetCorrectWeightInGallons() float64 {
 	unit := strings.ToUpper(p.SizeUnit)
 	switch unit {
@@ -164,7 +170,7 @@ func (p *Product) GetCorrectWeightInGallons() float64 {
 	}
 }
 
-func AreEqualPrices(a, b []Product) bool {
+func AreEqualPrices(a, b []*Product) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -176,7 +182,7 @@ func AreEqualPrices(a, b []Product) bool {
 	return true
 }
 
-func AreEqualQuantities(a, b []Product) bool {
+func AreEqualQuantities(a, b []*Product) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -205,12 +211,15 @@ func (p *Product) GetFormattedPurchasePrice() string {
 func (p *Product) GetFormattedTotalPrice() string {
 	return fmt.Sprintf("$%.2f", p.GetTotalPrice())
 }
+
 func (p *Product) GetFormattedTotalPurchasePrice() string {
 	return fmt.Sprintf("$%.2f", p.GetTotalPurchasePrice())
 }
+
 func (p *Product) GetFormattedTotalRevenue() string {
 	return fmt.Sprintf("$%.2f", p.GetTotalRevenue())
 }
+
 func (p *Product) GetFormattedQuantity() string {
 	return fmt.Sprintf("%d", p.Quantity)
 }
