@@ -1,4 +1,3 @@
-
 package repositories
 
 import (
@@ -7,6 +6,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
+	"cloud.google.com/go/storage"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
@@ -26,7 +26,7 @@ import (
 //   - error: Returns an error if the Firestore insertion fails; otherwise, returns nil.
 func CreateOrderInFirestore(order *models.Order, ctx context.Context) error {
 
-	docRef, _, err := firebase_shared.FirestoreClient.Collection("orders").Add(ctx, order.ToMap())
+	docRef, _, err := firebase_shared.FirestoreClient.Collection(constants.OrdersCollection).Add(ctx, order.ToMap())
 	if err != nil {
 		return err
 	}
@@ -36,18 +36,18 @@ func CreateOrderInFirestore(order *models.Order, ctx context.Context) error {
 
 // CanPlaceOrder checks if there is already an order pending for the user if the status
 // of any of the existing orders is still 'PENDING'. Firestore custom claims should be checked generally before calling this
-// function to make sure it only checks for user since admins can place as many orders 
+// function to make sure it only checks for user since admins can place as many orders
 // as they want
 //
-// Parameters: 
+// Parameters:
 // - orderUID - user id of of the order
 // - ctx - context for the async function
-// 
-// Returns: 
+//
+// Returns:
 // - error if any
 func CanPlaceOrder(orderUID string, ctx context.Context) error {
-	docs, err := firebase_shared.FirestoreClient.Collection("orders").Where("status", "==", constants.OrderStatusPending).Where("uid", "==", orderUID).Documents(ctx).GetAll()
-	if err != nil{
+	docs, err := firebase_shared.FirestoreClient.Collection(constants.OrdersCollection).Where("status", "==", constants.OrderStatusPending).Where("uid", "==", orderUID).Documents(ctx).GetAll()
+	if err != nil {
 		return err
 	}
 	if len(docs) > 0 {
@@ -72,7 +72,7 @@ func UploadOrderFileToStorage(orderID string, base64Str string, fileName string,
 	if err != nil {
 		return err
 	}
-	object := bucket.Object(fmt.Sprintf("orders/%s/%s", orderID, fileName))
+	object := bucket.Object(fmt.Sprintf("%s/%s/%s", constants.OrdersCollection, orderID, fileName))
 	writer := object.NewWriter(ctx)
 
 	data, err := base64.StdEncoding.DecodeString(base64Str)
@@ -92,18 +92,18 @@ func UploadOrderFileToStorage(orderID string, base64Str string, fileName string,
 }
 
 // UpdateOrderInFirestore updates specific fields of an order in Firestore.
-// 
+//
 // Parameters:
 // - orderID: Firestore document ID of the order to be updated.
 // - details: A struct or map containing only the fields to be updated.
 // - ctx: Context for Firestore operations.
 //
 // Note:
-// - This function uses `firestore.MergeAll` to update only the specified fields in the existing document.
-// - Pass only the necessary fields in `details`. Passing the entire order object may cause errors if it includes
-//   fields that are not mapped correctly or are excluded with the `firestore:"-"` tag.
-func UpdateOrderInFirestore(ctx context.Context,orderID string, updates []firestore.Update,) error {
-	_, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Update(ctx, updates)
+//   - This function uses `firestore.MergeAll` to update only the specified fields in the existing document.
+//   - Pass only the necessary fields in `details`. Passing the entire order object may cause errors if it includes
+//     fields that are not mapped correctly or are excluded with the `firestore:"-"` tag.
+func UpdateOrderInFirestore(ctx context.Context, orderID string, updates []firestore.Update) error {
+	_, err := firebase_shared.FirestoreClient.Collection(constants.OrdersCollection).Doc(orderID).Update(ctx, updates)
 	if err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func UpdateOrderInFirestore(ctx context.Context,orderID string, updates []firest
 // - An error if the document doesn't exist or the parsing fails.
 func FetchOrderFromFirestore(orderID string, ctx context.Context) (*models.Order, error) {
 
-	docSnapshot, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Get(ctx)
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection(constants.OrdersCollection).Doc(orderID).Get(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func FetchOrderFromFirestore(orderID string, ctx context.Context) (*models.Order
 // - A pointer to the enriched `Order` struct containing full customer and product information.
 // - An error if any part of the fetch or conversion fails.
 func FetchDetailedOrderFromFirestore(orderID string, ctx context.Context) (*models.Order, error) {
-	docSnapshot, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Get(ctx)
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection(constants.OrdersCollection).Doc(orderID).Get(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -160,21 +160,21 @@ func FetchDetailedOrderFromFirestore(orderID string, ctx context.Context) (*mode
 	}
 	//Assign the order object
 	var order models.Order
-	if err := docSnapshot.DataTo(&order); err != nil { 
+	if err := docSnapshot.DataTo(&order); err != nil {
 		return nil, err
 	}
 	order.SetID(docSnapshot.Ref.ID)
-	
+
 	customerID := docSnapshot.Data()["customerId"].(string)
 	customer, err := FetchCustomerFromFirestore(customerID, ctx)
 	if err != nil {
 		return nil, err
 	}
-	order.Customer = *customer
+	order.Customer = customer
 
 	//Get the product map
 	productMap, err := FetchAllProductsByIDs(ctx, order.ToProductIDs())
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	order.ToCompleteOrderItemsFromMinimal(productMap)
@@ -182,12 +182,20 @@ func FetchDetailedOrderFromFirestore(orderID string, ctx context.Context) (*mode
 	return &order, nil
 }
 
-func CreateDetailedOrderFromExistingOrder(ctx context.Context, order *models.Order) error {
-	fetchedOrder, err := FetchDetailedOrderFromFirestore(order.ID, ctx)
+func DoesShippingManifestExist(ctx context.Context, orderID string) (bool, error) {
+	bucket, err := firebase_shared.StorageClient.Bucket(firebase_shared.StorageBucket)
 	if err != nil {
-		return err
+		return false, err
 	}
-	order.Customer = fetchedOrder.Customer
-	order.ToCompleteOrderItemsFromMinimal(fetchedOrder.ToItemMap())
-	return nil
+	obj := bucket.Object(fmt.Sprintf("%s/%s", constants.OrdersCollection, orderID))
+
+	// Try to get object attributes
+	_, err = obj.Attrs(ctx)
+	if err != nil {
+		if err == storage.ErrObjectNotExist {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }

@@ -1,4 +1,4 @@
-//package repositories contains all firestore repositories and related functions for models from package models
+// package repositories contains all firestore repositories and related functions for models from package models
 package repositories
 
 import (
@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"google.golang.org/grpc/codes"
@@ -23,18 +24,18 @@ import (
 // error - error if any
 func SaveContactUsToFirestore(c *models.ContactUsForm, ip string, ctx context.Context) error {
 
-	docSnapshot, err := firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Get(ctx)
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection(constants.ContactUsCollection).Doc(ip).Get(ctx)
 
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
-			_, err = firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Set(ctx, c)
+			_, err = firebase_shared.FirestoreClient.Collection(constants.ContactUsCollection).Doc(ip).Set(ctx, c)
 			return err
 		}
 		return err
 	}
 
 	if !docSnapshot.Exists() {
-		_, err = firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Set(ctx, c)
+		_, err = firebase_shared.FirestoreClient.Collection(constants.ContactUsCollection).Doc(ip).Set(ctx, c)
 		return err
 	}
 
@@ -48,7 +49,7 @@ func SaveContactUsToFirestore(c *models.ContactUsForm, ip string, ctx context.Co
 		return errors.New("You need to wait 24 hours before submitting another contact us request")
 	}
 
-	_, err = firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Set(ctx, c)
+	_, err = firebase_shared.FirestoreClient.Collection(constants.ContactUsCollection).Doc(ip).Set(ctx, c)
 	if err != nil {
 		return err
 	}

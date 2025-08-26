@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
@@ -22,7 +23,7 @@ import (
 //   - error: error
 func FetchCustomerFromFirestore(id string, ctx context.Context) (*models.Customer, error) {
 
-	docSnapshot, err := firebase_shared.FirestoreClient.Collection("customers").Doc(id).Get(ctx)
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection(constants.CustomersCollection).Doc(id).Get(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -35,20 +36,20 @@ func FetchCustomerFromFirestore(id string, ctx context.Context) (*models.Custome
 }
 
 // Only fetches active customers from firestore collection ('customers')
-func FetchAllCustomersFromFirestore(ctx context.Context) ([]models.Customer, error) {
+func FetchAllCustomersFromFirestore(ctx context.Context) ([]*models.Customer, error) {
 
-	customers, err := firebase_shared.FirestoreClient.Collection("customers").Where("isActive", "==", true).Documents(ctx).GetAll()
+	customers, err := firebase_shared.FirestoreClient.Collection(constants.CustomersCollection).Where("isActive", "==", true).Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
 	}
-	customersList := make([]models.Customer, len(customers))
+	customersList := make([]*models.Customer, len(customers))
 	for i, customer := range customers {
 		var customerObj models.Customer
 		err = customer.DataTo(&customerObj)
 		if err != nil {
 			return nil, fmt.Errorf("Error getting customer: %v", err)
 		}
-		customersList[i] = customerObj
+		customersList[i] = &customerObj
 	}
 	return customersList, nil
 }
@@ -70,7 +71,7 @@ func SyncQuickbookCustomerRespToFirestore(qbItemsResponse *qbmodels.QBCustomersR
 	bulkWriter := firebase_shared.FirestoreClient.BulkWriter(ctx)
 
 	for _, customer := range qbItemsResponse.QueryResponse.Customer {
-		docRef := firebase_shared.FirestoreClient.Collection("customers").Doc(customer.ID)
+		docRef := firebase_shared.FirestoreClient.Collection(constants.CustomersCollection).Doc(customer.ID)
 		_, err := bulkWriter.Set(docRef, customer.MapToCustomer().ToMap(), firestore.MergeAll)
 		if err != nil {
 			return err
@@ -94,7 +95,7 @@ func SyncQuickbookCustomerRespToFirestore(qbItemsResponse *qbmodels.QBCustomersR
 // and always double check if the key matches with the `firestore` key in the struct otherwise this
 // will create a new key with that value in document. 
 func UpdateCustomerInFirestore(ctx context.Context, customerID string, details any) error {
-	_, err := firebase_shared.FirestoreClient.Collection("customers").Doc(customerID).Set(ctx, details, firestore.MergeAll)
+	_, err := firebase_shared.FirestoreClient.Collection(constants.CustomersCollection).Doc(customerID).Set(ctx, details, firestore.MergeAll)
 	if err != nil {
 		return err
 	}
@@ -111,6 +112,6 @@ func UpdateCustomerInFirestore(ctx context.Context, customerID string, details a
 //   - error: error
 //
 func CreateCustomerInFirestore(ctx context.Context, customer *models.Customer) error {
-	_, err := firebase_shared.FirestoreClient.Collection("customers").Doc(customer.ID).Set(ctx, customer.ToMap())
+	_, err := firebase_shared.FirestoreClient.Collection(constants.CustomersCollection).Doc(customer.ID).Set(ctx, customer.ToMap())
 	return err
 }
