@@ -4,6 +4,8 @@ import (
 	"errors"
 	"mime/multipart"
 	"time"
+
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
 type DeliveryInput struct {
@@ -56,4 +58,12 @@ type Delivery struct {
 	Signature      []byte
 	DeliveryImages [][]byte
 	DeliveredAt    time.Time
+}
+
+func (d *Delivery) GetDeliveredAtLocalTime() time.Time {
+	localTime, err := utils.ConvertUTCToLocalTimeZoneWithFormat(d.DeliveredAt, d.Order.TimeZone)
+	if err != nil {
+		return d.DeliveredAt
+	}
+	return localTime
 }
