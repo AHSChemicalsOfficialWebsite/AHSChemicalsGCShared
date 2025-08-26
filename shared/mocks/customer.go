@@ -7,11 +7,11 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 )
 
-func CreateMockCustomer() models.Customer {	
-	return models.Customer{
+func CreateMockCustomer() *models.Customer {	
+	return &models.Customer{
 		ID: "1",
 		Name: "Harsh",
-		Email: "pFJqA@example.com",
+		Email: "test_email@gmail.com",
 		Address1: "2040 N Preisker lane",
 		City: "Las Vegas",
 		State: "NV",
@@ -24,9 +24,9 @@ func CreateMockCustomer() models.Customer {
 	}
 }
 
-func CreateMockCustomers(val int) []models.Customer{
-	customers := make([]models.Customer, val)
-	for i := 0; i < val; i++ {
+func CreateMockCustomers(val int) []*models.Customer{
+	customers := make([]*models.Customer, val)
+	for range val {
 		customers = append(customers, CreateMockCustomer())
 	}
 	return customers
