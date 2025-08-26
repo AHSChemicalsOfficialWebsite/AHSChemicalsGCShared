@@ -27,7 +27,7 @@ func CreateOrderPlacedAdminEmail(order *models.Order) *send_email.EmailMetaData 
 		Data: map[string]any{
 			"customer_name":        order.Customer.Name,
 			"order_number":         order.ID,
-			"order_date":           order.CreatedAt.Format("January 2, 2006 at 3:04 PM"),
+			"order_date":           order.GetLocalCreatedAtTime().Format("January 2, 2006 at 3:04 PM"),
 			"items":                createItemsDataForAdminEmail(order),
 			"subtotal":             order.GetFormattedSubTotal(),
 			"tax_rate":             order.GetFormattedTaxRate(),
@@ -49,11 +49,13 @@ func CreateOrderPlacedAdminEmail(order *models.Order) *send_email.EmailMetaData 
 // Returns:
 //   - *EmailMetaData: a pointer to the populated EmailMetaData object configured for customer notification.
 func CreateOrderPlacedUserEmail(order *models.Order) *send_email.EmailMetaData {
+	
 	emailData := &send_email.EmailMetaData{
 		Recipients: map[string]string{order.Customer.Email: order.Customer.Name},
+
 		Data: map[string]any{
 			"order_number":         order.ID,
-			"order_date":           order.CreatedAt.Format("January 2, 2006 at 3:04 PM"),
+			"order_date":           order.GetLocalCreatedAtTime().Format("January 2, 2006 at 3:04 PM"),
 			"items":                createItemsDataForUserEmail(order),
 			"special_instructions": order.SpecialInstructions,
 		},
@@ -75,7 +77,7 @@ func CreateOrderStatusUpdatedAdminEmail(order *models.Order) *send_email.EmailMe
 		Recipients: company_details.EMAILINTERNALRECIPENTS,
 		Data: map[string]any{
 			"order_number":     order.ID,
-			"order_updated_at": order.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
+			"order_updated_at": order.GetLocalUpdatedAtTime().Format("January 2, 2006 at 3:04 PM"),
 			"order_status":     order.Status,
 			"customer_name":    order.Customer.Name,
 			"customer_email":   order.Customer.Email,
@@ -101,7 +103,7 @@ func CreateOrderStatusUpdatedUserEmail(order *models.Order) *send_email.EmailMet
 		Data: map[string]any{
 			"order_number":     order.ID,
 			"order_status":     order.Status,
-			"order_updated_at": order.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
+			"order_updated_at": order.GetLocalUpdatedAtTime().Format("January 2, 2006 at 3:04 PM"),
 		},
 		TemplateID: send_email.ORDER_STATUS_UPDATED_USER_TEMPLATE_ID,
 	}
@@ -122,7 +124,7 @@ func CreateOrderItemsUpdatedAdminEmail(order *models.Order) *send_email.EmailMet
 		Recipients: company_details.EMAILINTERNALRECIPENTS,
 		Data: map[string]any{
 			"order_number":     order.ID,
-			"order_updated_at": order.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
+			"order_updated_at": order.GetLocalUpdatedAtTime().Format("January 2, 2006 at 3:04 PM"),
 			"order_status":     order.Status,
 			"customer_name":    order.Customer.Name,
 			"customer_email":   order.Customer.Email,
@@ -199,7 +201,7 @@ func CreateOrderDeliveredUserEmail(delivery *models.Delivery) *send_email.EmailM
 			"order_number": delivery.Order.ID,
 			"received_by":  delivery.ReceivedBy,
 			"delivered_by": delivery.DeliveredBy,
-			"delivered_at": delivery.DeliveredAt.Format("January 2, 2006 at 3:04 PM"),
+			"delivered_at": delivery.GetDeliveredAtLocalTime().Format("January 2, 2006 at 3:04 PM"),
 		},
 		TemplateID: send_email.ORDER_DELIVERED_USER_TEMPLATE_ID,
 	}
