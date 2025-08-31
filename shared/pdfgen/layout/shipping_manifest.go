@@ -50,7 +50,7 @@ func NewShippingManifest(delivery *models.Delivery) *ShippingManifest {
 		DeliveredBy:          delivery.DeliveredBy,
 		ReceivedBy:           delivery.ReceivedBy,
 		Signature:            delivery.Signature,
-		DeliverImages:        delivery.DeliveryImages,
+		DeliverImages:        delivery.GetCorrectlyRotatedImages(),
 		DeliveredAt:          delivery.GetDeliveredAtLocalTime().Format("January 2, 2006 at 3:04 PM"),
 	}
 	shippingManifest.getTableValues(shippingManifest.Product)
@@ -196,7 +196,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	c.MoveTo(c.MarginLeft, tableEndYPos+5)
 
 	//Check if a new page needs to be created
-	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
+	c.AddNewPageIfEnd(30, canvas.PrimaryBlue, 0.8)
 
 	//Total Units
 	c.DrawLabelWithSingleLineText(&canvas.Text{
@@ -213,6 +213,9 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	//Not exactly billing details but the total weight of each product. Didn't know what to call it
 	c.DrawBillingDetails([]string{"NON HAZARDOUS WEIGHT:", "HAZARDOUS WEIGHT:", "TOTAL WEIGHT:"}, []string{p.TotalNonHazardWeight, p.TotalHazardousWeight, p.TotalWeight}, true, true)
 	c.MoveTo(c.MarginLeft, c.Y+10)
+
+	//Check if a new page needs to be created
+	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
 
 	//Received By
 	c.DrawLabelWithSingleLineText(&canvas.Text{
@@ -238,8 +241,8 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	}, p.DeliveredBy)
 	c.MoveTo(c.MarginLeft, c.Y+5)
 
-	//Check if a new page needs to be created (60px is the rough estimate of the signature height and 10px is the height of the label)
-	c.AddNewPageIfEnd(70, canvas.PrimaryBlue, 0.8)
+	//Check if a new page needs to be created (using 90px just to be safe)
+	c.AddNewPageIfEnd(90, canvas.PrimaryBlue, 0.8)
 
 	//Signature label
 	c.DrawSingleLineText(&canvas.Text{
@@ -255,14 +258,14 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 
 	//Signature Image
 	c.DrawImageFromBytes(canvas.ImageElement{
-		X:     c.X,
-		Y:     c.Y,
-		Width: 60,
-		Bytes: p.Signature,
+		X:      c.X,
+		Y:      c.Y,
+		Width:  60,
+		Bytes:  p.Signature,
 	})
-	c.IncY(70)
+	c.IncY(90)
 
-	//Check if a new page needs to be created (30px is the height of the image and 10px is the height of the label)
+	//Check if a new page needs to be created (40px is the height of the image and 10px is the height of the label)
 	c.AddNewPageIfEnd(40, canvas.PrimaryBlue, 0.8)
 
 	//Delivery images label
