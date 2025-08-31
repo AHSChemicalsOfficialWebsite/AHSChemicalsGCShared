@@ -1,19 +1,23 @@
 package models
 
 import (
+	"bytes"
 	"errors"
+	"image"
+	"image/png"
 	"mime/multipart"
 	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
+	"github.com/rwcarlsen/goexif/exif"
 )
 
 type DeliveryInput struct {
-	OrderID     string           
-	ReceivedBy  string          
-	DeliveredBy string          
-	Signature   multipart.File  
-	Images      []multipart.File      
+	OrderID     string
+	ReceivedBy  string
+	DeliveredBy string
+	Signature   multipart.File
+	Images      []multipart.File
 }
 
 func (d *DeliveryInput) SetOrderID(orderID string) {
@@ -66,4 +70,40 @@ func (d *Delivery) GetDeliveredAtLocalTime() time.Time {
 		return d.DeliveredAt
 	}
 	return localTime
+}
+
+func (d *Delivery) GetCorrectlyRotatedImages() [][]byte {
+	deliveryImages := make([][]byte, 0)
+	for _, imageBytes := range d.DeliveryImages {
+		img, _, err := image.Decode(bytes.NewReader(imageBytes))
+		if err != nil {
+			continue
+		}
+
+		//Get orientation of the image
+		x, err := exif.Decode(bytes.NewReader(imageBytes))
+		orientation := 1 // default
+		if err == nil {
+			tag, err := x.Get(exif.Orientation)
+			if err == nil {
+				o, err := tag.Int(0)
+				if err == nil {
+					orientation = o
+				}
+			}
+		}
+
+		img = utils.FixImageOrientation(img, orientation)
+		
+		buf := new(bytes.Buffer)
+		err = png.Encode(buf, img)
+		if err != nil {
+			continue
+		}
+		deliveryImages = append(deliveryImages, buf.Bytes())
+	}
+	if len(deliveryImages) == 0 {
+		return d.DeliveryImages
+	}
+	return deliveryImages
 }
