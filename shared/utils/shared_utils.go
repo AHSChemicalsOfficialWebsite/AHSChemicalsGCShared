@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"github.com/disintegration/imaging"
 )
 
 //HasDuplicateStrings checks if a slice of string contains any duplicates.
@@ -114,4 +115,34 @@ func ConvertUTCToLocalTimeZoneWithFormat(t time.Time, timezone string) (time.Tim
         return time.Time{}, err
     }
     return t.In(loc), nil
+}
+
+func FixImageOrientation(img image.Image, orientation int) image.Image {
+    switch orientation {
+    case 1: 
+        // Normal / no rotation
+        return img
+    case 2:
+        // Flipped horizontally
+        img = imaging.FlipH(img)
+    case 3:
+        // Rotated 180° (upside down)
+        img = imaging.Rotate180(img)
+    case 4:
+        // Flipped vertically
+        img = imaging.FlipV(img)
+    case 5:
+        // Transposed (flipped along top-left to bottom-right diagonal)
+        img = imaging.Transpose(img) // flip + rotate 90°
+    case 6:
+        // Rotated 90° clockwise 
+        img = imaging.Rotate90(img)
+    case 7:
+        // Transverse (flipped along top-right to bottom-left diagonal)
+        img = imaging.Transverse(img) // flip + rotate 270°
+    case 8:
+        // Rotated 270° clockwise (rotated to the left)
+        img = imaging.Rotate270(img)
+    }
+    return img
 }
