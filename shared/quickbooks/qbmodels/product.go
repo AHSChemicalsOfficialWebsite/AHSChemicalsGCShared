@@ -139,7 +139,7 @@ func (qb *QBItem) MapToProduct() *models.Product {
 		IsActive:      qb.Active,
 		CreatedAt:     time.Now().UTC(),
 		UpdatedAt:     time.Now().UTC(),
-		Hazardous:     false,
+		Hazardous:     true,
 		Price:         qb.UnitPrice,
 		PurchasePrice: qb.PurchaseCost,
 		Desc:          qb.Description,
