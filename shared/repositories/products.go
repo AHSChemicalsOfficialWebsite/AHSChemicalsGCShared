@@ -76,14 +76,24 @@ func SyncQuickbookProductRespToFirestore(qbItemsResponse *qbmodels.QBItemsRespon
 	}
 
 	bulkWriter := firebase_shared.FirestoreClient.BulkWriter(ctx)
+	defer bulkWriter.End() 
 
 	for _, item := range qbItemsResponse.QueryResponse.Item {
 		docRef := firebase_shared.FirestoreClient.Collection(constants.ProductsCollection).Doc(item.ID)
-		_, err := bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll)
-		if err != nil {
-			return err
+		originalProduct, _ := FetchProductFromFirestore(ctx, item.ID)
+
+		if originalProduct == nil {
+			// new product -> bulk create
+			bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll)
+		} else {
+			// existing product -> update only changed fields
+			updatedValues := models.GetUpdatedProductDetails(item.MapToProduct(), originalProduct)
+			if updatedValues != nil {
+				bulkWriter.Set(docRef, updatedValues, firestore.MergeAll)
+			}
 		}
 	}
+
 	bulkWriter.Flush()
 	return nil
 }
