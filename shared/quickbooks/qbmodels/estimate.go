@@ -33,6 +33,17 @@ func NewQBEstimate(order *models.Order) *QBEstimate {
 	return QBEstimate
 }
 
+func (qbe *QBEstimate) GetTotalTaxRate() float64 {
+    if qbe.TxnTaxDetail == nil {
+        return 0.0
+    }
+
+    totalRate := 0.0
+    for _, taxLine := range qbe.TxnTaxDetail.TaxLine {
+        totalRate += taxLine.TaxLineDetail.TaxPercent
+    }
+    return totalRate
+}
 func (i *QBEstimate) AddLines(order *models.Order) {
 	lines := make([]Line, 0)
 	for _, item := range order.Items {
