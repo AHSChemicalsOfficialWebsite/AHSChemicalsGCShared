@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbservices"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/repositories"
 )
 
 func TestGetTokenFromFirestore(t *testing.T) {
@@ -32,4 +33,16 @@ func TestCreateQBItemFromEntityID(t *testing.T){
 		t.Error(err)
 	}
 	t.Logf("Item fetched from quickbooks: %v", item)
+}
+
+func TestGetQuickbooksEstimate(t *testing.T){
+	order, err := repositories.FetchDetailedOrderFromFirestore("CTZAWb", context.Background())
+	if err != nil{
+		t.Error(err)
+	}
+	estimate, err := qbservices.GetOrderQBEstimate(order)
+	if err != nil{
+		t.Error(err)
+	}
+	t.Logf("Estimate fetched from quickbooks: %v", estimate)
 }
