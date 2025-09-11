@@ -15,9 +15,6 @@ func ValidateOrder(o *models.Order) error {
 	if len(o.Items) == 0 {
 		return errors.New("No items found in order")
 	}
-	if o.TaxRate == 0 {
-		return errors.New("No tax rate found in order")
-	}
 	if o.Customer.ID == "" {
 		return errors.New("No customer found for this order")
 	}
