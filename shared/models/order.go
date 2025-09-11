@@ -31,16 +31,7 @@ type OrderIDPaylod struct {
 	OrderID string `json:"orderId"`
 }
 
-// CreateCompleteOrder creates the complete order
-// Calculates the subtotal, tax amount and total and adds a default status pending.
-//
-// Param:
-//   - correctPrices map[string]float64 prices mapped with their corresponding item ID
-func (o *Order) CreateCompleteOrder(correctPrices map[string]float64) {
-	if correctPrices == nil {
-		return
-	}
-	o.SetItemPrices(correctPrices)
+func (o *Order) CreateCompleteOrder() {
 	o.getSubTotal()
 	o.getTaxAmount()
 	o.getTotal()
@@ -72,6 +63,10 @@ func (o *Order) SetUID(uid string) {
 
 func (o *Order) SetStatus(status string) {
 	o.Status = status
+}
+
+func (o *Order) SetTaxRate(taxRate float64) {
+	o.TaxRate = taxRate
 }
 
 func (o *Order) SetItemPrices(correctPrices map[string]float64) {
