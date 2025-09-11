@@ -35,15 +35,22 @@ func TestCreateQBItemFromEntityID(t *testing.T){
 	t.Logf("Item fetched from quickbooks: %v", item)
 }
 
-func TestGetQuickbooksEstimate(t *testing.T){
+func TestQuickbooksEstimate(t *testing.T){
 	order, err := repositories.FetchDetailedOrderFromFirestore("CTZAWb", context.Background())
 	if err != nil{
 		t.Error(err)
 	}
 	t.Logf("Order fetched from firestore: %v", order.Items[0].Name)
-	estimate, err := qbservices.GetOrderQBEstimate(order)
+	
+	estimate, err := qbservices.CreateOrderQBEstimate(order)
 	if err != nil{
 		t.Error(err)
 	}
-	t.Logf("Estimate fetched from quickbooks: %v", estimate)
+	t.Logf("Estimate fetched tax rate from quickbooks for the order is: %v", estimate.GetTotalTaxRate())
+
+	err = qbservices.DeleteQBEstimate(estimate)
+	if err != nil{
+		t.Error(err)
+	}
+	t.Logf("Estimate deleted from quickbooks")
 }
