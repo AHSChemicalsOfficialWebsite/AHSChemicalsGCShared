@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -14,8 +15,8 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
-func GetOrderQBEstimate(order *models.Order) (estimate *qbmodels.QBEstimate, err error) {
-	reqURL := quickbooks.QUICKBOOKS_GET_ESTIMATE_URL
+func CreateOrderQBEstimate(order *models.Order) (estimate *qbmodels.QBEstimate, err error) {
+	reqURL := quickbooks.QUICKBOOKS_CREATE_ESTIMATE_URL
 
 	newEstimate := qbmodels.NewQBEstimate(order)
 
@@ -60,4 +61,34 @@ func GetOrderQBEstimate(order *models.Order) (estimate *qbmodels.QBEstimate, err
 	}
 
 	return quickbooksItem.Estimate, nil
+}
+
+func DeleteQBEstimate(estimate *qbmodels.QBEstimate) (err error) {
+	reqURL := quickbooks.QUICKBOOKS_DELETE_ESTIMATE_URL
+
+	estimateJSON, err := json.Marshal(estimate)
+	if err != nil {
+		return err
+	}
+
+	//Create request
+	req, err := http.NewRequest(http.MethodDelete, reqURL, bytes.NewBuffer(estimateJSON))
+	if err != nil {
+		return err
+	}
+
+	//Do request
+	client := http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to delete estimate: status=%d, body=%s", resp.StatusCode, string(body))
+	}
+
+	return nil
 }
