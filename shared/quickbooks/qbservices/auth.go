@@ -177,7 +177,7 @@ func IsEmailSentOnSessionExpInFirestore(ctx context.Context, uid string) bool {
 }
 
 //Only used in webhooks since there is no way to pass the user uid when making changes in quickbooks.
-//So this fetches the uid from the first document found in the quickbooks_tokens.
+//So this fetches the any available uid from the firestore collection where the refresh token is not expired.
 func GetTokenUIDFromFirestore(ctx context.Context) (string, error) {
 	docRefs, err := firebase_shared.FirestoreClient.Collection(constants.QuickBooksTokenCollection).Documents(ctx).GetAll()
 	if err != nil{
@@ -186,5 +186,17 @@ func GetTokenUIDFromFirestore(ctx context.Context) (string, error) {
 	if len(docRefs) == 0 {
 		return "", errors.New("No admin token for quickbooks found. Please re authenticate quickbooks")
 	}
-	return docRefs[0].Ref.ID, nil
+	for _, docRef := range docRefs {
+		var tokenResponse qbmodels.QBReponseToken
+		err = docRef.DataTo(&tokenResponse)
+		if err != nil{
+			continue
+		}
+		if tokenResponse.IsRefreshTokenExpired(){
+			continue
+		}else{
+			return docRef.Ref.ID, nil
+		}
+	}
+	return "", errors.New("No admin token for quickbooks found. Please re authenticate quickbooks")
 }
