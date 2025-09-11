@@ -15,7 +15,7 @@ type Invoice struct {
 	DueDate               string               `json:"DueDate,omitempty"`
 	DocNumber             string               `json:"DocNumber,omitempty"`
 	PrivateNote           string               `json:"PrivateNote,omitempty"`
-	Line                  []InvoiceLine        `json:"Line"` // Required
+	Line                  []Line        	   `json:"Line"` // Required
 	CustomField           []CustomField        `json:"CustomField,omitempty"`
 	TotalAmt              float64              `json:"TotalAmt,omitempty"`
 	Balance               float64              `json:"Balance,omitempty"`
@@ -59,9 +59,9 @@ func (i *Invoice) GetDocNumber() string {
 }
 
 func (i *Invoice) AddLines(order *models.Order) {
-	invoiceLines := make([]InvoiceLine, 0)
+	invoiceLines := make([]Line, 0)
 	for _, item := range order.Items {
-		line := InvoiceLine{
+		line := Line{
 			DetailType:  "SalesItemLineDetail",
 			Description: item.GetFormattedDescription(),
 			Amount:      item.GetTotalPrice(),
@@ -77,7 +77,7 @@ type Reference struct {
 	Name  string `json:"name,omitempty"`
 }
 
-type InvoiceLine struct {
+type Line struct {
 	DetailType          string               `json:"DetailType"`
 	Description         string               `json:"Description,omitempty"`
 	Amount              float64              `json:"Amount"`
@@ -86,7 +86,7 @@ type InvoiceLine struct {
 	GroupLineDetail     *GroupLineDetail     `json:"GroupLineDetail,omitempty"`
 }
 
-func (i *InvoiceLine) SetSalesItemLineDetail(item *models.Product) {
+func (i *Line) SetSalesItemLineDetail(item *models.Product) {
 	detail := &SalesItemLineDetail{
 		ItemRef: Reference{
 			Value: item.ID,
