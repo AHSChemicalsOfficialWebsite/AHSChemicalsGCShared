@@ -188,6 +188,7 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 			TextColor:   canvas.White,
 			FillColor:   canvas.PrimaryBlue,
 			BorderColor: canvas.PrimaryBlue,
+			BorderThickness: 0.8,
 		},
 		Body: &canvas.TableBody{
 			X:           c.X,
@@ -196,8 +197,9 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 			Rows:        shippingTableValues,
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryBlue,
+			BorderThickness: 0.8,
 		},
-		Width: pdfutils.CalculateShippingTableCellWidths(shippingTableCellWidths),
+		Width: pdfutils.CalculateTableCellWidths(shippingTableCellWidths),
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",
 		Size:  10,
@@ -217,6 +219,7 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 			TextColor:   canvas.White,
 			FillColor:   canvas.PrimaryBlue,
 			BorderColor: canvas.PrimaryBlue,
+			BorderThickness: 0.8,
 		},
 		Body: &canvas.TableBody{
 			X:           c.X,
@@ -226,21 +229,23 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 			Rows:        p.TableValues,
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryBlue,
+			BorderThickness: 0.8,
 		},
-		Width: pdfutils.CalculateShippingTableCellWidths(productTableCellWidths),
+		Width: pdfutils.CalculateTableCellWidths(productTableCellWidths),
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",
 		Size:  10,
 		Style: "B",
 	})
-	c.MoveTo(147, tableEndYPos+5)
 
+	c.MoveTo(147, tableEndYPos+5)
 	//Check if new page needs to be drawn before drawing the billing section (30px is the height of the label drawn)
 	c.AddNewPageIfEnd(30, canvas.PrimaryBlue, 0.8)
+	c.MoveTo(147, c.Y)
 
 	//Draw the billing section
 	c.DrawBillingDetails([]string{"SUBTOTAL", fmt.Sprintf("TAX (%s)", p.TaxRate), "TOTAL"}, []string{p.SubTotal, p.TaxAmount, p.Total}, false, false)
-	c.MoveTo(c.MarginLeft, tableEndYPos+5)
+	c.MoveTo(c.MarginLeft, c.Y - 15)
 
 	//Comments or Special Instructions label
 	c.DrawSingleLineText(&canvas.Text{

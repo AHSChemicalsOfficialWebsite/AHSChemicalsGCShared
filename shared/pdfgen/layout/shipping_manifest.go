@@ -176,6 +176,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 			FillColor:   canvas.PrimaryBlue,
 			BorderColor: canvas.PrimaryBlue,
 			TextColor:   canvas.White,
+			BorderThickness: 0.8,
 		},
 		Body: &canvas.TableBody{
 			X:           c.X,
@@ -184,6 +185,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 			CellWidths:  shippingManifestTableColWidths,
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryBlue,
+			BorderThickness: 0.8,
 		},
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",

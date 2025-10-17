@@ -163,6 +163,7 @@ func (orr *OrderRevenueReport) RenderToPDF() ([]byte, error) {
 			TextColor:   canvas.White,
 			FillColor:   canvas.PrimaryGreen,
 			BorderColor: canvas.PrimaryGreen,
+			BorderThickness: 0.8,
 		},
 		Body: &canvas.TableBody{
 			X:           c.X,
@@ -171,8 +172,9 @@ func (orr *OrderRevenueReport) RenderToPDF() ([]byte, error) {
 			Rows:        orr.TableValues,
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryGreen,
+			BorderThickness: 0.8,
 		},
-		Width: pdfutils.CalculateShippingTableCellWidths(orderRevenueReportTableColWidths),
+		Width: pdfutils.CalculateTableCellWidths(orderRevenueReportTableColWidths),
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",
 		Size:  10,
