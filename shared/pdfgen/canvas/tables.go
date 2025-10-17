@@ -185,6 +185,8 @@ type TableBody2 struct {
 	Rows            []TableRow
 }
 
+// TODO: Not complete yet. Y position gets weird when drawing the next row. Also draws the lines of the second last 
+// column with 4 line gap for some reason. Will fix this later
 func (tb *TableBody2) Draw(c *Canvas, t *Text) {
 	initialX := tb.X
 	initialY := tb.Y + 5
@@ -223,7 +225,6 @@ func (tb *TableBody2) Draw(c *Canvas, t *Text) {
 					yTracker = c.Y + 5
 					startY = yTracker
 				}
-
 				t.SetContent(line)
 				t.SetX(x)
 				t.SetY(yTracker)
