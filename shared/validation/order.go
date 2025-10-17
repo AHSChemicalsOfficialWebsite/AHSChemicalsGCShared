@@ -41,7 +41,7 @@ func validateSpecialInstructions(specialInstructions string) error {
 		return errors.New("special instructions contain invalid characters")
 	}
 
-	if len(instructions) > 200 {
+	if len(instructions) > 150 {
 		return errors.New("special instructions are too long")
 	}
 	return nil
