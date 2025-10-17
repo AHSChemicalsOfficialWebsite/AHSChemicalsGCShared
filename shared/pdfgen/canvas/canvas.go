@@ -49,8 +49,8 @@ func NewCanvas(pdf *gofpdf.Fpdf) *Canvas {
 
 /* Setters */
 
-func (c *Canvas) SetBorderX(x float64)      { c.X = x }
-func (c *Canvas) SetBorderY(y float64)      { c.Y = y }
+func (c *Canvas) SetBorderX(x float64)      { c.BorderX = x }
+func (c *Canvas) SetBorderY(y float64)      { c.BorderY = y }
 func (c *Canvas) SetMarginLeft(x float64)   { c.MarginLeft = x }
 func (c *Canvas) SetMarginTop(y float64)    { c.MarginTop = y }
 func (c *Canvas) SetBorderWidth(w float64)  { c.BorderWidth = w }
@@ -76,8 +76,8 @@ func (c *Canvas) AddNewPageIfEnd(offest float64, borderColor [3]int, lineWidth f
 			Y:           c.BorderY,
 			Width:       c.BorderWidth,
 			Height:      c.BorderHeight,
-			LineWidth:   0.8,
-			BorderColor: PrimaryBlue,
+			LineWidth:   lineWidth,
+			BorderColor: borderColor,
 		})
 		c.MoveTo(c.MarginLeft, c.MarginTop)
 	}
