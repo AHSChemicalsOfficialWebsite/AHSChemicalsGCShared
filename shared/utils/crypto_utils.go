@@ -20,9 +20,7 @@ const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 //   secret := generateRandomSecret()
 func GenerateRandomSecret() (string, error) {
 	b := make([]byte, 32) 
-	if _, err := rand.Read(b); err != nil {
-		return "", err
-	}
+	rand.Read(b)
 	return base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(b), nil
 }
 
