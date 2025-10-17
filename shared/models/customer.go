@@ -29,6 +29,10 @@ func (c *Customer) FormatAddress2() string {
 	return fmt.Sprintf("%s, %s %s", c.City, c.State, c.Zip)
 }
 
+func (c *Customer) GetFormattedName() string{
+	return fmt.Sprintf("%s", c.Name)
+}
+
 func (c *Customer) ToMap() map[string]any {
 	return map[string]any{
 		"id":        c.ID,
