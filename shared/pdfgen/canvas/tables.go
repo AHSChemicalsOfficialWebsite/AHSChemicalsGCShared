@@ -5,13 +5,14 @@ import (
 )
 
 type TableHeader struct {
-	X, Y        float64
-	Headers     []string
-	CellWidths  []float64
-	Height      float64
-	FillColor   [3]int
-	TextColor   [3]int
-	BorderColor [3]int
+	X, Y            float64
+	Headers         []string
+	CellWidths      []float64
+	Height          float64
+	FillColor       [3]int
+	TextColor       [3]int
+	BorderColor     [3]int
+	BorderThickness float64
 }
 
 func (th *TableHeader) setHeight(c *Canvas, t *Text) {
@@ -37,35 +38,37 @@ func (th *TableHeader) Draw(c *Canvas, t *Text) {
 			Width:     cellWidth,
 			Height:    th.Height,
 			Style:     "F",
-			LineWidth: 0.8,
+			LineWidth: th.BorderThickness,
 			FillColor: th.FillColor,
 		})
 
 		t.SetContent(header)
 		blockHeight := t.GetMultiTextHeight(c.PDF, cellWidth)
-		//Center the text with 1 padding 
-		t.SetY(y + (th.Height - blockHeight)/2 + t.GetTextHeight(c.PDF) - 0.5)
+		//Center the text with -0.5 padding to account for the font
+		t.SetY(y + (th.Height-blockHeight)/2 + t.GetTextHeight(c.PDF) - 0.5)
 		t.SetX(x)
 		c.DrawMultipleLines(t, cellWidth, "C")
 		x += cellWidth
 	}
-	c.DrawRectangle(&Rectangle{ //Outer border for the table
+	//Draw the final outer border
+	c.DrawRectangle(&Rectangle{
 		X:           th.X,
 		Y:           th.Y,
-		Width:       utils.CalculateShippingTableCellWidths(th.CellWidths),
+		Width:       utils.CalculateTableCellWidths(th.CellWidths),
 		Height:      th.Height,
-		LineWidth:   0.8,
+		LineWidth:   th.BorderThickness,
 		BorderColor: th.BorderColor,
 	})
 }
 
 type TableBody struct {
-	X, Y        float64
-	Rows        [][]string
-	CellWidths  []float64
-	Height      float64
-	TextColor   [3]int
-	BorderColor [3]int
+	X, Y            float64
+	Rows            [][]string
+	CellWidths      []float64
+	Height          float64
+	TextColor       [3]int
+	BorderColor     [3]int
+	BorderThickness float64
 }
 
 func (tb *TableBody) DrawTableCellsRightBorder(c *Canvas) {
@@ -78,7 +81,7 @@ func (tb *TableBody) DrawTableCellsRightBorder(c *Canvas) {
 			X2:    x,
 			Y2:    tb.Y + tb.Height,
 			Color: tb.BorderColor,
-			Width: 0.8,
+			Width: tb.BorderThickness,
 		})
 	}
 }
@@ -103,14 +106,14 @@ func (tb *TableBody) Draw(c *Canvas, t *Text) {
 		rowHeight += 2.5
 
 		// Check for page overflow BEFORE drawing the row
-		if y + 10 > c.BorderHeight {
+		if y+rowHeight > c.BorderHeight {
 			// Finish current table on this page
 			c.DrawRectangle(&Rectangle{
 				X:           tb.X,
 				Y:           tb.Y,
-				Width:       utils.CalculateShippingTableCellWidths(tb.CellWidths),
+				Width:       utils.CalculateTableCellWidths(tb.CellWidths),
 				Height:      tb.Height,
-				LineWidth:   0.8,
+				LineWidth:   tb.BorderThickness,
 				BorderColor: tb.BorderColor,
 			})
 			tb.DrawTableCellsRightBorder(c)
@@ -118,7 +121,7 @@ func (tb *TableBody) Draw(c *Canvas, t *Text) {
 			// Add new page
 			c.PDF.AddPage()
 
-			// Redraw borders for new page
+			// Redraw the outer borders for the new page
 			c.DrawRectangle(&Rectangle{
 				X:           c.BorderX,
 				Y:           c.BorderY,
@@ -137,41 +140,114 @@ func (tb *TableBody) Draw(c *Canvas, t *Text) {
 			tb.Height = 0
 		}
 
-		// Draw the row
+		// Finally draw the row
 		for j, cell := range row {
 			t.SetContent(cell)
 			width := tb.CellWidths[j]
 			t.SetX(x)
-			t.SetY(y + (rowHeight - t.GetMultiTextHeight(c.PDF, width))/2)
+			t.SetY(y + (rowHeight-t.GetMultiTextHeight(c.PDF, width))/2)
 			c.DrawMultipleLines(t, width, "C")
 			x += width
 		}
-
-		// Reset x, and increment y and height
+		// Reset x, and increment y and height to draw the next row
 		x = tb.X
 		y += rowHeight
 		tb.Height += rowHeight
 	}
-
 	// Draw the final table border on the last page
 	c.DrawRectangle(&Rectangle{
 		X:           tb.X,
 		Y:           tb.Y,
-		Width:       utils.CalculateShippingTableCellWidths(tb.CellWidths),
+		Width:       utils.CalculateTableCellWidths(tb.CellWidths),
 		Height:      tb.Height,
-		LineWidth:   0.8,
+		LineWidth:   tb.BorderThickness,
 		BorderColor: tb.BorderColor,
 	})
 	tb.DrawTableCellsRightBorder(c)
 }
 
+type TableCell struct {
+	Lines []string
+	Width float64
+}
+
+type TableRow struct {
+	Cells []TableCell
+}
+
+type TableBody2 struct {
+	X, Y            float64
+	Height          float64
+	TextColor       [3]int
+	BorderColor     [3]int
+	CellWidths      []float64
+	BorderThickness float64
+	Rows            []TableRow
+}
+
+func (tb *TableBody2) Draw(c *Canvas, t *Text) {
+	initialX := tb.X
+	initialY := tb.Y + 5
+	yTracker := initialY
+	t.SetSize(9)
+	t.SetStyle("")
+	t.SetColor(tb.TextColor)
+
+	for _, row := range tb.Rows {
+		x := initialX
+		startY := yTracker
+		var maxCellHeight float64 = 0.0
+
+		// Draw each cell
+		for _, cell := range row.Cells {
+			lineHeight := t.GetMultiTextHeight(c.PDF, cell.Width)
+			cellHeight := float64(len(cell.Lines)) * (lineHeight + 1)
+			if cellHeight > maxCellHeight {
+				maxCellHeight = cellHeight
+			}
+
+			for _, line := range cell.Lines {
+				if yTracker+lineHeight > c.BorderHeight {
+					// Page break
+					c.PDF.AddPage()
+					c.DrawRectangle(&Rectangle{
+						X:           c.BorderX,
+						Y:           c.BorderY,
+						Width:       c.BorderWidth,
+						Height:      c.BorderHeight,
+						LineWidth:   0.8,
+						BorderColor: tb.BorderColor,
+					})
+					c.MoveTo(c.MarginLeft, c.MarginTop)
+					x = c.X
+					yTracker = c.Y + 5
+					startY = yTracker
+				}
+
+				t.SetContent(line)
+				t.SetX(x)
+				t.SetY(yTracker)
+				c.DrawMultipleLines(t, cell.Width, "C")
+				yTracker += lineHeight + 1
+			}
+
+			// Reset Y to start of row for next cell
+			yTracker = startY
+			x += cell.Width
+		}
+
+		yTracker += maxCellHeight + 5 
+	}
+}
+
+// Represents a complete table with header and body and width.
 type Table struct {
 	Header *TableHeader
 	Body   *TableBody
 	Width  float64
 }
 
-// Returns the y position where the table ends
+// Draws the entire table. Returns the y position where the table ends
 func (tb *Table) Draw(c *Canvas, t *Text) float64 {
 	tb.Header.Draw(c, t)
 
