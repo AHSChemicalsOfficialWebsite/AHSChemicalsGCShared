@@ -8,7 +8,7 @@ import (
 	"mime/multipart"
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/utils"
 	"github.com/disintegration/imaging"
 	"github.com/rwcarlsen/goexif/exif"
 )

@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
-	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/constants"
+	firebase_shared "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/firebase"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
 )
 
 //FetchAllProductsByIDs fetches all products from firestore from collection ('products')

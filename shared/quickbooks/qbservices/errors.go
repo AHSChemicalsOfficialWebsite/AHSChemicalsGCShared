@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
 )
 
 // Error code to know if the quickbooks session was expired or not. Quickbooks does not allow to reauthenticate programtiically. 

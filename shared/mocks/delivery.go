@@ -3,8 +3,8 @@ package mocks
 import (
 	"mime/multipart"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/utils"
 )
 
 func CreateMockDeliveryInput(orderID string) *models.DeliveryInput{

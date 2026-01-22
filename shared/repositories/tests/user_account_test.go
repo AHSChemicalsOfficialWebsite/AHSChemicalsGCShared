@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/repositories"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/repositories"
 )
 
 func TestUserAccount(t *testing.T) {

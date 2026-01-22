@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
+	firebase_shared "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/firebase"
 	"github.com/joho/godotenv"
 )
 

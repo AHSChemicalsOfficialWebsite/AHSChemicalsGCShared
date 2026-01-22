@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
-	pdfutils "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/company_details"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/pdfgen/canvas"
+	pdfutils "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 

@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
 )
 
 func ValidateOrder(o *models.Order) error {

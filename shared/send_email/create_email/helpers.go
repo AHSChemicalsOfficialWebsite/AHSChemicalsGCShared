@@ -1,8 +1,8 @@
 package create_email
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/send_email"
 )
 
 // CreateAttachments creates an array of Attachment structs to be sent along the SendGrid mail

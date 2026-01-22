@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbservices"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/repositories"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/quickbooks/qbservices"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/repositories"
 )
 
 func TestGetTokenFromFirestore(t *testing.T) {

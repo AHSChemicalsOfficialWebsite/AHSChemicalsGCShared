@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/gcp"
 	"github.com/joho/godotenv"
 )
 

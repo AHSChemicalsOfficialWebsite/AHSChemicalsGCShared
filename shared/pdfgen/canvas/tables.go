@@ -1,7 +1,7 @@
 package canvas
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/pdfgen/utils"
 )
 
 type TableHeader struct {

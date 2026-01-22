@@ -3,8 +3,8 @@ package qbmodels
 import (
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/quickbooks"
 )
 
 type QBCustomersResponse struct {

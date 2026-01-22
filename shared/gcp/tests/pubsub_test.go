@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/gcp"
 )
 
 func TestPublishMessage(t *testing.T) {

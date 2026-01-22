@@ -1,4 +1,4 @@
-module github.com/HarshMohanSason/AHSChemicalsGCShared
+module github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared
 
 go 1.24.2
 
@@ -10,6 +10,7 @@ require (
 	cloud.google.com/go/secretmanager v1.15.0
 	cloud.google.com/go/storage v1.55.0
 	firebase.google.com/go/v4 v4.15.2
+	github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared v1.22.5
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/joho/godotenv v1.5.1

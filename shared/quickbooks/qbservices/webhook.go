@@ -10,9 +10,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/quickbooks"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/utils"
 	"github.com/go-jose/go-jose/v4/json"
 )
 

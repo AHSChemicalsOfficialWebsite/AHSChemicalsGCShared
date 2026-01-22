@@ -14,10 +14,10 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
-	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/constants"
+	firebase_shared "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/firebase"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/quickbooks"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
 )
 
 // ExchangeTokenForAuthCode exchanges an authorization code fetched from the auth callback url for the token reponse from QuickBooks.

@@ -3,8 +3,8 @@ package create_email
 import (
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/company_details"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/send_email"
 )
 
 func CreateCancellationSummaryEmail(time time.Time) *send_email.EmailMetaData{

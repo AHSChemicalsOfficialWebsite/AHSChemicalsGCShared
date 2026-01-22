@@ -1,9 +1,9 @@
 package create_email
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/company_details"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/send_email"
 )
 
 // CreateOrderPlacedAdminEmail creates an email payload to notify internal admin recipients

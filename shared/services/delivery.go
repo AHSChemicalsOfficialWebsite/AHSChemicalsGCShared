@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/repositories"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/repositories"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/utils"
 )
 
 // NewDelivery creates a new delivery object from the received delivery info

@@ -4,9 +4,9 @@ package create_email
 import (
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/company_details"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/send_email"
 )
 
 func CreateContactUsAdminEmail(c *models.ContactUsForm) *send_email.EmailMetaData {

@@ -1,8 +1,8 @@
 package create_email
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/send_email"
 )
 
 func CreateUserAccountCreatedEmail(createdUser *models.UserAccountCreate) *send_email.EmailMetaData {

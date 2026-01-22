@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"cloud.google.com/go/compute/metadata"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/gcp"
 )
 
 var (

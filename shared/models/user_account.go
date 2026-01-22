@@ -3,8 +3,8 @@ package models
 import (
 	"errors"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/constants"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/utils"
 )
 
 // UserAccount represents a new user account created by the super-admin

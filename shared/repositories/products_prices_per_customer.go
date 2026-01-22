@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
-	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/constants"
+	firebase_shared "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/firebase"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
 )
 
 func SaveProductsPricesPerCustomerToFirestore(ctx context.Context) error {

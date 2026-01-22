@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
 )
 
 // ValidateContactUsForm performs validation on each field of the ContactUsForm.

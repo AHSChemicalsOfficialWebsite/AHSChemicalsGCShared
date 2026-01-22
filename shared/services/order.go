@@ -5,9 +5,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/repositories"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/constants"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/repositories"
 )
 
 // approveOrder changes the status of an order to APPROVED

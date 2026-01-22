@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/constants"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/utils"
 )
 
 type Order struct {

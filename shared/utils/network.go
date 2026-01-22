@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net"
 	"strings"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/constants"
 )
 
 // CorsEnabledFunction handles Cross-Origin Resource Sharing (CORS) for HTTP requests.

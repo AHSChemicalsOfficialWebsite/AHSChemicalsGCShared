@@ -1,7 +1,7 @@
 package send_email
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
 )
 
 type Attachment struct {

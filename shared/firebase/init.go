@@ -11,7 +11,7 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 	"firebase.google.com/go/v4/storage"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/gcp"
 	"google.golang.org/api/option"
 )
 

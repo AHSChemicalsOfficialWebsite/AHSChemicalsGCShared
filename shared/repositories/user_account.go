@@ -3,9 +3,9 @@ package repositories
 import (
 	"context"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
-	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/constants"
+	firebase_shared "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/firebase"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/shared/models"
 )
 
 func FetchAssignedAdminsForCustomer(ctx context.Context, customerID string) ([]*models.UserAccount, error) {
