@@ -12,10 +12,6 @@ import (
 )
 
 var (
-	Brands = map[string]struct{}{
-		"microtech": {},
-		"problend":  {},
-	}
 	slugSanitizer = regexp.MustCompile(`[^a-z0-9]+`)
 )
 
@@ -67,21 +63,16 @@ type QBItemCustomField struct {
 // Quickbooks does not allow storing additional properties like product brand.
 // So each product is inputted as one entire string: `BrandName - ProductName` in quickbooks manually. We parse
 // it from the delimeter '-' to get the appropriate brand and product name
-func (qb *QBItem) parseNameInto(product *models.Product) {
+func (qb *QBItem) parseNameAndBrandInto(product *models.Product) {
 	splitString := strings.SplitN(qb.Name, "-", 2)
 	if len(splitString) != 2 {
 		product.Name = qb.Name
 		return
 	}
-	parsedBrand := strings.TrimSpace(splitString[0])
+	parsedBrand := strings.ToLower(strings.TrimSpace(splitString[0]))
 	parsedProductName := strings.TrimSpace(splitString[1])
-
-	if _, ok := Brands[strings.ToLower(parsedBrand)]; ok {
-		product.Brand = parsedBrand
-		product.Name = parsedProductName
-	} else {
-		product.Name = qb.Name
-	}
+	product.Brand = parsedBrand
+	product.Name = parsedProductName
 }
 
 // parseSKUInto parses product SKU into Firestore Product
@@ -144,7 +135,7 @@ func (qb *QBItem) MapToProduct() *models.Product {
 		PurchasePrice: qb.PurchaseCost,
 		Desc:          qb.Description,
 	}
-	qb.parseNameInto(product)
+	qb.parseNameAndBrandInto(product)
 	qb.parseSKUInto(product)
 	qb.parseSlugAndNameKeyInto(product)
 	qb.parseCategoryInto(product)
