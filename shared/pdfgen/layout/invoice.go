@@ -46,7 +46,7 @@ func NewInvoice(order *models.Order, invoiceNumber string) *Invoice {
 		TaxRate:     order.GetFormattedTaxRate(),
 		CreatedAt:   order.GetLocalUpdatedAtTime().Format("January 2, 2006"),
 		PaymentDue:  order.GetLocalUpdatedAtTime().AddDate(0, 0, 15).Format("January 2, 2006"),
-		LateFeeDate: order.GetLocalUpdatedAtTime().AddDate(0, 0, 44).Format("January 2, 2006"),
+		LateFeeDate: order.GetLocalUpdatedAtTime().AddDate(0, 0, 30).Format("January 2, 2006"),
 	}
 	invoice.setTableValues(order.Items)
 
