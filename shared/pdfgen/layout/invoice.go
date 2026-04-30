@@ -27,7 +27,7 @@ type Invoice struct {
 }
 
 const (
-	TermsAndConditions = "The payment for this invoice is due within 30 days from the invoice date (Net 30). By receiving this invoice, you agree to these terms."
+	TermsAndConditions = "The payment for this invoice is due within 15 days from the invoice date (Net 15). By receiving this invoice, you agree to these terms."
 )
 
 var (
