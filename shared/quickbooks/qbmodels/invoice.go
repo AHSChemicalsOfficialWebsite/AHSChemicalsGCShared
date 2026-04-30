@@ -43,7 +43,7 @@ func NewInvoice(order *models.Order) *Invoice {
 	invoice := &Invoice{
 		CustomerRef:      Reference{Value: order.Customer.ID, Name: order.Customer.Name},
 		TxnDate:          order.UpdatedAt.Format("2006-01-02"),
-		DueDate:          order.UpdatedAt.AddDate(0, 0, 30).Format("2006-01-02"),
+		DueDate:          order.UpdatedAt.AddDate(0, 0, 15).Format("2006-01-02"),
 		TotalAmt:         order.Total,
 	}
 	invoice.AddLines(order)
