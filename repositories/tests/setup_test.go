@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	firebase "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared//firebase"
+	firebase "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/firebase"
 	"github.com/joho/godotenv"
 )
 
@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 	if err != nil{
 		log.Fatalf("Error loading the .env file: %v", err)
 	}
-	firebase.InitFirebaseDebug(os.Getenv("DEBUG_ADMIN_SDK"))
+	firebase.Init(os.Getenv("DEBUG_ADMIN_SDK"), nil)
 	code := m.Run()
 
 	os.Exit(code)

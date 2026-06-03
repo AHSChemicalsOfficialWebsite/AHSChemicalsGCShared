@@ -104,7 +104,7 @@ func SendNotification(ctx context.Context, title, body string, tokens []string) 
 	}
 }
 
-func removeInvalidToken(ctx context.Context, token string){
+func removeInvalidToken(ctx context.Context, token string) {
 
 	docs, err := FirestoreClient.Collection(UsersCollection).
         Where("fcmTokens", "array-contains", token).

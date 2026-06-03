@@ -1,4 +1,3 @@
-// package quickbooks contains initialization of quickbook credentials and basic shared functions
 package quickbooks
 
 import (

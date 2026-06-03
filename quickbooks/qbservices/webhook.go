@@ -21,7 +21,7 @@ func VerifyQuickBooksWebhookSignature(body []byte, signature string) bool {
 	mac.Write(body)
 
 	expectedMAC := mac.Sum(nil)
-	//Quickbooks sends the signature in base64 format, so need to encode the generated hmac as well
+	//Quickbooks sends the signature in base64 format
 	expectedSignature := base64.StdEncoding.EncodeToString(expectedMAC) 
 
 	return hmac.Equal([]byte(expectedSignature), []byte(signature))

@@ -49,7 +49,7 @@ func SaveProductsPricesPerCustomerToFirestore(ctx context.Context) error {
 // Returns:
 //   - map of product id to price
 //   - error
-func GetProductPricesFromCustomerID(customerID string, ctx context.Context) (map[string]float64, error) {
+func GetProductPricesFromCustomerID(ctx context.Context, customerID string ) (map[string]float64, error) {
 
 	docs, err := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Where("customerId", "==", customerID).Documents(ctx).GetAll()
 	if err != nil {

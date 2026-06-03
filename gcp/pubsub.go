@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	PubSubClient           *pubsub.Client
+	pubSubClient           *pubsub.Client
 	initPubSubOnce        	sync.Once
 )
 
@@ -21,7 +21,7 @@ func InitPubSub(projectID string, ctx context.Context) {
 		if err != nil {
 			log.Fatalf("Failed to create PubSub client: %v", err)
 		}
-		PubSubClient = client
+		pubSubClient = client
 		log.Println("PubSub initialized")
 	})
 }
@@ -37,7 +37,7 @@ type SubMessage struct {
 }
 
 // DecodeSubMessageData decodes the message data as a T struct. Returns a pointer of
-// type T struct. Using T for future usecases.
+// type T struct.
 func DecodeSubMessageData[T any](msg *SubMessage) (*T, error) {
 	var result T
 	if err := json.Unmarshal(msg.Message.Data, &result); err != nil {
@@ -47,10 +47,10 @@ func DecodeSubMessageData[T any](msg *SubMessage) (*T, error) {
 }
 
 func PublishMessage(ctx context.Context, topicID string, data []byte) error {
-	if PubSubClient == nil {
+	if pubSubClient == nil {
 		return fmt.Errorf("PubSub client not initialized")
 	}
-	topic := PubSubClient.Topic(topicID)
+	topic := pubSubClient.Topic(topicID)
 	result := topic.Publish(ctx, &pubsub.Message{
 		Data: data,
 	})

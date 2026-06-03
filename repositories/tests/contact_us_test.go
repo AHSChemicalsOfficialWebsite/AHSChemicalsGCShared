@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared//models"
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared//repositories"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/repositories"
 )
 
 func TestContactUsSaveToFirestore(t *testing.T) {

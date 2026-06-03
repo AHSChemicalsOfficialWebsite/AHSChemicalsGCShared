@@ -2,18 +2,24 @@ package firebase
 
 import (
 	"encoding/json"
+	"errors"
 	"strings"
+)
+
+var (
+	ErrInvalidHeaderFormat = errors.New("invalid Authorization header format")
+	ErrInvalidRole         = errors.New("invalid auth role")
 )
 
 // FirebaseErrorResponse represents the structure of an error response returned by Firebase Admin SDK.
 type FirebaseErrorResponse struct {
 	Error struct {
-		Code    int    `json:"code"`    
-		Message string `json:"message"` 
+		Code    int    `json:"code"`
+		Message string `json:"message"`
 		Errors  []struct {
 			Message string `json:"message"`
-			Domain  string `json:"domain"` 
-			Reason  string `json:"reason"` 
+			Domain  string `json:"domain"`
+			Reason  string `json:"reason"`
 		} `json:"errors"`
 	} `json:"error"`
 }

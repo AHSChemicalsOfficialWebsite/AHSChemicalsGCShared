@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared//repositories"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/repositories"
 )
 
 func TestProductsPricesPerCustomer(t *testing.T) {
@@ -17,7 +17,7 @@ func TestProductsPricesPerCustomer(t *testing.T) {
 
 func TestGetProductPricesFromCustomerID(t *testing.T) {
 	
-	pricesMap, err := repositories.GetProductPricesFromCustomerID("1",context.Background())
+	pricesMap, err := repositories.GetProductPricesFromCustomerID(context.Background(),"1")
 	if err != nil {
 		t.Error(err)
 	}

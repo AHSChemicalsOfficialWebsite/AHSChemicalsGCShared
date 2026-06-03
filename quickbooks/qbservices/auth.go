@@ -123,7 +123,6 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBRepons
 	if originalToken.IsExpired() {
 		//Check if refresh token is expired or not. If yes, return an error since user needs to re-login to quickbooks.
 		if originalToken.IsRefreshTokenExpired(){
-			SetEmailSentOnSessionExpInFirestore(ctx, uid, true)
 			return nil, ErrQuickBooksSessionExpired
 		}
 		newToken, err := refreshToken(ctx, originalToken.RefreshToken)
@@ -138,7 +137,6 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBRepons
 		if err != nil {
 			return nil, err
 		}
-		SetEmailSentOnSessionExpInFirestore(ctx, uid, false)
 		return newToken, nil
 	} else {
 		return &originalToken, nil
@@ -147,8 +145,9 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBRepons
 
 // SaveTokenToFirestore saves the QBTokenResponse object to firestore with timestamps.
 func SaveTokenToFirestore(ctx context.Context, t *qbmodels.QBReponseToken, uid string) error {
-	t.SetObtainedAt()
-	t.SetExpiresAt()
+	time := time.Now().UTC()
+	t.SetObtainedAt(time)
+	t.SetExpiresAt(time)
 
 	_, err := firebase.FirestoreClient.Collection(firebase.QuickBooksTokenCollection).Doc(uid).Set(ctx, t.ToMap(), firestore.MergeAll)
 	return err

@@ -55,12 +55,12 @@ func CreateOrderQBEstimate(ctx context.Context, order *models.Order, tokenResp *
 	return quickbooksItem.Estimate, nil
 }
 
-func DeleteOrderQBEstimate(ctx context.Context, estimate *qbmodels.QBEstimate, tokenResp *models.QBReponseToken) error {
+func DeleteOrderQBEstimate(ctx context.Context, estimate *qbmodels.QBEstimate, tokenResp *qbmodels.QBReponseToken) error {
 	if estimate.ID == "" || estimate.SyncToken == "" {
 		return fmt.Errorf("estimate ID and SyncToken are required to delete")
 	}
 
-	deletePayload := map[string]interface{}{
+	deletePayload := map[string]any{
 		"Id":        estimate.ID,
 		"SyncToken": estimate.SyncToken,
 		"sparse":    true,

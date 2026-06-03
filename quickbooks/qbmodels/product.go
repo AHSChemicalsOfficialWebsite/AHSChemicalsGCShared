@@ -125,11 +125,12 @@ func (qb *QBItem) parseCategoryInto(product *models.Product) {
 }
 
 func (qb *QBItem) MapToProduct() *models.Product {
+	time := time.Now().UTC()
 	product := &models.Product{
 		ID:            qb.ID,
 		IsActive:      qb.Active,
-		CreatedAt:     time.Now().UTC(),
-		UpdatedAt:     time.Now().UTC(),
+		CreatedAt:     time,
+		UpdatedAt:     time,
 		Price:         qb.UnitPrice,
 		PurchasePrice: qb.PurchaseCost,
 		Desc:          qb.Description,

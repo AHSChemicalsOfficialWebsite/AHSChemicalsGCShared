@@ -23,7 +23,7 @@ type Product struct {
 	Desc          string    `json:"desc" firestore:"desc"`
 	Slug          string    `json:"slug" firestore:"slug"`
 	NameKey       string    `json:"nameKey" firestore:"nameKey"`
-	Stock         int       `json:"stock" firestore:"stock"`
+	Stock         uint16    `json:"stock" firestore:"stock"`
 	CreatedAt     time.Time `json:"created_at" firestore:"createdAt"`
 	UpdatedAt     time.Time `json:"updated_at" firestore:"updatedAt"`
 }
@@ -110,7 +110,6 @@ func (p *Product) GetTotalPurchasePrice(quantity uint16) float64 {
 func (p *Product) GetTotalRevenuePerProduct(sellingPrice float64, quantity uint16) float64 {
 	return (sellingPrice - p.PurchasePrice) * float64(quantity)
 }
-
 func (p *Product) GetCorrectWeightInGallons(quantity uint16) float64 {
 	unit := strings.ToUpper(p.SizeUnit)
 	switch unit {

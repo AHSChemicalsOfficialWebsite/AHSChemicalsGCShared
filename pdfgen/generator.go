@@ -1,4 +1,3 @@
-// package pdfgen is used to generate pdfs from the structures defined in layout package
 package pdfgen
 
 import (
@@ -20,7 +19,7 @@ func GenerateBase64PDF(pdfGen PDFGen) (string, error) {
 	return base64Str, nil
 }
 
-//For debugging purposes
+// For debugging purposes
 func GeneratePDFFile(pdfGen PDFGen, fileName string) error {
 	pdfBytes, err := pdfGen.RenderToPDF()
 	if err != nil {

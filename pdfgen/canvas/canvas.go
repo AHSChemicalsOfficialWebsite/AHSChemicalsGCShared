@@ -92,7 +92,7 @@ func (c *Canvas) DrawCompanyDetails() {
 		{company_details.AddressLine2, ""},
 		{"Phone: " + company_details.Phone, ""},
 		{"Email: " + company_details.Email, ""},
-		{"Website: " + company_details.Url, ""},
+		{"Website: " + company_details.WebsiteUrl, ""},
 	}
 
 	for _, line := range lines {

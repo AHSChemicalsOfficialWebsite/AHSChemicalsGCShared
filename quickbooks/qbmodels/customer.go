@@ -105,13 +105,13 @@ func (qb *QBCustomer) SetAddressInCustomer(c *models.Customer) {
 }
 
 func (qb *QBCustomer) MapToCustomer() *models.Customer{
-
+	time := time.Now().UTC()
 	customer := &models.Customer{
 		ID: qb.ID,
 		IsActive: qb.Active,
 		Name: qb.DisplayName,
-		CreatedAt: time.Now().UTC(),
-		UpdatedAt: time.Now().UTC(),
+		CreatedAt: time,
+		UpdatedAt: time,
 	}
 	qb.SetEmailInCustomer(customer)
 	qb.SetPhoneInCustomer(customer)

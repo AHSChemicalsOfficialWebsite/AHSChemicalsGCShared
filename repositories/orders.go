@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 
 	"cloud.google.com/go/firestore"
@@ -12,18 +11,9 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
-func CreateOrderInFirestore(order *models.Order, ctx context.Context) error {
-
-	_, err := firebase.FirestoreClient.Collection(firebase.OrdersCollection).Doc(order.ID).Set(ctx, order.ToMap())
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 //Only for the auth role "user"
-func CanPlaceOrder(orderUID string, ctx context.Context) error {
-	docs, err := firebase.FirestoreClient.Collection(firebase.OrdersCollection).Where("status", "==", constants.OrderStatusPending).Where("uid", "==", orderUID).Documents(ctx).GetAll()
+func CanPlaceOrder(ctx context.Context, orderUID string) error {
+	docs, err := firebase.FirestoreClient.Collection(firebase.OrdersCollection).Where("status", "==", constants.OrderStatusPending).Where("uid", "==", orderUID).Where("role", "==", firebase.UserRole).Documents(ctx).GetAll()
 	if err != nil {
 		return err
 	}
@@ -33,18 +23,13 @@ func CanPlaceOrder(orderUID string, ctx context.Context) error {
 	return nil
 }
 
-func UploadOrderFileToStorage(orderID string, base64Str string, fileName string, ctx context.Context) error {
+func UploadOrderFileToStorage(ctx context.Context, orderID string, data []byte, fileName string) error {
 	bucket, err := firebase.StorageClient.Bucket(firebase.StorageBucket)
 	if err != nil {
 		return err
 	}
 	object := bucket.Object(fmt.Sprintf("%s/%s/%s", firebase.OrdersCollection, orderID, fileName))
 	writer := object.NewWriter(ctx)
-
-	data, err := base64.StdEncoding.DecodeString(base64Str)
-	if err != nil {
-		return fmt.Errorf("failed to decode base64 string: %w", err)
-	}
 
 	if _, err := writer.Write(data); err != nil {
 		return fmt.Errorf("failed to write to Cloud Storage: %w", err)
@@ -65,7 +50,7 @@ func UpdateOrderInFirestore(ctx context.Context, orderID string, updates []fires
 	return nil
 }
 
-func FetchOrderFromFirestore(orderID string, ctx context.Context) (*models.Order, error) {
+func FetchOrderFromFirestore(ctx context.Context, orderID string) (*models.Order, error) {
 	docSnapshot, err := firebase.FirestoreClient.Collection(firebase.OrdersCollection).Doc(orderID).Get(ctx)
 	if err != nil {
 		return nil, err
@@ -82,7 +67,7 @@ func FetchOrderFromFirestore(orderID string, ctx context.Context) (*models.Order
 
 	//Set customer
 	customerID := docSnapshot.Data()["customerId"].(string)
-	customer, err := FetchCustomerFromFirestore(customerID, ctx)
+	customer, err := FetchCustomerFromFirestore(ctx, customerID)
 	if err != nil {
 		return nil, err
 	}

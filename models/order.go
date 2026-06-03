@@ -6,49 +6,12 @@ import (
 	"time"
 
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/constants"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-type CartItem struct {
-	Quantity  uint16   `json:"quantity" firestore:"quantity"`
-	ProductID string   `json:"productId" firestore:"productId"`
-	Price     float64  `json:"price" firestore:"price"`
-	Product   *Product `json:"product" firestore:"-"`
-}
-
-func (item *CartItem) GetFormattedQuantity() string {
-	return fmt.Sprintf("%d", item.Quantity)
-}
-func (item *CartItem) GetFormattedPrice() string {
-	return fmt.Sprintf("$%.2f", item.Price)
-}
-
-// Quantity * Price
-func (item *CartItem) GetFormattedItemTotalPrice() string {
-	return fmt.Sprintf("$%.2f", float64(item.Quantity)*item.Price)
-}
-
-func AreEqualPrices(a, b []*CartItem) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i].Price != b[i].Price {
-			return false
-		}
-	}
-	return true
-}
-
-func AreEqualQuantities(a, b []*CartItem) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i].Quantity != b[i].Quantity {
-			return false
-		}
-	}
-	return true
+// Small type struct to fetch order when only orderId is provided
+type OrderIDPaylod struct {
+	OrderID string `json:"orderId"`
 }
 
 type Order struct {
@@ -66,12 +29,8 @@ type Order struct {
 	UpdatedAt           time.Time   `json:"updatedAt" firestore:"updatedAt"`
 }
 
-// Small struct to fetch order if only order id is passed form frontend
-type OrderIDPaylod struct {
-	OrderID string `json:"orderId"`
-}
-
 func (o *Order) Complete() {
+	o.SetID(gonanoid.Must(8))
 	o.GetSubTotal()
 	o.GetTaxAmount()
 	o.GetTotal()
@@ -81,14 +40,15 @@ func (o *Order) Complete() {
 	o.SetUpdatedAt(time)
 }
 
-func (o *Order) UpdateBill() {
+func (o *Order) UpdateBill(t time.Time) {
 	o.GetSubTotal()
 	o.GetTaxAmount()
 	o.GetTotal()
+	o.SetUpdatedAt(t)
 }
 
 /*
-	Setters
+Setters
 */
 
 func (o *Order) SetID(id string) {
@@ -108,7 +68,7 @@ func (o *Order) SetTaxRate(taxRate float64) {
 }
 func (o *Order) SetItemPrices(correctPrices map[string]float64) {
 	for i, item := range o.Items {
-		o.Items[i].Product.SetPrice(correctPrices[item.Product.ID])
+		o.Items[i].Price = correctPrices[item.Product.ID]
 	}
 }
 func (o *Order) SetCreatedAt(createdAt time.Time) {
@@ -119,7 +79,7 @@ func (o *Order) SetUpdatedAt(updatedAt time.Time) {
 }
 
 /*
-	Getters
+Getters
 */
 
 func (o *Order) GetSubTotal() {
@@ -146,7 +106,7 @@ func (o *Order) GetTotalCOG() float64 {
 }
 
 /*
-	Formatters
+Formatters
 */
 
 func (o *Order) GetFormattedTotal() string {
@@ -179,7 +139,7 @@ func (o *Order) GetFormattedCOG() string {
 	return fmt.Sprintf("$%.2f", o.GetTotalCOG())
 }
 
-// Subtotal - COG. Does not include tax as per client request
+// Subtotal - COG. Does not include tax as per the client requirement
 func (o *Order) GetFormattedTotalRevenue() string {
 	return fmt.Sprintf("$%.2f", o.SubTotal-o.GetTotalCOG())
 }
@@ -220,38 +180,6 @@ func (o *Order) ToItemMap() map[string]*Product {
 		idMap[item.Product.ID] = item.Product
 	}
 	return idMap
-}
-
-type TrackOrderChange struct {
-	StatusChanged bool
-	ItemsChanged  bool
-}
-
-func NewOrderTracker() *TrackOrderChange {
-	return &TrackOrderChange{
-		StatusChanged: false,
-		ItemsChanged:  false,
-	}
-}
-func (t *TrackOrderChange) SetStatusChanged(statusChanged bool) {
-	t.StatusChanged = statusChanged
-}
-func (t *TrackOrderChange) SetItemsChanged(new, old []*CartItem) {
-	if !AreEqualPrices(new, old) || !AreEqualQuantities(new, old) {
-		t.ItemsChanged = true
-	}
-}
-func (t *TrackOrderChange) HasChanges() bool {
-	return t.StatusChanged || t.ItemsChanged
-}
-func (t *TrackOrderChange) IsOnlyStatusChanged() bool {
-	return t.StatusChanged && !t.ItemsChanged
-}
-func (t *TrackOrderChange) TrackOrderChanges(editedOrder, originalOrder *Order) {
-	if editedOrder.Status != originalOrder.Status {
-		t.SetStatusChanged(true)
-	}
-	t.SetItemsChanged(editedOrder.Items, originalOrder.Items)
 }
 
 /*

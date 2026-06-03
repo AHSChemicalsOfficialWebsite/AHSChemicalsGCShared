@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared//repositories"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/repositories"
 )
 
 func TestUserAccount(t *testing.T) {
 
-	userAccounts, err := repositories.FetchAssignedAdminsForCustomer(context.Background(), "1")
+	userAccounts, err := repositories.FetchAllCustomersFromFirestore(context.Background())
 	if err != nil {
 		t.Errorf("Error fetching user accounts: %v", err)
 		return

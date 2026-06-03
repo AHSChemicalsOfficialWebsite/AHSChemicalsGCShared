@@ -10,7 +10,7 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/quickbooks/qbmodels"
 )
 
-func FetchCustomerFromFirestore(id string, ctx context.Context) (*models.Customer, error) {
+func FetchCustomerFromFirestore(ctx context.Context, id string) (*models.Customer, error) {
 	docSnapshot, err := firebase.FirestoreClient.Collection(firebase.CustomersCollection).Doc(id).Get(ctx)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func FetchAllCustomersFromFirestore(ctx context.Context) ([]*models.Customer, er
 	return customersList, nil
 }
 
-func SyncQuickbookCustomerRespToFirestore(qbItemsResponse *qbmodels.QBCustomersResponse, ctx context.Context) error {
+func SyncQuickbookCustomerRespToFirestore(ctx context.Context, qbItemsResponse *qbmodels.QBCustomersResponse) error {
 	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Customer == nil {
 		return nil
 	}

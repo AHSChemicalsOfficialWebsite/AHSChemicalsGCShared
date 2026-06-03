@@ -34,7 +34,7 @@ func (input *DeliveryFrontendInput) NewDelivery(order *Order) (*Delivery, error)
 		}
 		imageBytes = append(imageBytes, b)
 	}
-
+	
 	return &Delivery{
 		Order:          order,
 		ReceivedBy:     input.ReceivedBy,

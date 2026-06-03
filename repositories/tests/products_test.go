@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared//quickbooks/qbmodels"
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared//repositories"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/quickbooks/qbmodels"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/repositories"
 )
 
 func TestSyncProductsToFirestore(t *testing.T) {
@@ -35,7 +35,7 @@ func TestSyncProductsToFirestore(t *testing.T) {
 		t.Error(err)
 	}
 
-	err = repositories.SyncQuickbookProductRespToFirestore(&qbItemResponse, context.Background())
+	err = repositories.SyncQuickbookProductRespToFirestore(context.Background(),&qbItemResponse)
 
 	if err != nil {
 		t.Error(err)

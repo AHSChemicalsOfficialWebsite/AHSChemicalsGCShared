@@ -10,37 +10,6 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/quickbooks/qbmodels"
 )
 
-// FetchAllProductsByIDs fetches all products from firestore from collection ('products')
-// Returns map of product id and the product object in order to search in O(1)
-//
-// Params:
-//   - ctx: context
-//   - productIDs: []string, product ids
-//
-// Returns:
-//   - map[string]models.Product. Key is product id
-//   - error
-func FetchAllProductsByIDs(ctx context.Context, productIDs []string) (map[string]*models.Product, error) {
-	docRefs := make([]*firestore.DocumentRef, len(productIDs))
-	for i, productID := range productIDs {
-		docRefs[i] = firebase.FirestoreClient.Collection(firebase.ProductsCollection).Doc(productID)
-	}
-	docSnapshots, err := firebase.FirestoreClient.GetAll(ctx, docRefs)
-	if err != nil {
-		return nil, err
-	}
-
-	productMap := make(map[string]*models.Product)
-	for i, docSnapshot := range docSnapshots {
-		var product models.Product
-		if err := docSnapshot.DataTo(&product); err != nil {
-			return nil, fmt.Errorf("error decoding product %s: %v", productIDs[i], err)
-		}
-		productMap[product.ID] = &product
-	}
-	return productMap, nil
-}
-
 func FetchAllProductsFromFirestore(ctx context.Context) ([]*models.Product, error) {
 	docSnapshots, err := firebase.FirestoreClient.Collection(firebase.ProductsCollection).Documents(ctx).GetAll()	
 	if err != nil {
@@ -86,7 +55,7 @@ func SetProductsInCartItem(ctx context.Context, cartItems []*models.CartItem) er
 //
 // Returns:
 //   - error: error
-func SyncQuickbookProductRespToFirestore(qbItemsResponse *qbmodels.QBItemsResponse, ctx context.Context) error {
+func SyncQuickbookProductRespToFirestore( ctx context.Context, qbItemsResponse *qbmodels.QBItemsResponse) error {
 	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Item == nil {
 		return nil
 	}

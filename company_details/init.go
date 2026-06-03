@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	Name = "Azure Hospitality Supply"
-	Url  = "https://azurehospitalitysupply.com"
+	Name       = "Azure Hospitality Supply"
+	WebsiteUrl = "https://azurehospitalitysupply.com"
 )
 
 var (
