@@ -44,7 +44,7 @@ func CreateOrderQBEstimate(ctx context.Context, order *models.Order, tokenResp *
 		return nil, fmt.Errorf("failed to read QuickBooks response: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("QuickBooks API error: %s", string(bodyBytes))
+		return nil, fmt.Errorf("Failed to create estimate in quickbooks: %s", string(bodyBytes))
 	}
 
 	var quickbooksItem qbmodels.QBEstimateResponse
@@ -90,8 +90,7 @@ func DeleteOrderQBEstimate(ctx context.Context, estimate *qbmodels.QBEstimate, t
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("QuickBooks API error: %s", string(body))
+		return fmt.Errorf("Failed to delete estimate in quickbooks: %s", string(body))
 	}
-
 	return nil
 }

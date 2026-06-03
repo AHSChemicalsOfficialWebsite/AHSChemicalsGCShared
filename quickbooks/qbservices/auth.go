@@ -18,7 +18,6 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/quickbooks/qbmodels"
 )
 
-// ExchangeTokenForAuthCode exchanges an authorization code fetched from the auth callback url for the token reponse from QuickBooks.
 func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (*qbmodels.QBReponseToken, error) {
 	tokenURL := "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
 
@@ -64,7 +63,6 @@ func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (*qbmodels.Q
 	return &tokenResp, nil
 }
 
-// refreshToken uses a valid refresh token to obtain a new access token. If the refresh token has expired, it will return an error.
 func refreshToken(ctx context.Context, refreshToken string) (*qbmodels.QBReponseToken, error) {
 	tokenURL := "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
 
@@ -106,44 +104,38 @@ func refreshToken(ctx context.Context, refreshToken string) (*qbmodels.QBReponse
 	return &tokenResp, nil
 }
 
-// EnsureValidAccessToken retrieves and validates the QuickBooks access token and related OAuth data
-// for the specified user from Firestore.
-func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBReponseToken, error) {
-	docSnapshot, err := firebase.FirestoreClient.Collection(firebase.QuickBooksTokenCollection).Doc(uid).Get(ctx)
-	if err != nil || !docSnapshot.Exists() {
-		return nil, fmt.Errorf("quickbooks authentication required")
-	}
-
-	var originalToken qbmodels.QBReponseToken
-	err = docSnapshot.DataTo(&originalToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if originalToken.IsExpired() {
-		//Check if refresh token is expired or not. If yes, return an error since user needs to re-login to quickbooks.
-		if originalToken.IsRefreshTokenExpired(){
-			return nil, ErrQuickBooksSessionExpired
-		}
-		newToken, err := refreshToken(ctx, originalToken.RefreshToken)
-		if err != nil {
-			return nil, err
-		}
-		//newToken does not return the realmId and state.
-		newToken.SetRealmID(originalToken.RealmId)
-		newToken.SetState(originalToken.State)
-		
-		err = SaveTokenToFirestore(ctx, newToken, uid)
-		if err != nil {
-			return nil, err
-		}
-		return newToken, nil
-	} else {
-		return &originalToken, nil
-	}
+func GetValidToken(ctx context.Context) (*qbmodels.QBReponseToken, error) {
+    docRefs, err := firebase.FirestoreClient.Collection(firebase.QuickBooksTokenCollection).Documents(ctx).GetAll()
+    if err != nil {
+        return nil, err
+    }
+    if len(docRefs) == 0 {
+        return nil, errors.New("No QuickBooks authentication, please re-authenticate it")
+    }
+    for _, docRef := range docRefs {
+        var token qbmodels.QBReponseToken
+        if err := docRef.DataTo(&token); err != nil {
+            continue
+        }
+        if token.IsRefreshTokenExpired() {
+            continue
+        }
+        if token.IsExpired() {
+            // refresh it and return
+            newToken, err := refreshToken(ctx, token.RefreshToken)
+            if err != nil {
+                continue // try next token
+            }
+            newToken.SetRealmID(token.RealmId)
+            newToken.SetState(token.State)
+            SaveTokenToFirestore(ctx, newToken, docRef.Ref.ID)
+            return newToken, nil
+        }
+        return &token, nil
+    }
+    return nil, ErrQuickBooksSessionExpired
 }
 
-// SaveTokenToFirestore saves the QBTokenResponse object to firestore with timestamps.
 func SaveTokenToFirestore(ctx context.Context, t *qbmodels.QBReponseToken, uid string) error {
 	time := time.Now().UTC()
 	t.SetObtainedAt(time)
@@ -171,28 +163,4 @@ func IsEmailSentOnSessionExpInFirestore(ctx context.Context, uid string) bool {
 
 	isEmailSent, ok := val.(bool)
 	return ok && isEmailSent
-}
-
-// Fetches the any available uid from the firestore collection where the refresh token is not expired.
-func GetTokenUIDFromFirestore(ctx context.Context) (string, error) {
-	docRefs, err := firebase.FirestoreClient.Collection(firebase.QuickBooksTokenCollection).Documents(ctx).GetAll()
-	if err != nil{
-		return "", err
-	}
-	if len(docRefs) == 0 {
-		return "", errors.New("No admin token for quickbooks found. Please re authenticate quickbooks")
-	}
-	for _, docRef := range docRefs {
-		var tokenResponse qbmodels.QBReponseToken
-		err = docRef.DataTo(&tokenResponse)
-		if err != nil{
-			continue
-		}
-		if tokenResponse.IsRefreshTokenExpired(){
-			continue
-		}else{
-			return docRef.Ref.ID, nil
-		}
-	}
-	return "", errors.New("No admin token for quickbooks found. Please re authenticate quickbooks")
 }

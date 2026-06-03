@@ -8,10 +8,10 @@ import (
 
 func CreateMockProduct() *models.Product {
 	return &models.Product{
-		ID:            "prod-001",
+		ID:            "245",
 		IsActive:      true,
 		Brand:         "Acme",
-		Name:          "Industrial Cleaner",
+		Name:          "Stain Pro 1 Reclaim",
 		SKU:           "ACM-CLN-500ML",
 		Size:          500.0,
 		SizeUnit:      "ml",

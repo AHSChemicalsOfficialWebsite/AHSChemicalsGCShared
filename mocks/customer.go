@@ -8,8 +8,8 @@ import (
 
 func CreateMockCustomer() *models.Customer {	
 	return &models.Customer{
-		ID: "1",
-		Name: "Harsh",
+		ID: "106",
+		Name: "Alexis Party Rental",
 		Email: "test_email@gmail.com",
 		Address1: "2040 N Preisker lane",
 		City: "Las Vegas",
