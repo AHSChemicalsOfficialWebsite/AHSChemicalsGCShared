@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	CorsAllowOriginDebug      = "http://localhost:3000"
+	CorsAllowOriginDebug      = "http://localhost:5173"
 	CorsAllowOriginStaging    = "https://ahschemicalsstaging.web.app"
 	CorsAllowOriginProduction = "https://azurehospitalitysupply.com"
 )
