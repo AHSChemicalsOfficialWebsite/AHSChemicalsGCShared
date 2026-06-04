@@ -6,18 +6,23 @@ import (
 	"cloud.google.com/go/firestore"
 	"firebase.google.com/go/v4/messaging"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/gcp"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
-func getFCMTokens(ctx context.Context) ([]interface{}, error) {
-	fcmTokens := make([]interface{}, 0)
-	docs, err := FirestoreClient.Collection(UsersCollection).Documents(ctx).GetAll()
-	if err != nil {
-		return nil, err
-	}
-	for _, doc := range docs {
-		fcmTokens = append(fcmTokens, doc.Data()["fcmTokens"].([]interface{})...)
-	}
-	return nil, err
+func getFCMTokens(ctx context.Context) ([]string, error) {
+    docs, err := FirestoreClient.Collection(UsersCollection).Documents(ctx).GetAll()
+    if err != nil {
+        return nil, err
+    }
+    var tokens []string
+    for _, doc := range docs {
+        var user models.UserAccount
+        if err := doc.DataTo(&user); err != nil {
+            continue
+        }
+        tokens = append(tokens, user.FCMTokens...)
+    }
+    return tokens, nil
 }
 
 func SendNotification(ctx context.Context, title, body string) {
@@ -26,6 +31,7 @@ func SendNotification(ctx context.Context, title, body string) {
 		gcp.LogError("FCM Push Notification", "Error getting tokens: "+err.Error())
 		return
 	}
+
 	badge := 1 // for APNS
 	message := &messaging.MulticastMessage{
 		Tokens: tokens,
