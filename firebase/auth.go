@@ -28,9 +28,7 @@ func IsAuthorized(request *http.Request, roles ...models.Role) (*auth.Token, err
 		claimValue, ok := token.Claims["role"].(string)
 		if ok && claimValue != "" && claimValue == role.String() {
 			return token, nil
-		} else {
-			return nil, ErrInvalidRole
 		}
 	}
-	return token, nil
+	return 
 }

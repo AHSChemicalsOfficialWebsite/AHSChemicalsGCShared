@@ -122,7 +122,7 @@ func (o *Order) GetFormattedTaxRate() string {
 	return fmt.Sprintf("%.2f%%", o.TaxRate*100)
 }
 func (o *Order) GetFormattedTotalItems() string {
-	var totalUnits uint16 = 0
+	var totalUnits int = 0
 	for _, item := range o.Items {
 		totalUnits += item.Quantity
 	}

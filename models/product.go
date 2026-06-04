@@ -23,7 +23,7 @@ type Product struct {
 	Desc          string    `json:"desc" firestore:"desc"`
 	Slug          string    `json:"slug" firestore:"slug"`
 	NameKey       string    `json:"nameKey" firestore:"nameKey"`
-	Stock         uint16    `json:"stock" firestore:"stock"`
+	Stock         int    `json:"stock" firestore:"stock"`
 	CreatedAt     time.Time `json:"created_at" firestore:"createdAt"`
 	UpdatedAt     time.Time `json:"updated_at" firestore:"updatedAt"`
 }
@@ -103,14 +103,14 @@ func (p *Product) SetUpdatedAt(updatedAt time.Time) {
 /* Getters */
 
 // Purchase Price * Quantity
-func (p *Product) GetTotalPurchasePrice(quantity uint16) float64 {
+func (p *Product) GetTotalPurchasePrice(quantity int) float64 {
 	return p.PurchasePrice * float64(quantity)
 }
 // (Selling Price - Purchase Price) * Quantity
-func (p *Product) GetTotalRevenuePerProduct(sellingPrice float64, quantity uint16) float64 {
+func (p *Product) GetTotalRevenuePerProduct(sellingPrice float64, quantity int) float64 {
 	return (sellingPrice - p.PurchasePrice) * float64(quantity)
 }
-func (p *Product) GetCorrectWeightInGallons(quantity uint16) float64 {
+func (p *Product) GetCorrectWeightInGallons(quantity int) float64 {
 	unit := strings.ToUpper(p.SizeUnit)
 	switch unit {
 	case "OZ", "OUNCE", "OUNCES":
@@ -136,12 +136,12 @@ func (p *Product) GetShortDescription() string {
 func (p *Product) GetFormattedPurchasePrice() string {
 	return fmt.Sprintf("$%.2f", p.PurchasePrice)
 }
-func (p *Product) GetFormattedTotalPurchasePrice(quantity uint16) string {
+func (p *Product) GetFormattedTotalPurchasePrice(quantity int) string {
 	return fmt.Sprintf("$%.2f", p.GetTotalPurchasePrice(quantity))
 }
-func (p *Product) GetFormattedTotalRevenuePerProduct(sellingPrice float64, quantity uint16) string {
+func (p *Product) GetFormattedTotalRevenuePerProduct(sellingPrice float64, quantity int) string {
 	return fmt.Sprintf("$%.2f", p.GetTotalRevenuePerProduct(sellingPrice, quantity))
 }
-func (p *Product) GetFormattedWeight(quantity uint16) string {
+func (p *Product) GetFormattedWeight(quantity int) string {
 	return fmt.Sprintf("%.2f gal", p.GetCorrectWeightInGallons(quantity))
 }
