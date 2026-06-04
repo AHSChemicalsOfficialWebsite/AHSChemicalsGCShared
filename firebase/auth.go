@@ -22,13 +22,15 @@ func IsAuthorized(request *http.Request, roles ...models.Role) (*auth.Token, err
 	if err != nil {
 		return nil, err
 	}
-
-	// check for role if any
+	//In case no role is specified, return the token
+    if len(roles) == 0 {
+        return token, nil
+    }
 	for _, role := range roles {
 		claimValue, ok := token.Claims["role"].(string)
 		if ok && claimValue != "" && claimValue == role.String() {
 			return token, nil
 		}
 	}
-	return 
+	return nil, ErrInvalidRole
 }
