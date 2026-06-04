@@ -7,7 +7,7 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
-func FetchAssignedEmailsForCustomer(ctx context.Context, customerID string, roles ...firebase.Role) ([]*models.UserAccount, error) {
+func FetchAssignedEmailsForCustomer(ctx context.Context, customerID string, roles ...models.Role) ([]*models.UserAccount, error) {
 	userAccounts := make([]*models.UserAccount, 0)
 	for _, role := range roles {
 		docSnapshots, err := firebase.FirestoreClient.Collection(firebase.UsersCollection).

@@ -5,28 +5,10 @@ import (
 	"strings"
 
 	"firebase.google.com/go/v4/auth"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
-//Custom claim role assigned to each firebase authenticated user
-type Role string
-
-func (r Role) String() string {
-	return string(r)
-}
-
-const (
-	UserRole       Role = "user"
-	AdminRole      Role = "admin"
-	SuperAdminRole Role = "super_admin"
-)
-
-var ValidRoles = map[Role]struct{}{
-	UserRole:       {},
-	AdminRole:      {},
-	SuperAdminRole: {},
-}
-
-func IsAuthorized(request *http.Request, roles ...Role) (*auth.Token, error) {
+func IsAuthorized(request *http.Request, roles ...models.Role) (*auth.Token, error) {
 	ctx := request.Context()
 
 	authHeader := request.Header.Get("Authorization")

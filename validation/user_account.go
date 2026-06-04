@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/firebase"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/utils"
 )
@@ -26,7 +25,7 @@ func Validate(c *models.UserAccountCreate) error {
 	if c.Role == "" {
 		return ErrNoRole
 	}
-	if _, ok := firebase.ValidRoles[firebase.Role(c.Role)]; !ok {
+	if _, ok := models.ValidRoles[models.Role(c.Role)]; !ok {
 		return ErrInvalidRole
 	}
 	return nil

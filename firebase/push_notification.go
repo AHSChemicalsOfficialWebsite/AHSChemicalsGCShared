@@ -8,8 +8,22 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/gcp"
 )
 
-func SendNotification(ctx context.Context, title, body string, tokens []string) {
-	if len(tokens) == 0 {
+func getFCMTokens(ctx context.Context) ([]interface{}, error) {
+	fcmTokens := make([]interface{}, 0)
+	docs, err := FirestoreClient.Collection(UsersCollection).Documents(ctx).GetAll()
+	if err != nil {
+		return nil, err
+	}
+	for _, doc := range docs {
+		fcmTokens = append(fcmTokens, doc.Data()["fcmTokens"].([]interface{})...)
+	}
+	return nil, err
+}
+
+func SendNotification(ctx context.Context, title, body string) {
+	tokens, err := getFCMTokens(ctx)
+	if err != nil{
+		gcp.LogError("FCM Push Notification", "Error getting tokens: "+err.Error())
 		return
 	}
 	badge := 1 // for APNS
@@ -91,14 +105,14 @@ func SendNotification(ctx context.Context, title, body string, tokens []string) 
 	}
 	resp, err := MessagingClient.SendEachForMulticast(ctx, message)
 	if err != nil {
-		gcp.LogError("FCM Push Notification", "Error sending notification: " + err.Error())
+		gcp.LogError("FCM Push Notification", "Error sending notification: "+err.Error())
 	}
 	for i, result := range resp.Responses {
 		if !result.Success {
 			if messaging.IsUnregistered(result.Error) {
 				removeInvalidToken(ctx, tokens[i])
-			}else{
-				gcp.LogError("FCM Push Notification", "Error sending notification: " + result.Error.Error())
+			} else {
+				gcp.LogError("FCM Push Notification", "Error sending notification: "+result.Error.Error())
 			}
 		}
 	}
@@ -107,17 +121,17 @@ func SendNotification(ctx context.Context, title, body string, tokens []string) 
 func removeInvalidToken(ctx context.Context, token string) {
 
 	docs, err := FirestoreClient.Collection(UsersCollection).
-        Where("fcmTokens", "array-contains", token).
-        Documents(ctx).GetAll()
-    if err != nil {
-        gcp.LogInfo("FCM Push Notification", "Error getting documents during remove Invalid Token: " + err.Error())
-    }
-    for _, doc := range docs {
-       _ , err = doc.Ref.Update(ctx, []firestore.Update{
-            {Path: "fcmTokens", Value: firestore.ArrayRemove(token)},
-        })
-        if err != nil {
-			gcp.LogInfo("FCM Push Notification", "Error updating document during remove Invalid Token: " + err.Error())
+		Where("fcmTokens", "array-contains", token).
+		Documents(ctx).GetAll()
+	if err != nil {
+		gcp.LogInfo("FCM Push Notification", "Error getting documents during remove Invalid Token: "+err.Error())
+	}
+	for _, doc := range docs {
+		_, err = doc.Ref.Update(ctx, []firestore.Update{
+			{Path: "fcmTokens", Value: firestore.ArrayRemove(token)},
+		})
+		if err != nil {
+			gcp.LogInfo("FCM Push Notification", "Error updating document during remove Invalid Token: "+err.Error())
 		}
-    }
+	}
 }
