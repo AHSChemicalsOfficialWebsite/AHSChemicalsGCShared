@@ -23,7 +23,7 @@ type Product struct {
 	Desc          string    `json:"desc" firestore:"desc"`
 	Slug          string    `json:"slug" firestore:"slug"`
 	NameKey       string    `json:"nameKey" firestore:"nameKey"`
-	Stock         int    `json:"stock" firestore:"stock"`
+	Stock         int       `json:"stock" firestore:"stock"`
 	CreatedAt     time.Time `json:"created_at" firestore:"createdAt"`
 	UpdatedAt     time.Time `json:"updated_at" firestore:"updatedAt"`
 }
@@ -106,6 +106,7 @@ func (p *Product) SetUpdatedAt(updatedAt time.Time) {
 func (p *Product) GetTotalPurchasePrice(quantity int) float64 {
 	return p.PurchasePrice * float64(quantity)
 }
+
 // (Selling Price - Purchase Price) * Quantity
 func (p *Product) GetTotalRevenuePerProduct(sellingPrice float64, quantity int) float64 {
 	return (sellingPrice - p.PurchasePrice) * float64(quantity)
@@ -147,8 +148,8 @@ func (p *Product) GetFormattedWeight(quantity int) string {
 }
 
 type ProductInventoryUpdate struct {
-	ProductID string
-	Quantity  int
-	Brand     string
-	Name      string
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
+	Brand     string `json:"brand"`
+	Name      string `json:"name"`
 }
