@@ -145,3 +145,10 @@ func (p *Product) GetFormattedTotalRevenuePerProduct(sellingPrice float64, quant
 func (p *Product) GetFormattedWeight(quantity int) string {
 	return fmt.Sprintf("%.2f gal", p.GetCorrectWeightInGallons(quantity))
 }
+
+type ProductInventoryUpdate struct {
+	ProductID string
+	Quantity  int
+	Brand     string
+	Name      string
+}

@@ -51,7 +51,7 @@ func NewShippingManifest(delivery *models.Delivery) *ShippingManifest {
 		ReceivedBy:           delivery.ReceivedBy,
 		Signature:            delivery.Signature,
 		DeliverImages:        delivery.GetCorrectlyRotatedImages(),
-		DeliveredAt:          delivery.Order.UpdatedAt.Format("January 2, 2006 at 3:04 PM UTC"),
+		DeliveredAt:          delivery.DeliveredAt.Format("January 2, 2006 at 3:04 PM UTC"),
 	}
 	shippingManifest.getTableValues(shippingManifest.Items)
 	return shippingManifest

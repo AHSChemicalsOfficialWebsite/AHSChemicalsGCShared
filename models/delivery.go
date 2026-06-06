@@ -18,6 +18,7 @@ type DeliveryFrontendInput struct {
 	DeliveredBy string
 	Signature   multipart.File
 	Images      []multipart.File
+	Timezone    string
 }
 
 func (input *DeliveryFrontendInput) NewDelivery(order *Order) (*Delivery, error) {
@@ -34,14 +35,17 @@ func (input *DeliveryFrontendInput) NewDelivery(order *Order) (*Delivery, error)
 		}
 		imageBytes = append(imageBytes, b)
 	}
-	
+	loc, err := time.LoadLocation(input.Timezone)
+	if err != nil {
+		loc = time.UTC
+	}
 	return &Delivery{
 		Order:          order,
 		ReceivedBy:     input.ReceivedBy,
 		DeliveredBy:    input.DeliveredBy,
 		Signature:      sigBytes,
 		DeliveryImages: imageBytes,
-		DeliveredAt:    time.Now().UTC(),
+		DeliveredAt:    time.Now().In(loc),
 	}, nil
 }
 
@@ -82,7 +86,7 @@ func (d *Delivery) GetCorrectlyRotatedImages() [][]byte {
 		}
 
 		//Get the original orientation of the image
-		orientation := 1 
+		orientation := 1
 		x, err := exif.Decode(bytes.NewReader(imageBytes))
 		if err == nil {
 			tag, err := x.Get(exif.Orientation)
@@ -107,7 +111,7 @@ func (d *Delivery) GetCorrectlyRotatedImages() [][]byte {
 		case 5: // Transposed
 			img = imaging.Transpose(img)
 		case 6: // 90° clockwise
-			img = imaging.Rotate270(img) 
+			img = imaging.Rotate270(img)
 		case 7: // Transverse
 			img = imaging.Transverse(img)
 		case 8: // 270° clockwise (90° CCW)

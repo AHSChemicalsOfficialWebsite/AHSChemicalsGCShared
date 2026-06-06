@@ -15,6 +15,9 @@ func ValidateOrder(o *models.Order) error {
 	if len(o.Items) == 0 {
 		return ErrNoItems
 	}
+	if o.Customer == nil {
+		return ErrNoCustomerFound
+	}
 	for _, item := range o.Items {
 		if item.Quantity == 0 {
 			return ErrItemZeroQty
