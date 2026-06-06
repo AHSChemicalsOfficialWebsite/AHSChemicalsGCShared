@@ -148,8 +148,9 @@ func (p *Product) GetFormattedWeight(quantity int) string {
 }
 
 type ProductInventoryUpdate struct {
-	ProductID string `json:"product_id"`
+	ProductID string `json:"productId"`
 	Quantity  int    `json:"quantity"`
 	Brand     string `json:"brand"`
 	Name      string `json:"name"`
+	FromQR    bool   `json:"fromQR"`
 }
