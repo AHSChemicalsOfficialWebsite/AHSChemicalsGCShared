@@ -6,7 +6,7 @@ import (
 )
 
 // Only validating the required fields. Email, name etc can be validated in firebase auth
-func Validate(c *models.UserAccountCreate) error {
+func ValidateUserAccount(c *models.UserAccountCreate) error {
 	if err := validateName(c.Name); err != nil {
 		return ErrNameInvalid
 	}

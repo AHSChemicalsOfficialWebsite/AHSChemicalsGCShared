@@ -8,33 +8,38 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
-func SaveProductsPricesPerCustomerToFirestore(ctx context.Context) error {
-	customers, err := FetchAllCustomersFromFirestore(ctx)
-	if err != nil {
-		return err
-	}
-	products, err := FetchAllProductsFromFirestore(ctx)
-	if err != nil {
-		return err
-	}
+func CreateProductPricesForNewCustomer(ctx context.Context, customer models.Customer) error {
+    products, err := FetchAllProductsFromFirestore(ctx)
+    if err != nil {
+        return err
+    }
+    bulkWriter := firebase.FirestoreClient.BulkWriter(ctx)
+    for _, product := range products {
+        key := fmt.Sprintf("%s|%s", product.ID, customer.ID)
+        ref := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Doc(key)
+        _, err := bulkWriter.Create(ref, models.CreateProductPricePerCustomer(product, customer.ID).ToMap())
+        if err != nil {
+            return err
+        }
+    }
+    bulkWriter.Flush()
+    return nil
+}
 
+func CreateProductPricesForNewProduct(ctx context.Context, product models.Product) error {
+    customers, err := FetchAllCustomersFromFirestore(ctx)
+	if err != nil {
+		return err
+	}
 	bulkWriter := firebase.FirestoreClient.BulkWriter(ctx)
-
-	//Just blindly updating all prices per customers for each product since we first need to make
-	//a read request to firestore to get all customers and products then check if prices have changed
-	//or not which is way more reads than just directly bulk updating. In addition to this, the amount
-	//of customers and products are not that much so it really does not matter.
-	for _, product := range products {
-		for _, customer := range customers {
-			key := fmt.Sprintf("%s|%s", product.ID, customer.ID)
-			productToAdd := models.CreateProductPricePerCustomer(product, customer.ID).ToMap()
-			_, err := bulkWriter.Set(firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Doc(key), productToAdd)
-			if err != nil {
-				return err
-			}
+	for _, customer := range customers {
+		key := fmt.Sprintf("%s|%s", product.ID, customer.ID)
+		ref := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Doc(key)
+		_, err := bulkWriter.Create(ref, models.CreateProductPricePerCustomer(&product, customer.ID).ToMap())
+		if err != nil {
+			return err
 		}
 	}
-
 	bulkWriter.Flush()
 	return nil
 }

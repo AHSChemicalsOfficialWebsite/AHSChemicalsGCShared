@@ -14,7 +14,6 @@ type QBReponseToken struct {
 	State                    string    `json:"state" firestore:"state"`
 	RealmId                  string    `json:"realmId" firestore:"realmId"`
 	Scope                    string    `json:"scope" firestore:"scope"`
-	EmailSentOnSessionExpiry bool      `json:"email_sent_on_session_expiry" firestore:"email_sent_on_session_expiry"`
 }
 //If access token is expired or not
 func (r *QBReponseToken) IsExpired() bool {
@@ -40,9 +39,6 @@ func (r *QBReponseToken) SetState(state string) {
 func (r *QBReponseToken) SetScope(scope string) {
 	r.Scope = scope
 }
-func (r *QBReponseToken) SetEmailSentOnSessionExpiry(val bool) {
-	r.EmailSentOnSessionExpiry = val
-}
 
 func (r *QBReponseToken) ToMap() map[string]any {
 	return map[string]any{
@@ -56,6 +52,5 @@ func (r *QBReponseToken) ToMap() map[string]any {
 		"state":                        r.State,
 		"scope":                        r.Scope,
 		"realmId":                      r.RealmId,
-		"email_sent_on_session_expiry": r.EmailSentOnSessionExpiry,
 	}
 }

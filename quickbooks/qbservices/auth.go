@@ -133,7 +133,7 @@ func GetValidToken(ctx context.Context) (*qbmodels.QBReponseToken, error) {
         }
         return &token, nil
     }
-    return nil, ErrQuickBooksSessionExpired
+    return nil, ErrNoQuickBooksAuth
 }
 
 func SaveTokenToFirestore(ctx context.Context, t *qbmodels.QBReponseToken, uid string) error {
@@ -143,22 +143,4 @@ func SaveTokenToFirestore(ctx context.Context, t *qbmodels.QBReponseToken, uid s
 
 	_, err := firebase.FirestoreClient.Collection(firebase.QuickBooksTokenCollection).Doc(uid).Set(ctx, t.ToMap(), firestore.MergeAll)
 	return err
-}
-
-func SetEmailSentOnSessionExpInFirestore(ctx context.Context, uid string) error {
-	_, err := firebase.FirestoreClient.Collection(firebase.QuickBooksTokenCollection).Doc(uid).Update(ctx, []firestore.Update{{Path: "email_sent_on_session_expiry", Value: true}})
-	return err
-}
-
-func IsEmailSentOnSessionExpInFirestore(ctx context.Context, uid string) bool {
-	docSnapshot, err := firebase.FirestoreClient.Collection(firebase.QuickBooksTokenCollection).Doc(uid).Get(ctx)
-	if err != nil || !docSnapshot.Exists() {
-		return false // Default to false to allow sending email
-	}
-	var token qbmodels.QBReponseToken
-	err = docSnapshot.DataTo(&token)
-	if err != nil {
-		return false
-	}
-	return token.EmailSentOnSessionExpiry
 }
