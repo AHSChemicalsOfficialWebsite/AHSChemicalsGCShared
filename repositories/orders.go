@@ -22,13 +22,17 @@ func CanPlaceOrder(ctx context.Context, orderUID string) error {
 	return nil
 }
 
-func UploadOrderFileToStorage(ctx context.Context, orderID string, data []byte, fileName string) error {
+func UploadOrderFileToStorage(ctx context.Context, orderID, fileName string, data []byte, metaData map[string]string) error {
 	bucket, err := firebase.StorageClient.Bucket(firebase.StorageBucket)
 	if err != nil {
 		return err
 	}
 	object := bucket.Object(fmt.Sprintf("%s/%s/%s", firebase.OrdersCollection, orderID, fileName))
 	writer := object.NewWriter(ctx)
+		
+	if metaData != nil {
+		writer.Metadata = metaData
+	}
 
 	if _, err := writer.Write(data); err != nil {
 		return fmt.Errorf("failed to write to Cloud Storage: %w", err)
