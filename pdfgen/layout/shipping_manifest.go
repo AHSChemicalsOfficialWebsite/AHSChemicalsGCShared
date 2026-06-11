@@ -51,7 +51,7 @@ func NewShippingManifest(delivery *models.Delivery) *ShippingManifest {
 		ReceivedBy:           delivery.ReceivedBy,
 		Signature:            delivery.Signature,
 		DeliverImages:        delivery.GetCorrectlyRotatedImages(),
-		DeliveredAt:          delivery.DeliveredAt.Format("January 2, 2006 at 3:04 PM UTC"),
+		DeliveredAt:          delivery.DeliveredAt.Format("January 2, 2006 at 3:04 PM MST"),
 	}
 	shippingManifest.getTableValues(shippingManifest.Items)
 	return shippingManifest
@@ -100,7 +100,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	c.MoveTo(c.MarginLeft, 10)
 
 	//Draw the company logo on top left
-	c.DrawImageFromBytes(canvas.ImageElement{
+	c.DrawLogo(canvas.ImageElement{
 		X:      c.X,
 		Y:      c.Y,
 		Width:  65,

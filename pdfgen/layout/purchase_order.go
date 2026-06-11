@@ -78,7 +78,7 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 	c.MoveTo(c.MarginLeft, 10)
 
 	//Draw the company logo on top left
-	c.DrawImageFromBytes(canvas.ImageElement{
+	c.DrawLogo(canvas.ImageElement{
 		X:      c.X,
 		Y:      c.Y,
 		Width:  65,

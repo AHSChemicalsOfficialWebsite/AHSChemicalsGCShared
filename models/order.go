@@ -32,6 +32,7 @@ const (
 
 type Order struct {
 	ID                  string      `json:"id" firestore:"-"`
+	InvoiceNumber       string      `json:"invoiceNumber" firestore:"invoiceNumber,omitempty"`
 	Customer            *Customer   `json:"customer" firestore:"customer"`
 	Uid                 string      `json:"uid" firestore:"uid"`
 	SpecialInstructions string      `json:"specialInstructions" firestore:"specialInstructions"`
@@ -65,6 +66,9 @@ func (o *Order) UpdateBill(t time.Time) {
 
 func (o *Order) SetID(id string) {
 	o.ID = id
+}
+func (o *Order) SetInvoiceNumber(invoiceNumber string) {
+	o.InvoiceNumber = invoiceNumber
 }
 func (o *Order) SetCustomer(customer *Customer) {
 	o.Customer = customer

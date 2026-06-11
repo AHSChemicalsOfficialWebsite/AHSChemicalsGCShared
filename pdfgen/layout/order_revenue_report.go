@@ -91,7 +91,7 @@ func (orr *OrderRevenueReport) RenderToPDF() ([]byte, error) {
 	c.MoveTo(125, c.MarginTop)
 
 	//Draw the company logo on top right
-	c.DrawImageFromBytes(canvas.ImageElement{
+	c.DrawLogo(canvas.ImageElement{
 		X:      c.X,
 		Y:      c.Y,
 		Width:  70,

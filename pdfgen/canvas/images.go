@@ -43,7 +43,8 @@ var logoPNG []byte
 
 func (c *Canvas) DrawLogo(image ImageElement) {
     reader := bytes.NewReader(logoPNG)
-    c.PDF.RegisterImageOptionsReader("logo", gofpdf.ImageOptions{ImageType: "png"}, reader)
+
+    c.PDF.RegisterImageOptionsReader("logo", gofpdf.ImageOptions{ImageType: "PNG"}, reader)
     c.PDF.ImageOptions("logo", image.X, image.Y, image.Width, image.Height, image.Flow, gofpdf.ImageOptions{}, image.Link, image.LinkStr)
 }
 
