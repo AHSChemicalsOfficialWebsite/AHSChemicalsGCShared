@@ -12,3 +12,8 @@ type ContactUsForm struct {
 	Message   string    `json:"message" firestore:"message"`  
 	Timestamp time.Time `json:"timestamp" firestore:"timestamp"`
 }
+
+func (c *ContactUsForm) SetTimestamp(t time.Time) {
+	c.Timestamp = t
+}
+	

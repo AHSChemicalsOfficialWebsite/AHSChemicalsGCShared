@@ -8,6 +8,15 @@ import (
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
+type OrderDocument string
+
+const (
+	OrderDocumentPurchaseOrder    OrderDocument = "purchase-order"
+	OrderDocumentShippingManifest OrderDocument = "shipping-manifest"
+	OrderDocumentInvoice          OrderDocument = "invoice"
+	OrderDocumentRevenueReport    OrderDocument = "revenue-report"
+)
+
 type OrderIDPaylod struct {
 	OrderID string `json:"orderId"`
 }
@@ -94,6 +103,7 @@ func (o *Order) GetTaxAmount() {
 func (o *Order) GetTotal() {
 	o.Total = o.SubTotal + o.TaxAmount
 }
+
 // Total cost of goods (purchase price * quantity)
 func (o *Order) GetTotalCOG() float64 {
 	totalCOG := 0.0
