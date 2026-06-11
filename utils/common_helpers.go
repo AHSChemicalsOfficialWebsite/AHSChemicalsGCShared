@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"os"
 	"strings"
+	"time"
 )
 
 func HasDuplicateStrings(slice []string) bool {
@@ -62,4 +63,14 @@ func CreateMultipartFile(path string) (multipart.File, error) {
 
 func RoundToDecimals(val float64, place float64) float64 {
 	return math.Round(val * 10*(place)) / (10*place)
+}
+
+func MultiPartFileToBytes(file multipart.File) ([]byte, error) {
+	defer file.Close()
+	return io.ReadAll(file)
+}
+
+func GetLocalTimeFromTimezone(t time.Time,timezone string) time.Time {
+	loc, _ := time.LoadLocation(timezone)
+   	return t.In(loc)
 }

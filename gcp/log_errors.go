@@ -6,7 +6,6 @@ import (
 	"os"
 	"sync"
 
-	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/logging"
 )
 
@@ -15,13 +14,9 @@ var (
 	initGCPLoggerOnce sync.Once
 )
 
-func InitLogger(ctx context.Context) {
+func InitLogger(ctx context.Context, projectID string) {
 	initGCPLoggerOnce.Do(func() {
-		projectID, err := metadata.ProjectIDWithContext(ctx)
-		if err != nil {
-			log.Fatalf("Failed to get project ID: %v", err)
-		}
-
+		var err error
 		logClient, err = logging.NewClient(ctx, projectID)
 		if err != nil {
 			log.Fatalf("Failed to create logger: %v", err)

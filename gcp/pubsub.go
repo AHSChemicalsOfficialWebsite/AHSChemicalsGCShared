@@ -15,7 +15,7 @@ var (
 	initPubSubOnce        	sync.Once
 )
 
-func InitPubSub(projectID string, ctx context.Context) {
+func InitPubSub(ctx context.Context, projectID string) {
 	initPubSubOnce.Do(func() {
 		client, err := pubsub.NewClient(ctx, projectID)
 		if err != nil {

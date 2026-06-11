@@ -9,6 +9,7 @@ import (
 )
 
 var ErrNoQuickBooksAuth = errors.New("Quickbooks auth failed. Either no token is provided or the token is expired.")
+
 func ReturnErrorFromQBResp(respBody []byte, apiName string) error {
 	var errResp qbmodels.QBErrorResponse
 	err := json.Unmarshal(respBody, &errResp)

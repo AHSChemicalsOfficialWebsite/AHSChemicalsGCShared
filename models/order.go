@@ -5,17 +5,24 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/constants"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-// Small type struct to fetch order when only orderId is provided
 type OrderIDPaylod struct {
 	OrderID string `json:"orderId"`
 }
 
+type OrderStatus string
+
+const (
+	OrderStatusPending   OrderStatus = "pending"
+	OrderStatusApproved  OrderStatus = "approved"
+	OrderStatusDelivered OrderStatus = "delivered"
+	OrderStatusCancelled OrderStatus = "cancelled"
+)
+
 type Order struct {
-	ID                  string      `json:"id"`
+	ID                  string      `json:"id" firestore:"-"`
 	Customer            *Customer   `json:"customer" firestore:"customer"`
 	Uid                 string      `json:"uid" firestore:"uid"`
 	SpecialInstructions string      `json:"specialInstructions" firestore:"specialInstructions"`
@@ -24,7 +31,7 @@ type Order struct {
 	TaxAmount           float64     `json:"taxAmount" firestore:"taxAmount"`
 	SubTotal            float64     `json:"subTotal" firestore:"subTotal"`
 	Total               float64     `json:"total" firestore:"total"`
-	Status              string      `json:"status" firestore:"status"`
+	Status              OrderStatus `json:"status" firestore:"status"`
 	CreatedAt           time.Time   `json:"createdAt" firestore:"createdAt"`
 	UpdatedAt           time.Time   `json:"updatedAt" firestore:"updatedAt"`
 }
@@ -34,7 +41,7 @@ func (o *Order) Complete() {
 	o.GetSubTotal()
 	o.GetTaxAmount()
 	o.GetTotal()
-	o.SetStatus(constants.OrderStatusPending)
+	o.SetStatus(OrderStatusPending)
 	time := time.Now().UTC()
 	o.SetCreatedAt(time)
 	o.SetUpdatedAt(time)
@@ -47,10 +54,6 @@ func (o *Order) UpdateBill(t time.Time) {
 	o.SetUpdatedAt(t)
 }
 
-/*
-Setters
-*/
-
 func (o *Order) SetID(id string) {
 	o.ID = id
 }
@@ -60,7 +63,7 @@ func (o *Order) SetCustomer(customer *Customer) {
 func (o *Order) SetUID(uid string) {
 	o.Uid = uid
 }
-func (o *Order) SetStatus(status string) {
+func (o *Order) SetStatus(status OrderStatus) {
 	o.Status = status
 }
 func (o *Order) SetTaxRate(taxRate float64) {
@@ -78,10 +81,6 @@ func (o *Order) SetUpdatedAt(updatedAt time.Time) {
 	o.UpdatedAt = updatedAt
 }
 
-/*
-Getters
-*/
-
 func (o *Order) GetSubTotal() {
 	subTotal := 0.0
 	for _, item := range o.Items {
@@ -95,7 +94,6 @@ func (o *Order) GetTaxAmount() {
 func (o *Order) GetTotal() {
 	o.Total = o.SubTotal + o.TaxAmount
 }
-
 // Total cost of goods (purchase price * quantity)
 func (o *Order) GetTotalCOG() float64 {
 	totalCOG := 0.0
@@ -104,11 +102,6 @@ func (o *Order) GetTotalCOG() float64 {
 	}
 	return totalCOG
 }
-
-/*
-Formatters
-*/
-
 func (o *Order) GetFormattedTotal() string {
 	return fmt.Sprintf("$%.2f", o.Total)
 }
@@ -135,6 +128,7 @@ func (o *Order) GetFormattedNetWeight() string {
 	}
 	return fmt.Sprintf("%.2f gal", weight)
 }
+
 func (o *Order) GetFormattedCOG() string {
 	return fmt.Sprintf("$%.2f", o.GetTotalCOG())
 }
@@ -144,9 +138,6 @@ func (o *Order) GetFormattedTotalRevenue() string {
 	return fmt.Sprintf("$%.2f", o.SubTotal-o.GetTotalCOG())
 }
 
-/*
-Converters
-*/
 func (o *Order) ToMap() map[string]any {
 	return map[string]any{
 		"customerId":          o.Customer.ID,
@@ -182,9 +173,6 @@ func (o *Order) ToItemMap() map[string]*Product {
 	return idMap
 }
 
-/*
-Email templates for sendgrid
-*/
 func (order *Order) CreateItemsDataForAdminEmail() []map[string]any {
 	orderItems := make([]map[string]any, 0)
 	for _, item := range order.Items {

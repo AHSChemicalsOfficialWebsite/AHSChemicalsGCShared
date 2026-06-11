@@ -18,6 +18,7 @@ func getFCMTokens(ctx context.Context) ([]string, error) {
     for _, doc := range docs {
         var user models.UserAccount
         if err := doc.DataTo(&user); err != nil {
+        	gcp.LogWarning("FCM Push Notification", "Error converting document to user: "+err.Error())
             continue
         }
         tokens = append(tokens, user.FCMTokens...)

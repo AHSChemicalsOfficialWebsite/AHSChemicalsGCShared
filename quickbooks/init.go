@@ -38,7 +38,7 @@ func InitDebug() {
 	})
 }
 
-func InitProd(projectID string, ctx context.Context) {
+func InitProd(ctx context.Context,projectID string) {
 	initOnce.Do(func() {
 		CLIENT_ID = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_CLIENT_ID")
 		CLIENT_SECRET = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_CLIENT_SECRET")

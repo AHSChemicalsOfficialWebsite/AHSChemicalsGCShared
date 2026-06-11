@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/constants"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/repositories"
 )
@@ -23,14 +22,14 @@ import (
 //   - error: An error object if edited status is incorrect .
 func approveOrder(editedOrder, originalOrder *models.Order) error {
 	switch originalOrder.Status {
-	case constants.OrderStatusPending:
-		editedOrder.Status = constants.OrderStatusApproved
+	case models.OrderStatusPending:
+		editedOrder.Status = models.OrderStatusApproved
 		return nil
-	case constants.OrderStatusCancelled:
+	case models.OrderStatusCancelled:
 		if time.Since(originalOrder.UpdatedAt) > 30*24*time.Hour {
 			return errors.New("Cannot approve: more than 30 days have passed since rejection. Place a new order instead")
 		}
-		editedOrder.Status = constants.OrderStatusApproved
+		editedOrder.Status = models.OrderStatusApproved
 		return nil
 	default:
 		return errors.New("Order can only be approved if it is in PENDING or Cancelled state")
@@ -47,10 +46,10 @@ func approveOrder(editedOrder, originalOrder *models.Order) error {
 //
 // Returns:
 //   - error: An error object if edited status is incorrect .
-func cancelOrder(editedOrder *models.Order, originalOrderStatus string) error {
+func cancelOrder(editedOrder *models.Order, originalOrderStatus models.OrderStatus) error {
 	switch originalOrderStatus {
-	case constants.OrderStatusPending:
-		editedOrder.Status = constants.OrderStatusCancelled
+	case models.OrderStatusPending:
+		editedOrder.Status = models.OrderStatusCancelled
 		return nil
 	default:
 		return errors.New("Order can only be Cancelled if it is in PENDING state")
@@ -80,8 +79,8 @@ func deliverOrder(editedOrder, originalOrder *models.Order) error {
 		return errors.New("order has not been delivered yet. Please generate a shipping manifest first")
 	}
 	switch originalOrder.Status {
-	case constants.OrderStatusApproved:
-		editedOrder.Status = constants.OrderStatusDelivered
+	case models.OrderStatusApproved:
+		editedOrder.Status = models.OrderStatusDelivered
 		return nil
 	default:
 		return errors.New("Order can only be delivered if it is in APPROVED state")
@@ -99,11 +98,11 @@ func deliverOrder(editedOrder, originalOrder *models.Order) error {
 func GetOrderWithUpdatedStatus(editedOrder, originalOrder *models.Order) error {
 
 	switch editedOrder.Status {
-	case constants.OrderStatusApproved:
+	case models.OrderStatusApproved:
 		return approveOrder(editedOrder, originalOrder)
-	case constants.OrderStatusCancelled:
+	case models.OrderStatusCancelled:
 		return cancelOrder(editedOrder, originalOrder.Status)
-	case constants.OrderStatusDelivered:
+	case models.OrderStatusDelivered:
 		return deliverOrder(editedOrder, originalOrder)
 	default:
 		return nil

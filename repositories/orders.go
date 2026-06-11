@@ -6,14 +6,13 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/storage"
-	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/constants"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/firebase"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
 //Only for the auth role "user"
 func CanPlaceOrder(ctx context.Context, orderUID string) error {
-	docs, err := firebase.FirestoreClient.Collection(firebase.OrdersCollection).Where("status", "==", constants.OrderStatusPending).Where("uid", "==", orderUID).Where("role", "==", models.UserRole).Documents(ctx).GetAll()
+	docs, err := firebase.FirestoreClient.Collection(firebase.OrdersCollection).Where("status", "==", models.OrderStatusPending).Where("uid", "==", orderUID).Where("role", "==", models.UserRole).Documents(ctx).GetAll()
 	if err != nil {
 		return err
 	}

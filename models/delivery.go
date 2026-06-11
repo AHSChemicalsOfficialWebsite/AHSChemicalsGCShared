@@ -4,66 +4,11 @@ import (
 	"bytes"
 	"image"
 	"image/png"
-	"io"
-	"mime/multipart"
 	"time"
 
 	"github.com/disintegration/imaging"
 	"github.com/rwcarlsen/goexif/exif"
 )
-
-type DeliveryFrontendInput struct {
-	OrderID     string
-	ReceivedBy  string
-	DeliveredBy string
-	Signature   multipart.File
-	Images      []multipart.File
-	Timezone    string
-}
-
-func (input *DeliveryFrontendInput) NewDelivery(order *Order) (*Delivery, error) {
-	sigBytes, err := io.ReadAll(input.Signature)
-	if err != nil {
-		return nil, err
-	}
-
-	imageBytes := make([][]byte, 0, len(input.Images))
-	for _, img := range input.Images {
-		b, err := io.ReadAll(img)
-		if err != nil {
-			continue
-		}
-		imageBytes = append(imageBytes, b)
-	}
-	loc, err := time.LoadLocation(input.Timezone)
-	if err != nil {
-		loc = time.UTC
-	}
-	return &Delivery{
-		Order:          order,
-		ReceivedBy:     input.ReceivedBy,
-		DeliveredBy:    input.DeliveredBy,
-		Signature:      sigBytes,
-		DeliveryImages: imageBytes,
-		DeliveredAt:    time.Now().In(loc),
-	}, nil
-}
-
-func (dfi *DeliveryFrontendInput) SetOrderID(orderID string) {
-	dfi.OrderID = orderID
-}
-func (dfi *DeliveryFrontendInput) SetReceivedBy(receivedBy string) {
-	dfi.ReceivedBy = receivedBy
-}
-func (dfi *DeliveryFrontendInput) SetDeliveredBy(deliveredBy string) {
-	dfi.DeliveredBy = deliveredBy
-}
-func (dfi *DeliveryFrontendInput) SetSignature(signature multipart.File) {
-	dfi.Signature = signature
-}
-func (dfi *DeliveryFrontendInput) SetImages(images []multipart.File) {
-	dfi.Images = images
-}
 
 type Delivery struct {
 	Order          *Order
@@ -71,7 +16,8 @@ type Delivery struct {
 	DeliveredBy    string
 	Signature      []byte
 	DeliveryImages [][]byte
-	DeliveredAt    time.Time
+	DeliveredAt    time.Time //In UTC
+	Timezone       string
 }
 
 // For some reason on ios, when an image is taken and sent to backend,

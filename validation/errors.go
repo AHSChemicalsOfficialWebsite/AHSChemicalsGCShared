@@ -9,7 +9,6 @@ var (
 	ErrNameRequired     = errors.New("name is required")
 	ErrNameInvalid      = errors.New("invalid name entered. Please enter your full name (first and last)")
 	ErrPhoneRequired    = errors.New("phone number is required")
-	ErrPhoneInvalid     = errors.New("invalid phone number entered. Only need the 10 digits of the number")
 	ErrLocationRequired = errors.New("location is required")
 	ErrLocationInvalid  = errors.New("invalid location entered. Location can only be between 10 and 50 characters with no symbols or special characters")
 	ErrMessageRequired  = errors.New("message is required")

@@ -1,4 +1,3 @@
-// Validation package handles complex validations in the shared package
 package validation
 
 import (
@@ -11,7 +10,6 @@ import (
 
 var (
 	nameRegex     = regexp.MustCompile(`^[A-Za-z]+(?:\s+[A-Za-z]+)+$`)
-	phoneRegex    = regexp.MustCompile(`^[0-9]{10}$`)
 	locationRegex = regexp.MustCompile(`^[a-zA-Z0-9 ,._-]{10,50}$`)
 	messageRegex  = regexp.MustCompile(`^[a-zA-Z0-9\s.,'"!?;:\-_()\n\r]{10,300}$`)
 )
@@ -58,9 +56,6 @@ func validateName(name string) error {
 func validatePhone(phone string) error {
 	if phone == "" {
 		return ErrPhoneRequired
-	}
-	if !phoneRegex.MatchString(phone) {
-		return ErrPhoneInvalid
 	}
 	return nil
 }

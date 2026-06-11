@@ -46,7 +46,7 @@ func InitDebug() {
 	})
 }
 
-func InitProd(projectID string, ctx context.Context) {
+func InitProd(ctx context.Context, projectID string) {
 	initOnce.Do(func() {
 		Email = gcp.LoadSecretsHelper(projectID, "COMPANY_EMAIL")
 		Phone = gcp.LoadSecretsHelper(projectID, "COMPANY_PHONE")

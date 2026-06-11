@@ -12,6 +12,7 @@ type ProductPricePerCustomer struct {
 	ProductID   string    `json:"productId" firsetore:"productId"`
 	CustomerID  string    `json:"customerId" firsetore:"customerId"`
 	Price       float64   `json:"price" firsetore:"price"`
+	SKU         string    `json:"sku" firsetore:"sku"`
 	CreatedAt   time.Time `json:"createdAt" firsetore:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt" firsetore:"updatedAt"`
 }
@@ -23,6 +24,7 @@ func (ppc *ProductPricePerCustomer) ToMap() map[string]any {
 		"productId":   ppc.ProductID,
 		"customerId":  ppc.CustomerID,
 		"price":       ppc.Price,
+		"sku":         ppc.SKU,
 		"createdAt":   firestore.ServerTimestamp,
 		"updatedAt":   firestore.ServerTimestamp,
 	}
@@ -35,5 +37,6 @@ func CreateProductPricePerCustomer(product *Product, customerID string) *Product
 		ProductID:   product.ID,
 		CustomerID:  customerID,
 		Price:       product.Price,
+		SKU:         product.SKU,
 	}
 }
