@@ -29,7 +29,7 @@ const (
 	QUICKBOOKS_QUICKBOOKS_EXPIRED_TEMPLATE_ID = "d-5c6a813945bd4669b99225c9f6d13dca"
 )
 
-func Init(projectID string, ctx context.Context) {
+func Init(ctx context.Context, projectID string) {
 	initOnce.Do(func() {
 		if projectID == "" { // For local testing
 			ApiKey = os.Getenv("SENDGRID_API_KEY")
