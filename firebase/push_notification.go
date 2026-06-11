@@ -26,7 +26,7 @@ func getFCMTokens(ctx context.Context) ([]string, error) {
     return tokens, nil
 }
 
-func SendNotification(ctx context.Context, title, body string) {
+func SendNotification(ctx context.Context, n *models.Notifcation) {
 	tokens, err := getFCMTokens(ctx)
 	if err != nil{
 		gcp.LogError("FCM Push Notification", "Error getting tokens: "+err.Error())
@@ -37,8 +37,8 @@ func SendNotification(ctx context.Context, title, body string) {
 	message := &messaging.MulticastMessage{
 		Tokens: tokens,
 		Notification: &messaging.Notification{
-			Title:    title,
-			Body:     body,
+			Title:    n.Title,
+			Body:     n.Body,
 			ImageURL: "https://azurehospitalitysupply.com/web-app-manifest-192x192.png",
 		},
 		Webpush: &messaging.WebpushConfig{
@@ -47,11 +47,11 @@ func SendNotification(ctx context.Context, title, body string) {
 				"TTL":     "86400", //24 hours
 			},
 			Notification: &messaging.WebpushNotification{
-				Title:              title,
-				Body:               body,
+				Title:              n.Title,
+				Body:               n.Body,
 				Icon:               "https://azurehospitalitysupply.com/web-app-manifest-192x192.png", // notification icon
 				Badge:              "https://azurehospitalitysupply.com/favicon-96x96.png",            // small monochrome icon in status bar
-				Image:              "https://azurehospitalitysupply.com/web-app-manifest-512x512.png", // large image below notification body
+				Image:              "https://azurehospitalitysupply.com/web-app-manifest-512x512.png", // large image below notification n.Body
 				Vibrate:            []int{200, 100, 200},
 				RequireInteraction: true,
 				Renotify:           false, // if true, notify even if same tag exists
@@ -79,8 +79,8 @@ func SendNotification(ctx context.Context, title, body string) {
 		Android: &messaging.AndroidConfig{
 			Priority: "high",
 			Notification: &messaging.AndroidNotification{
-				Title:       title,
-				Body:        body,
+				Title:       n.Title,
+				Body:        n.Body,
 				Icon:        "ic_notification",
 				Color:       "#415391",
 				Sound:       "default",
@@ -95,8 +95,8 @@ func SendNotification(ctx context.Context, title, body string) {
 			Payload: &messaging.APNSPayload{
 				Aps: &messaging.Aps{
 					Alert: &messaging.ApsAlert{
-						Title:    title,
-						Body:     body,
+						Title:    n.Title,
+						Body:     n.Body,
 						SubTitle: "Inventory Alert",
 					},
 					Badge:            &badge,
