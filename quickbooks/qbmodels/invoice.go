@@ -15,7 +15,7 @@ type Invoice struct {
 	DueDate               string               `json:"DueDate,omitempty"`
 	DocNumber             string               `json:"DocNumber,omitempty"`
 	PrivateNote           string               `json:"PrivateNote,omitempty"`
-	Line                  []Line        	   `json:"Line"` // Required
+	Line                  []Line               `json:"Line"` // Required
 	CustomField           []CustomField        `json:"CustomField,omitempty"`
 	TotalAmt              float64              `json:"TotalAmt,omitempty"`
 	Balance               float64              `json:"Balance,omitempty"`
@@ -41,10 +41,10 @@ type Invoice struct {
 
 func NewInvoice(order *models.Order) *Invoice {
 	invoice := &Invoice{
-		CustomerRef:      Reference{Value: order.Customer.ID, Name: order.Customer.Name},
-		TxnDate:          order.UpdatedAt.Format("2006-01-02"),
-		DueDate:          order.UpdatedAt.AddDate(0, 0, 15).Format("2006-01-02"),
-		TotalAmt:         order.Total,
+		CustomerRef: Reference{Value: order.Customer.ID, Name: order.Customer.Name},
+		TxnDate:     order.UpdatedAt.Format("2006-01-02"),
+		DueDate:     order.UpdatedAt.AddDate(0, 0, 15).Format("2006-01-02"),
+		TotalAmt:    order.Total,
 	}
 	invoice.AddLines(order)
 	return invoice
@@ -66,7 +66,7 @@ func (i *Invoice) AddLines(order *models.Order) {
 			Description: item.Product.GetFormattedDescription(),
 			Amount:      float64(item.Quantity) * item.Price,
 		}
-		line.SetSalesItemLineDetail(item.Product, item.Quantity)
+		line.SetSalesItemLineDetail(item)
 		invoiceLines = append(invoiceLines, line)
 	}
 	i.Line = invoiceLines
@@ -86,14 +86,14 @@ type Line struct {
 	GroupLineDetail     *GroupLineDetail     `json:"GroupLineDetail,omitempty"`
 }
 
-func (i *Line) SetSalesItemLineDetail(item *models.Product, quantity int) {
+func (i *Line) SetSalesItemLineDetail(item *models.CartItem) {
 	detail := &SalesItemLineDetail{
 		ItemRef: Reference{
-			Value: item.ID,
-			Name:  item.Name,
+			Value: item.ProductID,
+			Name:  item.Product.Name,
 		},
-		Qty:       float64(quantity),
-		UnitPrice: item.Price,
+		Qty:        float64(item.Quantity),
+		UnitPrice:  item.Price,
 		TaxCodeRef: &Reference{Value: "TAX"},
 	}
 	i.SalesItemLineDetail = detail
