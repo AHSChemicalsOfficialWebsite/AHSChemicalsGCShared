@@ -39,7 +39,7 @@ func NewPurchaseOrder(o *models.Order) *PurchaseOrder {
 		TaxAmount:           o.GetFormattedTaxAmount(),
 		SubTotal:            o.GetFormattedSubTotal(),
 		Total:               o.GetFormattedTotal(),
-		CreatedAt:           o.UpdatedAt.Format("January 2, 2006 at 3:04 PM UTC"),
+		CreatedAt:           o.CreatedAt.Format("January 2, 2006"),
 	}
 	purchaseOrder.getTableValues(o.Items)
 	return purchaseOrder
