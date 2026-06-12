@@ -1,6 +1,7 @@
 package qbmodels
 
 import (
+	"errors"
 	"time"
 
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
@@ -11,6 +12,13 @@ type QBCustomersResponse struct {
 	QueryResponse struct {
 		Customer []QBCustomer `json:"Customer"`
 	} `json:"QueryResponse"`
+}
+
+func (r *QBCustomersResponse) GetCustomer() (*QBCustomer, error) {
+    if len(r.QueryResponse.Customer) == 0 {
+        return nil, errors.New("customer not found in QuickBooks")
+    }
+    return &r.QueryResponse.Customer[0], nil
 }
 
 type QBCustomer struct {

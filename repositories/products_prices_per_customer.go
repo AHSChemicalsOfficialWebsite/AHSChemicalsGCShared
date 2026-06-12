@@ -8,7 +8,7 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
-func CreateProductPricesForNewCustomer(ctx context.Context, customer models.Customer) error {
+func CreateProductPricesForNewCustomer(ctx context.Context, customer *models.Customer) error {
     products, err := FetchAllProductsFromFirestore(ctx)
     if err != nil {
         return err
@@ -26,7 +26,7 @@ func CreateProductPricesForNewCustomer(ctx context.Context, customer models.Cust
     return nil
 }
 
-func CreateProductPricesForNewProduct(ctx context.Context, product models.Product) error {
+func CreateProductPricesForNewProduct(ctx context.Context, product *models.Product) error {
     customers, err := FetchAllCustomersFromFirestore(ctx)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func CreateProductPricesForNewProduct(ctx context.Context, product models.Produc
 	for _, customer := range customers {
 		key := fmt.Sprintf("%s|%s", product.ID, customer.ID)
 		ref := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Doc(key)
-		_, err := bulkWriter.Create(ref, models.CreateProductPricePerCustomer(&product, customer.ID).ToMap())
+		_, err := bulkWriter.Create(ref, models.CreateProductPricePerCustomer(product, customer.ID).ToMap())
 		if err != nil {
 			return err
 		}
@@ -54,7 +54,7 @@ func CreateProductPricesForNewProduct(ctx context.Context, product models.Produc
 // Returns:
 //   - map of product id to price
 //   - error
-func GetProductPricesFromCustomerID(ctx context.Context, customerID string ) (map[string]float64, error) {
+func GetProductPricesFromCustomerID(ctx context.Context, customerID string) (map[string]float64, error) {
 
 	docs, err := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Where("customerId", "==", customerID).Documents(ctx).GetAll()
 	if err != nil {

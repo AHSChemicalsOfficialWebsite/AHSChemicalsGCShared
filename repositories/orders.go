@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/firestore"
-	"cloud.google.com/go/storage"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/firebase"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
@@ -60,22 +59,4 @@ func FetchOrderFromFirestore(ctx context.Context, orderID string) (*models.Order
 	}
 
 	return &order, nil
-}
-
-func DoesShippingManifestExist(ctx context.Context, orderID string) (bool, error) {
-	bucket, err := firebase.StorageClient.Bucket(firebase.StorageBucket)
-	if err != nil {
-		return false, err
-	}
-	obj := bucket.Object(fmt.Sprintf("%s/%s", firebase.OrdersCollection, orderID))
-
-	// Try to get object attributes
-	_, err = obj.Attrs(ctx)
-	if err != nil {
-		if err == storage.ErrObjectNotExist {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
 }

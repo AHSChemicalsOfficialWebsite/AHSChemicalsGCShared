@@ -1,6 +1,7 @@
 package qbmodels
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -19,6 +20,13 @@ type QBItemsResponse struct {
 	QueryResponse struct {
 		Item []QBItem `json:"Item"`
 	} `json:"QueryResponse"`
+}
+
+func (r *QBItemsResponse) GetItem() (*QBItem, error) {
+    if len(r.QueryResponse.Item) == 0 {
+        return nil, errors.New("customer not found in QuickBooks")
+    }
+    return &r.QueryResponse.Item[0], nil
 }
 
 type QBItem struct {
