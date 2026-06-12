@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -228,33 +227,4 @@ func (order *Order) CreateItemsDataForUserEmail() []map[string]any {
 		orderItems = append(orderItems, mappedItem)
 	}
 	return orderItems
-}
-
-
-func (updatedOrder* Order) ApproveOrder(originalOrder *Order) error {
-	switch originalOrder.Status {
-	case OrderStatusPending:
-		updatedOrder.Status = OrderStatusApproved
-		return nil
-	case OrderStatusCancelled:
-		if time.Since(originalOrder.UpdatedAt) > 30*24*time.Hour {
-			return errors.New("Cannot approve: more than 30 days have passed since rejection. Place a new order instead")
-		}
-		updatedOrder.Status = OrderStatusApproved
-		return nil
-	default:
-		return errors.New("Order can only be approved if it is in PENDING or Cancelled state")
-	}
-}
-
-func (updatedOrder *Order) CancelOrder(originalOrder *Order) error {
-	switch originalOrder.Status {
-	case OrderStatusDelivered:
-		return errors.New("Cannot cancel: order has already been delivered")
-	case OrderStatusCancelled:
-		return errors.New("Cannot cancel: order has already been cancelled")
-	default:
-		updatedOrder.Status = OrderStatusCancelled
-		return nil
-	}
 }

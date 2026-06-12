@@ -3,6 +3,8 @@ package validation
 import (
 	"regexp"
 	"strings"
+	"time"
+
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
@@ -41,4 +43,29 @@ func validateSpecialInstructions(specialInstructions string) error {
 		return ErrSpecialInstructionsTooLong
 	}
 	return nil
+}
+
+func CanApproveOrder(originalOrder *models.Order) error {
+    switch originalOrder.Status {
+    case models.OrderStatusPending:
+        return nil
+    case models.OrderStatusCancelled:
+        if time.Since(originalOrder.UpdatedAt) > 30*24*time.Hour {
+            return ErrCannotApproveExpiredCancellation
+        }
+        return nil
+    default:
+        return ErrCannotApproveNotPendingOrCancelled
+    }
+}
+
+func CanCancelOrder(originalOrder *models.Order) error {
+    switch originalOrder.Status {
+    case models.OrderStatusDelivered:
+        return ErrCannotCancelDelivered
+    case models.OrderStatusCancelled:
+        return ErrCannotCancelAlreadyCancelled
+    default:
+        return nil
+    }
 }
