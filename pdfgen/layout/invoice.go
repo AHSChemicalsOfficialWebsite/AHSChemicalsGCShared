@@ -35,9 +35,9 @@ var (
 	invoiceTableColWidths = []float64{75, 25, 40, 40}
 )
 
-func NewInvoice(order *models.Order, invoiceNumber string) *Invoice {
+func NewInvoice(order *models.Order) *Invoice {
 	invoice := &Invoice{
-		Number:      invoiceNumber,
+		Number:      order.InvoiceNumber,
 		Customer:    order.Customer,
 		LateFee:     fmt.Sprintf("$%.2f", order.Total*0.1),
 		Total:       order.GetFormattedTotal(),

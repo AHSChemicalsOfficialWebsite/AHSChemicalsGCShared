@@ -9,6 +9,7 @@ import (
 func CreateMockOrder(itemLength int) *models.Order{
 	return &models.Order{
 		ID:"1",
+		InvoiceNumber: "1234",
 		Customer: CreateMockCustomer(),
 		Items: CreateMockOrderItems(itemLength),
 		SpecialInstructions: "Test instrucitons",

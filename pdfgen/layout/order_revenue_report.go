@@ -29,9 +29,9 @@ var (
 	orderRevenueReportTableColWidths = []float64{25, 35, 10, 22, 22, 22, 22, 22}
 )
 
-func NewOrderRevenueReport(order *models.Order, invoiceNo string) *OrderRevenueReport {
+func NewOrderRevenueReport(order *models.Order) *OrderRevenueReport {
 	orderRevenue := &OrderRevenueReport{
-		InvoiceNo:  invoiceNo,
+		InvoiceNo:  order.InvoiceNumber,
 		OrderNo:    order.ID,
 		Items:      order.Items,
 		Customer:   order.Customer,
