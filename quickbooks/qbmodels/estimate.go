@@ -53,7 +53,7 @@ func (i *QBEstimate) AddLines(order *models.Order) {
 			Description: item.Product.GetFormattedDescription(),
 			Amount:      float64(item.Quantity) * item.Price,
 		}
-		line.SetSalesItemLineDetail(item.Product, item.Quantity)
+		line.SetSalesItemLineDetail(item)
 		lines = append(lines, line)
 	}
 	i.Line = lines
