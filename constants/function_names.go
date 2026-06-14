@@ -19,6 +19,7 @@ const (
 	SyncProductPricesPerCustomer             = "sync-products-prices-per-customer"
 	UpdateOrder                              = "update-order"
 	UpdateProductInventory                   = "update-product-inventory"
+	QRScannedUnlock               			 = "qr-scanned-unlock"
 )
 
 type ServiceEndpoint struct {
@@ -79,6 +80,9 @@ var Endpoints = map[string]ServiceEndpoint{
 	},
 	SyncProductPricesPerCustomer: {
 		Port: "4010",
+	},
+	QRScannedUnlock: {
+		Port: "4011",
 	},
 }
 
