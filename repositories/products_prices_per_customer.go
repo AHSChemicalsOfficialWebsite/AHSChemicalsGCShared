@@ -1,0 +1,73 @@
+package repositories
+
+import (
+	"context"
+	"fmt"
+
+	firebase "github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/firebase"
+	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
+)
+
+func CreateProductPricesForNewCustomer(ctx context.Context, customer *models.Customer) error {
+    products, err := FetchAllProductsFromFirestore(ctx)
+    if err != nil {
+        return err
+    }
+    bulkWriter := firebase.FirestoreClient.BulkWriter(ctx)
+    for _, product := range products {
+        key := fmt.Sprintf("%s|%s", product.ID, customer.ID)
+        ref := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Doc(key)
+        _, err := bulkWriter.Create(ref, models.CreateProductPricePerCustomer(product, customer.ID).ToMap())
+        if err != nil {
+            return err
+        }
+    }
+    bulkWriter.Flush()
+    return nil
+}
+
+func CreateProductPricesForNewProduct(ctx context.Context, product *models.Product) error {
+    customers, err := FetchAllCustomersFromFirestore(ctx)
+	if err != nil {
+		return err
+	}
+	bulkWriter := firebase.FirestoreClient.BulkWriter(ctx)
+	for _, customer := range customers {
+		key := fmt.Sprintf("%s|%s", product.ID, customer.ID)
+		ref := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Doc(key)
+		_, err := bulkWriter.Create(ref, models.CreateProductPricePerCustomer(product, customer.ID).ToMap())
+		if err != nil {
+			return err
+		}
+	}
+	bulkWriter.Flush()
+	return nil
+}
+
+// GetProductPricesFromCustomerID returns a map of product id to price.
+// Returning a map is done to avoid multiple calls to firestore and to search in O(1)
+//
+// Params:
+//   - customerID: ID of the customer
+//   - ctx: context
+//
+// Returns:
+//   - map of product id to price
+//   - error
+func GetProductPricesFromCustomerID(ctx context.Context, customerID string) (map[string]float64, error) {
+
+	docs, err := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Where("customerId", "==", customerID).Documents(ctx).GetAll()
+	if err != nil {
+		return nil, err
+	}
+	pricesMap := make(map[string]float64) //Map of product id to price
+	for _, doc := range docs {
+		var pppc models.ProductPricePerCustomer
+		err := doc.DataTo(&pppc)
+		if err != nil {
+			return nil, err
+		}
+		pricesMap[pppc.ProductID] = pppc.Price
+	}
+	return pricesMap, nil
+}
