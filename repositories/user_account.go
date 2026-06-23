@@ -27,3 +27,14 @@ func FetchAssignedEmailsForCustomer(ctx context.Context, customerID string, role
 	}
 	return userAccounts, nil
 }
+
+func IsCustomerAssignedToRole(ctx context.Context, customerID string, role models.Role) (bool, error) {
+	docSnapshots, err := firebase.FirestoreClient.Collection(firebase.UsersCollection).
+		Where("role", "==", role).
+		Where("customers", "array-contains", customerID).
+		Documents(ctx).GetAll()
+	if err != nil {
+		return false, err
+	}
+	return len(docSnapshots) > 0, nil
+}
