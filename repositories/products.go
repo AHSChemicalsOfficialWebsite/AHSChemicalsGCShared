@@ -11,7 +11,7 @@ import (
 )
 
 func FetchAllProductsFromFirestore(ctx context.Context) ([]*models.Product, error) {
-	docSnapshots, err := firebase.FirestoreClient.Collection(firebase.ProductsCollection).Documents(ctx).GetAll()	
+	docSnapshots, err := firebase.FirestoreClient.Collection(firebase.ProductsCollection).Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func SetProductsInCartItem(ctx context.Context, cartItems []*models.CartItem) er
 //
 // Returns:
 //   - error: error
-func SyncQuickbookProductRespToFirestore( ctx context.Context, qbItemsResponse *qbmodels.QBItemsResponse) error {
+func SyncQuickbookProductRespToFirestore(ctx context.Context, qbItemsResponse *qbmodels.QBItemsResponse) error {
 	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Item == nil {
 		return nil
 	}
@@ -64,6 +64,9 @@ func SyncQuickbookProductRespToFirestore( ctx context.Context, qbItemsResponse *
 	defer bulkWriter.End()
 
 	for _, item := range qbItemsResponse.QueryResponse.Item {
+		if !item.Active {
+			continue
+		}
 		docRef := firebase.FirestoreClient.Collection(firebase.ProductsCollection).Doc(item.ID)
 		bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll)
 	}
