@@ -64,9 +64,6 @@ func SyncQuickbookProductRespToFirestore(ctx context.Context, qbItemsResponse *q
 	defer bulkWriter.End()
 
 	for _, item := range qbItemsResponse.QueryResponse.Item {
-		if !item.Active {
-			continue
-		}
 		docRef := firebase.FirestoreClient.Collection(firebase.ProductsCollection).Doc(item.ID)
 		bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll)
 	}
