@@ -10,7 +10,7 @@ import (
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/quickbooks/qbmodels"
 )
 
-func FetchAllProductsFromFirestore(ctx context.Context) ([]*models.Product, error) {
+func FetchAllActiveProductsFromFirestore(ctx context.Context) ([]*models.Product, error) {
 	docSnapshots, err := firebase.FirestoreClient.Collection(firebase.ProductsCollection).Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
@@ -61,13 +61,14 @@ func SyncQuickbookProductRespToFirestore(ctx context.Context, qbItemsResponse *q
 	}
 
 	bulkWriter := firebase.FirestoreClient.BulkWriter(ctx)
-	defer bulkWriter.End()
 
 	for _, item := range qbItemsResponse.QueryResponse.Item {
 		docRef := firebase.FirestoreClient.Collection(firebase.ProductsCollection).Doc(item.ID)
-		bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll)
+		_, err := bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll)
+		if err != nil {
+			return err
+		}
 	}
-
 	bulkWriter.Flush()
 	return nil
 }
