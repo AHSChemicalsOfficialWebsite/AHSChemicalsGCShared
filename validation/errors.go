@@ -37,7 +37,6 @@ var (
 
 	// product errors
 	ErrProductIDRequired  = errors.New("product ID is required")
-	ErrInvalidStock       = errors.New("product inventory cannot be negative")
 	ErrBrandIDRequired    = errors.New("brand ID is required")
 	ErrLocationIDRequired = errors.New("location ID is required")
 	ErrNotEnoughStock     = errors.New("Not enough stock. Please update inventory")

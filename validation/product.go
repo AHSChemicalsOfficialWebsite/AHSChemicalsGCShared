@@ -6,9 +6,6 @@ func ValidateProductInventoryUpdate(pip *models.ProductInventoryUpdate) error {
 	if (len(pip.ProductID) == 0){
 		return ErrProductIDRequired
 	}
-	if (pip.Quantity < 0){
-		return ErrInvalidStock
-	}
 	if (len(pip.Brand) == 0){
 		return ErrBrandIDRequired
 	}
