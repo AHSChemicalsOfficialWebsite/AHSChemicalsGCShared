@@ -9,7 +9,7 @@ import (
 )
 
 func CreateProductPricesForNewCustomer(ctx context.Context, customer *models.Customer) error {
-    products, err := FetchAllProductsFromFirestore(ctx)
+    products, err := FetchAllActiveProductsFromFirestore(ctx)
     if err != nil {
         return err
     }
@@ -27,7 +27,7 @@ func CreateProductPricesForNewCustomer(ctx context.Context, customer *models.Cus
 }
 
 func CreateProductPricesForNewProduct(ctx context.Context, product *models.Product) error {
-    customers, err := FetchAllCustomersFromFirestore(ctx)
+    customers, err := FetchAllActiveCustomersFromFirestore(ctx)
 	if err != nil {
 		return err
 	}
