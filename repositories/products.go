@@ -55,14 +55,9 @@ func SetProductsInCartItem(ctx context.Context, cartItems []*models.CartItem) er
 //
 // Returns:
 //   - error: error
-func SyncQuickbookProductRespToFirestore(ctx context.Context, qbItemsResponse *qbmodels.QBItemsResponse) error {
-	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Item == nil {
-		return nil
-	}
-
+func SyncQuickbookProductRespToFirestore(ctx context.Context, qbItems []qbmodels.QBItem) error {
 	bulkWriter := firebase.FirestoreClient.BulkWriter(ctx)
-
-	for _, item := range qbItemsResponse.QueryResponse.Item {
+	for _, item := range qbItems {
 		docRef := firebase.FirestoreClient.Collection(firebase.ProductsCollection).Doc(item.ID)
 		_, err := bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll)
 		if err != nil {

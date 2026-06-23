@@ -20,6 +20,9 @@ func ValidateOrder(o *models.Order) error {
 	if o.Customer == nil {
 		return ErrNoCustomerFound
 	}
+	if !o.Customer.IsActive{
+		return ErrCustomerInactive
+	}
 	for _, item := range o.Items {
 		if item.Quantity == 0 {
 			return ErrItemZeroQty
@@ -29,6 +32,9 @@ func ValidateOrder(o *models.Order) error {
 		}
 		if item.Product == nil {
 			return ErrItemNoProduct
+		}
+		if !item.Product.IsActive{
+			return ErrProductInactive
 		}
 	}
 	return validateSpecialInstructions(o.SpecialInstructions)

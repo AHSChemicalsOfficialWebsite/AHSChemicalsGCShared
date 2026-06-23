@@ -41,14 +41,9 @@ func FetchAllActiveCustomersFromFirestore(ctx context.Context) ([]*models.Custom
 	return customersList, nil
 }
 
-func SyncQuickbookCustomerRespToFirestore(ctx context.Context, qbItemsResponse *qbmodels.QBCustomersResponse) error {
-	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Customer == nil {
-		return nil
-	}
-
+func SyncQuickbookCustomerRespToFirestore(ctx context.Context, qbCustomers []qbmodels.QBCustomer) error {
 	bulkWriter := firebase.FirestoreClient.BulkWriter(ctx)
-
-	for _, customer := range qbItemsResponse.QueryResponse.Customer {
+	for _, customer := range qbCustomers {
 		docRef := firebase.FirestoreClient.Collection(firebase.CustomersCollection).Doc(customer.ID)
 		_, err := bulkWriter.Set(docRef, customer.MapToCustomer().ToMap(), firestore.MergeAll)
 		if err != nil {
