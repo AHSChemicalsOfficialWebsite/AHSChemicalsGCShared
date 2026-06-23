@@ -11,7 +11,19 @@ var (
 	ErrInvalidRole         = errors.New("invalid auth role")
 )
 
-// FirebaseErrorResponse represents the structure of an error response returned by Firebase Admin SDK.
+// Reference: https://firebase.google.com/docs/reference/rest/auth
+var RestApiErrorsMap = map[string]string{
+	"EMAIL_EXISTS":                "The email address is already in use by another account.",
+	"INVALID_EMAIL":               "The email address is badly formatted.",
+	"WEAK_PASSWORD":               "The password must be 6 characters long or more.",
+	"OPERATION_NOT_ALLOWED":       "Password sign-in is disabled for this project.",
+	"TOO_MANY_ATTEMPTS_TRY_LATER": "We have blocked all requests from this device due to unusual activity. Try again later.",
+	"USER_NOT_FOUND":              "There is no user record corresponding to this identifier. The user may have been deleted.",
+	"USER_DISABLED":               "The user account has been disabled by an administrator.",
+	"INVALID_ID_TOKEN":            "The user's credential is no longer valid. The user must sign in again.",
+}
+
+// FirebaseErrorResponse represents the structure of an error response returned by Firebase RESI API errors.
 type FirebaseErrorResponse struct {
 	Error struct {
 		Code    int    `json:"code"`
@@ -36,9 +48,7 @@ type FirebaseErrorResponse struct {
 //   - A pointer to FirebaseErrorResponse if extraction is successful.
 //   - nil if the JSON portion is not found.
 //   - If JSON is malformed, returns a FirebaseErrorResponse with empty or partial fields.
-func ExtractFirebaseErrorFromResponse(err error) *FirebaseErrorResponse {
-	errString := err.Error()
-
+func ExtractFirebaseErrorFromResponse(errString string) *FirebaseErrorResponse {
 	// Locate the start of the JSON object within the error string.
 	start := strings.Index(errString, "{")
 	if start == -1 {
