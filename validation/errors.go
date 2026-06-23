@@ -19,6 +19,7 @@ var (
 	ErrNoItems                            = errors.New("no items found in order")
 	ErrItemZeroQty                        = errors.New("one of the items in the order has a quantity of 0")
 	ErrItemNoProduct                      = errors.New("one of the items in the order does not have any product information")
+	ErrItemNoProductID                    = errors.New("one of the items in the order does not have a product ID")
 	ErrSpecialInstructionsInvalidChars    = errors.New("special instructions contain invalid characters")
 	ErrSpecialInstructionsTooLong         = errors.New("special instructions are too long")
 	ErrNoCustomerFound                    = errors.New("No customer found for this order")

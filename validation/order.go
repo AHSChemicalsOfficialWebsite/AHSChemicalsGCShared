@@ -24,6 +24,9 @@ func ValidateOrder(o *models.Order) error {
 		if item.Quantity == 0 {
 			return ErrItemZeroQty
 		}
+		if item.ProductID == "" {
+			return ErrItemNoProductID
+		}
 		if item.Product == nil {
 			return ErrItemNoProduct
 		}
