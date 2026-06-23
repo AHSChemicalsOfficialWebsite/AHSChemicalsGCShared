@@ -19,7 +19,7 @@ func SaveContactUsToFirestore(ctx context.Context,ip string, c *models.ContactUs
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			_, err = docRef.Create(ctx, c)
-			return nil
+			return err
 		}
 		return err
 	}
@@ -35,8 +35,5 @@ func SaveContactUsToFirestore(ctx context.Context,ip string, c *models.ContactUs
 	}
 
 	_, err = docRef.Set(ctx, c)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
