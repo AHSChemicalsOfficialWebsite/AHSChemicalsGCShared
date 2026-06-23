@@ -24,7 +24,7 @@ func FetchCustomerFromFirestore(ctx context.Context, id string) (*models.Custome
 }
 
 // Only fetches active customers from firestore collection ('customers')
-func FetchAllCustomersFromFirestore(ctx context.Context) ([]*models.Customer, error) {
+func FetchAllActiveCustomersFromFirestore(ctx context.Context) ([]*models.Customer, error) {
 	customers, err := firebase.FirestoreClient.Collection(firebase.CustomersCollection).Where("isActive", "==", true).Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
