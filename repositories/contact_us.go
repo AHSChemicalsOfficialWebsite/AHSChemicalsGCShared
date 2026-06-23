@@ -11,20 +11,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func SaveContactUsToFirestore(c *models.ContactUsForm, ip string, ctx context.Context) error {
+func SaveContactUsToFirestore(ctx context.Context,ip string, c *models.ContactUsForm) error {
 
-	docSnapshot, err := firebase.FirestoreClient.Collection(firebase.ContactUsCollection).Doc(ip).Get(ctx)
+	docRef := firebase.FirestoreClient.Collection(firebase.ContactUsCollection).Doc(ip)
+	docSnapshot, err := docRef.Get(ctx)
 
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
-			_, err = firebase.FirestoreClient.Collection(firebase.ContactUsCollection).Doc(ip).Set(ctx, c)
-			return err
+			_, err = docRef.Create(ctx, c)
+			return nil
 		}
-		return err
-	}
-
-	if !docSnapshot.Exists() {
-		_, err = firebase.FirestoreClient.Collection(firebase.ContactUsCollection).Doc(ip).Set(ctx, c)
 		return err
 	}
 
@@ -38,7 +34,7 @@ func SaveContactUsToFirestore(c *models.ContactUsForm, ip string, ctx context.Co
 		return errors.New("You need to wait 24 hours before submitting another contact us request")
 	}
 
-	_, err = firebase.FirestoreClient.Collection(firebase.ContactUsCollection).Doc(ip).Set(ctx, c)
+	_, err = docRef.Set(ctx, c)
 	if err != nil {
 		return err
 	}
