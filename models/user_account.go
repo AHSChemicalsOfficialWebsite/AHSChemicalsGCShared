@@ -20,22 +20,12 @@ var ValidRoles = map[Role]struct{}{
 }
 
 type UserAccountCreate struct {
-	Name      string   `json:"name"`
-	Email     string   `json:"email"`
-	Password  string   `json:"password"`
-	Customers []string `json:"customers"`
-	Brands    []string `json:"brands"`
-	Role      Role     `json:"role"`
-}
-
-func (c *UserAccountCreate) ToFirestoreMap() map[string]any {
-	return map[string]any{
-		"name":      c.Name,
-		"email":     c.Email,
-		"customers": c.Customers,
-		"brands":    c.Brands,
-		"role":      c.Role,
-	}
+	Name      string   `json:"name" firestore:"name"`
+	Email     string   `json:"email" firestore:"email"`
+	Password  string   `json:"password" firestore:"-"`
+	Customers []string `json:"customers" firestore:"customers"`
+	Brands    []string `json:"brands" firestore:"brands"`
+	Role      Role     `json:"role" firestore:"role"`
 }
 
 // Used when storing/retrieving from Firestore (no password)
