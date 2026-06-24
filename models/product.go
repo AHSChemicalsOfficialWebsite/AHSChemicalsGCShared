@@ -10,7 +10,7 @@ import (
 
 type Product struct {
 	ID            string    `json:"id" firestore:"id"`
-	IsActive      bool      `json:"is_active" firestore:"isActive"`
+	IsActive      bool      `json:"isActive" firestore:"isActive"`
 	Brand         string    `json:"brand" firestore:"brand"`
 	Name          string    `json:"name" firestore:"name"`
 	SKU           string    `json:"sku" firestore:"sku"`
@@ -24,8 +24,8 @@ type Product struct {
 	Slug          string    `json:"slug" firestore:"slug"`
 	NameKey       string    `json:"nameKey" firestore:"nameKey"`
 	Stock         int       `json:"stock" firestore:"stock"`
-	CreatedAt     time.Time `json:"created_at" firestore:"createdAt"`
-	UpdatedAt     time.Time `json:"updated_at" firestore:"updatedAt"`
+	CreatedAt     time.Time `json:"createdAt" firestore:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt" firestore:"updatedAt"`
 }
 
 func (p *Product) ToMap() map[string]any {

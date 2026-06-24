@@ -3,7 +3,7 @@ package models
 import "fmt"
 
 type CartItem struct {
-	Quantity  int   `json:"quantity" firestore:"quantity"`
+	Quantity  int      `json:"quantity" firestore:"quantity"`
 	ProductID string   `json:"productId" firestore:"productId"`
 	Price     float64  `json:"price" firestore:"price"`
 	Product   *Product `json:"product" firestore:"-"`
