@@ -19,8 +19,8 @@ type Customer struct {
 	State     string    `json:"state" firestore:"state"`
 	Zip       string    `json:"zip" firestore:"zip"`
 	Country   string    `json:"country" firestore:"country"`
-	CreatedAt time.Time `json:"createdAt" firestore:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" firestore:"updatedAt"`
+	CreatedAt *time.Time `json:"createdAt" firestore:"createdAt"`
+	UpdatedAt *time.Time `json:"updatedAt" firestore:"updatedAt"`
 }
 
 func (c *Customer) GetFormattedAddress2() string {
