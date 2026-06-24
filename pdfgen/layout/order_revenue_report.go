@@ -13,7 +13,7 @@ type OrderRevenueReport struct {
 	InvoiceNo   string
 	OrderNo     string
 	Items       []*models.CartItem
-	Customer    *models.Customer
+	Customer    *models.CustomerRequest
 	TableValues [][]string
 	Cash        string
 	COG         string // cost of goods

@@ -1,13 +1,12 @@
 package mocks
 
 import (
-	"time"
 
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
 )
 
-func CreateMockCustomer() *models.Customer {	
-	return &models.Customer{
+func CreateMockCustomer() *models.CustomerRequest {	
+	return &models.CustomerRequest{
 		ID: "106",
 		Name: "Alexis Party Rental",
 		Email: "test_email@gmail.com",
@@ -18,13 +17,11 @@ func CreateMockCustomer() *models.Customer {
 		Phone: "702-555-5555",
 		IsActive: true,
 		Country: "US",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 }
 
-func CreateMockCustomers(val int) []*models.Customer{
-	customers := make([]*models.Customer, val)
+func CreateMockCustomers(val int) []*models.CustomerRequest{
+	customers := make([]*models.CustomerRequest, val)
 	for range val {
 		customers = append(customers, CreateMockCustomer())
 	}

@@ -31,19 +31,19 @@ const (
 )
 
 type Order struct {
-	ID                  string      `json:"id" firestore:"-"`
-	InvoiceNumber       string      `json:"invoiceNumber" firestore:"invoiceNumber,omitempty"`
-	Customer            *Customer   `json:"customer" firestore:"customer"`
-	Uid                 string      `json:"uid" firestore:"uid"`
-	SpecialInstructions string      `json:"specialInstructions" firestore:"specialInstructions"`
-	Items               []*CartItem `json:"items" firestore:"items"`
-	TaxRate             float64     `json:"taxRate" firestore:"taxRate"`
-	TaxAmount           float64     `json:"taxAmount" firestore:"taxAmount"`
-	SubTotal            float64     `json:"subTotal" firestore:"subTotal"`
-	Total               float64     `json:"total" firestore:"total"`
-	Status              OrderStatus `json:"status" firestore:"status"`
-	CreatedAt           time.Time   `json:"createdAt" firestore:"createdAt"`
-	UpdatedAt           time.Time   `json:"updatedAt" firestore:"updatedAt"`
+	ID                  string           `json:"id" firestore:"-"`
+	InvoiceNumber       string           `json:"invoiceNumber" firestore:"invoiceNumber,omitempty"`
+	Customer            *CustomerRequest `json:"customer" firestore:"customer"`
+	Uid                 string           `json:"uid" firestore:"uid"`
+	SpecialInstructions string           `json:"specialInstructions" firestore:"specialInstructions"`
+	Items               []*CartItem      `json:"items" firestore:"items"`
+	TaxRate             float64          `json:"taxRate" firestore:"taxRate"`
+	TaxAmount           float64          `json:"taxAmount" firestore:"taxAmount"`
+	SubTotal            float64          `json:"subTotal" firestore:"subTotal"`
+	Total               float64          `json:"total" firestore:"total"`
+	Status              OrderStatus      `json:"status" firestore:"status"`
+	CreatedAt           time.Time        `json:"createdAt" firestore:"createdAt"`
+	UpdatedAt           time.Time        `json:"updatedAt" firestore:"updatedAt"`
 }
 
 func (o *Order) Complete() {
@@ -70,7 +70,7 @@ func (o *Order) SetID(id string) {
 func (o *Order) SetInvoiceNumber(invoiceNumber string) {
 	o.InvoiceNumber = invoiceNumber
 }
-func (o *Order) SetCustomer(customer *Customer) {
+func (o *Order) SetCustomer(customer *CustomerRequest) {
 	o.Customer = customer
 }
 func (o *Order) SetUID(uid string) {

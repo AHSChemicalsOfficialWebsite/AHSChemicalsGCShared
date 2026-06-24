@@ -21,7 +21,7 @@ var (
 
 type ShippingManifest struct {
 	PONumber             string
-	Customer             *models.Customer
+	Customer             *models.CustomerRequest
 	Items                []*models.CartItem
 	DeliveredBy          string
 	TotalUnits           string

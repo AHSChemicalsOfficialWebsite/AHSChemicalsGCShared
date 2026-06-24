@@ -19,16 +19,39 @@ type Customer struct {
 	State     string    `json:"state" firestore:"state"`
 	Zip       string    `json:"zip" firestore:"zip"`
 	Country   string    `json:"country" firestore:"country"`
-	CreatedAt *time.Time `json:"createdAt" firestore:"createdAt"`
-	UpdatedAt *time.Time `json:"updatedAt" firestore:"updatedAt"`
+	CreatedAt time.Time `json:"createdAt" firestore:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt" firestore:"updatedAt"`
 }
 
-func (c *Customer) GetFormattedAddress2() string {
-	return fmt.Sprintf("%s, %s %s", c.City, c.State, c.Zip)
+func (c *Customer) ToCustomerRequest() *CustomerRequest {
+	return &CustomerRequest{
+		ID:       c.ID,
+		IsActive: c.IsActive,
+		Name:     c.Name,
+		Email:    c.Email,
+		Phone:    c.Phone,
+		Address1: c.Address1,
+		City:     c.City,
+		State:    c.State,
+		Zip:      c.Zip,
+		Country:  c.Country,
+	}
+}
+type CustomerRequest struct {
+	ID       string `json:"id"`
+	IsActive bool   `json:"isActive"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Address1 string `json:"address1"`
+	City     string `json:"city"`
+	State    string `json:"state"`
+	Zip      string `json:"zip"`
+	Country  string `json:"country"`
 }
 
-func (c *Customer) GetFormattedName() string{
-	return fmt.Sprintf("%s", c.Name)
+func (cr *CustomerRequest) GetFormattedAddress2() string {
+	return fmt.Sprintf("%s, %s %s", cr.City, cr.State, cr.Zip)
 }
 
 func (c *Customer) ToMap() map[string]any {

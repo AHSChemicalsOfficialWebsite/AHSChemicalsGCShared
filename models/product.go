@@ -9,23 +9,23 @@ import (
 )
 
 type Product struct {
-	ID            string     `json:"id" firestore:"id"`
-	IsActive      bool       `json:"isActive" firestore:"isActive"`
-	Brand         string     `json:"brand" firestore:"brand"`
-	Name          string     `json:"name" firestore:"name"`
-	SKU           string     `json:"sku" firestore:"sku"`
-	Size          float64    `json:"size" firestore:"size"`
-	SizeUnit      string     `json:"sizeUnit" firestore:"sizeUnit"`
-	PackOf        int        `json:"packOf" firestore:"packOf"`
-	Category      string     `json:"category" firestore:"category"`
-	Price         float64    `json:"price" firestore:"price"` //This is only meant for record purposes. Actual prices are set by the super admins for each individual customer. So when an order is placed, the actual price of that product is stored in the cart item struct. This is only read once from `product_prices_per_customers` collection when an order is placed.
-	PurchasePrice float64    `json:"purchasePrice" firestore:"purchasePrice"`
-	Desc          string     `json:"desc" firestore:"desc"`
-	Slug          string     `json:"slug" firestore:"slug"`
-	NameKey       string     `json:"nameKey" firestore:"nameKey"`
-	Stock         int        `json:"stock" firestore:"stock"`
-	CreatedAt     *time.Time `json:"createdAt" firestore:"createdAt"`
-	UpdatedAt     *time.Time `json:"updatedAt" firestore:"updatedAt"`
+	ID            string    `json:"id" firestore:"id"`
+	IsActive      bool      `json:"isActive" firestore:"isActive"`
+	Brand         string    `json:"brand" firestore:"brand"`
+	Name          string    `json:"name" firestore:"name"`
+	SKU           string    `json:"sku" firestore:"sku"`
+	Size          float64   `json:"size" firestore:"size"`
+	SizeUnit      string    `json:"sizeUnit" firestore:"sizeUnit"`
+	PackOf        int       `json:"packOf" firestore:"packOf"`
+	Category      string    `json:"category" firestore:"category"`
+	Price         float64   `json:"price" firestore:"price"` //This is only meant for record purposes. Actual prices are set by the super admins for each individual customer. So when an order is placed, the actual price of that product is stored in the cart item struct. This is only read once from `product_prices_per_customers` collection when an order is placed.
+	PurchasePrice float64   `json:"purchasePrice" firestore:"purchasePrice"`
+	Desc          string    `json:"desc" firestore:"desc"`
+	Slug          string    `json:"slug" firestore:"slug"`
+	NameKey       string    `json:"nameKey" firestore:"nameKey"`
+	Stock         int       `json:"stock" firestore:"stock"`
+	CreatedAt     time.Time `json:"createdAt" firestore:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt" firestore:"updatedAt"`
 }
 
 func (p *Product) ToMap() map[string]any {
@@ -94,10 +94,10 @@ func (p *Product) SetNameKey(nameKey string) {
 	p.NameKey = nameKey
 }
 func (p *Product) SetCreatedAt(createdAt time.Time) {
-	p.CreatedAt = &createdAt
+	p.CreatedAt = createdAt
 }
 func (p *Product) SetUpdatedAt(updatedAt time.Time) {
-	p.UpdatedAt = &updatedAt
+	p.UpdatedAt = updatedAt
 }
 
 /* Getters */

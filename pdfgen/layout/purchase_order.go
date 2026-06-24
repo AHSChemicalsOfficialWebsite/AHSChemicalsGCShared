@@ -20,7 +20,7 @@ var (
 
 type PurchaseOrder struct {
 	ID                  string
-	Customer            *models.Customer
+	Customer            *models.CustomerRequest
 	SpecialInstructions string
 	TableValues         [][]string
 	TaxRate             string

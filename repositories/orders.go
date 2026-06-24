@@ -50,7 +50,7 @@ func FetchOrderFromFirestore(ctx context.Context, orderID string) (*models.Order
 	if err != nil {
 		return nil, err
 	}
-	order.Customer = customer
+	order.Customer = customer.ToCustomerRequest()
 
 	//Set products
 	err = SetProductsInCartItem(ctx, order.Items)
