@@ -14,7 +14,7 @@ import (
 type Invoice struct {
 	Number      string
 	Items       []*models.Product
-	Customer    *models.Customer
+	Customer    *models.CustomerRequest
 	TableValues [][]string
 	LateFee     string
 	Total       string
