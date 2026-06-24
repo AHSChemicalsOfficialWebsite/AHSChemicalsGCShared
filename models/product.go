@@ -94,10 +94,10 @@ func (p *Product) SetNameKey(nameKey string) {
 	p.NameKey = nameKey
 }
 func (p *Product) SetCreatedAt(createdAt time.Time) {
-	p.CreatedAt = createdAt
+	p.CreatedAt = &createdAt
 }
 func (p *Product) SetUpdatedAt(updatedAt time.Time) {
-	p.UpdatedAt = updatedAt
+	p.UpdatedAt = &updatedAt
 }
 
 /* Getters */
