@@ -3,13 +3,15 @@ package repositories
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/firebase"
 	"github.com/AHSChemicalsOfficialWebsite/AHSChemicalsGCShared/models"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-//Only for the auth role "user"
+// Only for the auth role "user"
 func CanPlaceOrder(ctx context.Context, orderUID string) error {
 	docs, err := firebase.FirestoreClient.Collection(firebase.OrdersCollection).Where("status", "==", models.OrderStatusPending).Where("uid", "==", orderUID).Documents(ctx).GetAll()
 	if err != nil {
@@ -50,13 +52,52 @@ func FetchOrderFromFirestore(ctx context.Context, orderID string) (*models.Order
 	if err != nil {
 		return nil, err
 	}
-	order.Customer = customer.ToCustomerRequest()
+	order.Customer = customer
 
 	//Set products
-	err = SetProductsInCartItem(ctx, order.Items)
+	err = SetProductsInOrderItem(ctx, order.Items)
 	if err != nil {
 		return nil, err
 	}
 
 	return &order, nil
+}
+
+func BuildOrderFromRequest(ctx context.Context, req *models.OrderRequest, prices map[string]float64) (*models.Order, error) {
+	customer, err := FetchCustomerFromFirestore(ctx, req.CustomerID)
+	if err != nil {
+		return nil, err
+	}
+	order := &models.Order{
+		Status:              models.OrderStatusPending,
+		ID:                  gonanoid.Must(8),
+		Customer:            customer,
+		SpecialInstructions: req.SpecialInstructions,
+		CreatedAt:           time.Now().UTC(),
+	}
+
+	//Get the products from firestore for each item
+	docRefs := make([]*firestore.DocumentRef, len(req.Items))
+	for i, item := range req.Items {
+		docRefs[i] = firebase.FirestoreClient.Collection(firebase.ProductsCollection).Doc(item.ProductID)
+	}
+
+	docSnapshots, err := firebase.FirestoreClient.GetAll(ctx, docRefs)
+	if err != nil{
+		return nil, err
+	}
+
+	for i, docSnapshot := range docSnapshots {
+		var product models.Product
+		if err := docSnapshot.DataTo(&product); err != nil {
+			return nil, err
+		}
+		order.Items = append(order.Items, &models.OrderItem{
+			Product:    &product,
+			Quantity:   req.Items[i].Quantity,
+			Price:      prices[product.ID],
+			ProductID:  product.ID,
+		})
+	}
+	return order, nil
 }

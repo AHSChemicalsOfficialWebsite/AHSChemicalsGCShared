@@ -109,7 +109,7 @@ func (c *Canvas) DrawCompanyDetails() {
 	}
 }
 
-func (c *Canvas) DrawCustomerDetails(customer *models.CustomerRequest) {
+func (c *Canvas) DrawCustomerDetails(customer *models.Customer) {
 	lines := []struct {
 		text  string
 		style string

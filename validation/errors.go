@@ -15,12 +15,9 @@ var (
 	ErrMessageInvalid   = errors.New("invalid message entered. Message should be between 10 and 300 characters with no symbols or special characters")
 
 	// order errors
-	ErrNoUserID                           = errors.New("no user ID found when order was placed")
-	ErrNoItems                            = errors.New("no items found in order")
-	ErrItemZeroQty                        = errors.New("one of the items in the order has a quantity of 0")
-	ErrItemNoProduct                      = errors.New("one of the items in the order does not have any product information")
-	ErrItemNoProductID                    = errors.New("one of the items in the order does not have a product ID")
-	ErrProductInactive                    = errors.New("one of the items in the order has an inactive product")
+	ErrCustomerIDRequired                 = errors.New("customer ID is required")
+	ErrOrderItemsRequired                 = errors.New("order items are required")
+	ErrOrderItemQuantityRequired          = errors.New("one of the order items quantity is zero")
 	ErrSpecialInstructionsInvalidChars    = errors.New("special instructions contain invalid characters")
 	ErrSpecialInstructionsTooLong         = errors.New("special instructions are too long")
 	ErrNoCustomerFound                    = errors.New("No customer found for this order")

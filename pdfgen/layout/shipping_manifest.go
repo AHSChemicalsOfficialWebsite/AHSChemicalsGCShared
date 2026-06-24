@@ -21,8 +21,8 @@ var (
 
 type ShippingManifest struct {
 	PONumber             string
-	Customer             *models.CustomerRequest
-	Items                []*models.CartItem
+	Customer             *models.Customer
+	Items                []*models.OrderItem
 	DeliveredBy          string
 	TotalUnits           string
 	TotalNonHazardWeight string
@@ -57,7 +57,7 @@ func NewShippingManifest(delivery *models.Delivery) *ShippingManifest {
 	return shippingManifest
 }
 
-func (p *ShippingManifest) getTableValues(items []*models.CartItem) {
+func (p *ShippingManifest) getTableValues(items []*models.OrderItem) {
 	tableValues := make([][]string, 0)
 	for _, item := range items {
 		tableValues = append(tableValues, []string{

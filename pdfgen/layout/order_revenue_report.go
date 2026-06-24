@@ -12,8 +12,8 @@ import (
 type OrderRevenueReport struct {
 	InvoiceNo   string
 	OrderNo     string
-	Items       []*models.CartItem
-	Customer    *models.CustomerRequest
+	Items       []*models.OrderItem
+	Customer    *models.Customer
 	TableValues [][]string
 	Cash        string
 	COG         string // cost of goods

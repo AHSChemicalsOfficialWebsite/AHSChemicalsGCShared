@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
 type OrderDocument string
@@ -30,38 +28,63 @@ const (
 	OrderStatusCancelled OrderStatus = "cancelled"
 )
 
+type OrderRequest struct {
+	Items               []*OrderRequestItem `json:"items"`
+	CustomerID          string              `json:"customerId"`
+	SpecialInstructions string              `json:"specialInstructions"`
+}
+
+type OrderRequestItem struct {
+	ProductID string `json:"productId"`
+	Quantity  int    `json:"quantity"`
+}
+
+func (or *OrderRequest) ToProductIDs() []string{
+	productIDs := make([]string, 0)
+	for _, item := range or.Items {
+		productIDs = append(productIDs, item.ProductID)
+	}
+	return productIDs
+}
+
 type Order struct {
-	ID                  string           `json:"id" firestore:"-"`
-	InvoiceNumber       string           `json:"invoiceNumber" firestore:"invoiceNumber,omitempty"`
-	Customer            *CustomerRequest `json:"customer" firestore:"customer"`
-	Uid                 string           `json:"uid" firestore:"uid"`
-	SpecialInstructions string           `json:"specialInstructions" firestore:"specialInstructions"`
-	Items               []*CartItem      `json:"items" firestore:"items"`
-	TaxRate             float64          `json:"taxRate" firestore:"taxRate"`
-	TaxAmount           float64          `json:"taxAmount" firestore:"taxAmount"`
-	SubTotal            float64          `json:"subTotal" firestore:"subTotal"`
-	Total               float64          `json:"total" firestore:"total"`
-	Status              OrderStatus      `json:"status" firestore:"status"`
-	CreatedAt           time.Time        `json:"createdAt" firestore:"createdAt"`
-	UpdatedAt           time.Time        `json:"updatedAt" firestore:"updatedAt"`
+	ID                  string      `json:"id" firestore:"-"`
+	InvoiceNumber       string      `json:"invoiceNumber" firestore:"invoiceNumber,omitempty"`
+	Customer            *Customer   `json:"customer" firestore:"customer"`
+	Uid                 string      `json:"uid" firestore:"uid"`
+	SpecialInstructions string      `json:"specialInstructions" firestore:"specialInstructions"`
+	Items               []*OrderItem `json:"items" firestore:"items"`
+	TaxRate             float64     `json:"taxRate" firestore:"taxRate"`
+	TaxAmount           float64     `json:"taxAmount" firestore:"taxAmount"`
+	SubTotal            float64     `json:"subTotal" firestore:"subTotal"`
+	Total               float64     `json:"total" firestore:"total"`
+	Status              OrderStatus `json:"status" firestore:"status"`
+	CreatedAt           time.Time   `json:"createdAt" firestore:"createdAt"`
+	UpdatedAt           time.Time   `json:"updatedAt" firestore:"updatedAt"`
 }
 
-func (o *Order) Complete() {
-	o.SetID(gonanoid.Must(8))
+type OrderItem struct {
+	Quantity  int      `json:"quantity" firestore:"quantity"`
+	ProductID string   `json:"productId" firestore:"productId"`
+	Price     float64  `json:"price" firestore:"price"`
+	Product   *Product `json:"product" firestore:"-"`
+}
+
+func (item *OrderItem) GetFormattedQuantity() string {
+	return fmt.Sprintf("%d", item.Quantity)
+}
+func (item *OrderItem) GetFormattedPrice() string {
+	return fmt.Sprintf("$%.2f", item.Price)
+}
+func (item *OrderItem) GetFormattedItemTotalPrice() string {
+	return fmt.Sprintf("$%.2f", float64(item.Quantity)*item.Price)
+}
+
+func (o *Order) UpdateBill() {
 	o.GetSubTotal()
 	o.GetTaxAmount()
 	o.GetTotal()
-	o.SetStatus(OrderStatusPending)
-	time := time.Now().UTC()
-	o.SetCreatedAt(time)
-	o.SetUpdatedAt(time)
-}
-
-func (o *Order) UpdateBill(t time.Time) {
-	o.GetSubTotal()
-	o.GetTaxAmount()
-	o.GetTotal()
-	o.SetUpdatedAt(t)
+	o.SetUpdatedAt(time.Now().UTC())
 }
 
 func (o *Order) SetID(id string) {
@@ -70,7 +93,7 @@ func (o *Order) SetID(id string) {
 func (o *Order) SetInvoiceNumber(invoiceNumber string) {
 	o.InvoiceNumber = invoiceNumber
 }
-func (o *Order) SetCustomer(customer *CustomerRequest) {
+func (o *Order) SetCustomer(customer *Customer) {
 	o.Customer = customer
 }
 func (o *Order) SetUID(uid string) {

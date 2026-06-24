@@ -26,8 +26,8 @@ func FetchAllActiveProductsFromFirestore(ctx context.Context) ([]*models.Product
 	return products, nil
 }
 
-// SetProductsInCartItem sets products in cart item by fetching actual product from firestore
-func SetProductsInCartItem(ctx context.Context, cartItems []*models.CartItem) error {
+// SetProductsInOrderItem sets products in cart item by fetching actual product from firestore
+func SetProductsInOrderItem(ctx context.Context, cartItems []*models.OrderItem) error {
 	docRefs := make([]*firestore.DocumentRef, len(cartItems))
 	for i, cartItem := range cartItems {
 		docRefs[i] = firebase.FirestoreClient.Collection(firebase.ProductsCollection).Doc(cartItem.ProductID)

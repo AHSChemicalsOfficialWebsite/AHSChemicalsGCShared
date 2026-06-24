@@ -23,35 +23,8 @@ type Customer struct {
 	UpdatedAt time.Time `json:"updatedAt" firestore:"updatedAt"`
 }
 
-func (c *Customer) ToCustomerRequest() *CustomerRequest {
-	return &CustomerRequest{
-		ID:       c.ID,
-		IsActive: c.IsActive,
-		Name:     c.Name,
-		Email:    c.Email,
-		Phone:    c.Phone,
-		Address1: c.Address1,
-		City:     c.City,
-		State:    c.State,
-		Zip:      c.Zip,
-		Country:  c.Country,
-	}
-}
-type CustomerRequest struct {
-	ID       string `json:"id"`
-	IsActive bool   `json:"isActive"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Address1 string `json:"address1"`
-	City     string `json:"city"`
-	State    string `json:"state"`
-	Zip      string `json:"zip"`
-	Country  string `json:"country"`
-}
-
-func (cr *CustomerRequest) GetFormattedAddress2() string {
-	return fmt.Sprintf("%s, %s %s", cr.City, cr.State, cr.Zip)
+func (c *Customer) GetFormattedAddress2() string {
+	return fmt.Sprintf("%s, %s %s", c.Address1, c.City, c.State)
 }
 
 func (c *Customer) ToMap() map[string]any {

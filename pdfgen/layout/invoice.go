@@ -14,7 +14,7 @@ import (
 type Invoice struct {
 	Number      string
 	Items       []*models.Product
-	Customer    *models.CustomerRequest
+	Customer    *models.Customer
 	TableValues [][]string
 	LateFee     string
 	Total       string
@@ -53,7 +53,7 @@ func NewInvoice(order *models.Order) *Invoice {
 	return invoice
 }
 
-func (i *Invoice) setTableValues(items []*models.CartItem) {
+func (i *Invoice) setTableValues(items []*models.OrderItem) {
 	tableValues := make([][]string, 0)
 	for _, item := range items {
 		tableValues = append(tableValues, []string{

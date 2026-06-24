@@ -86,7 +86,7 @@ type Line struct {
 	GroupLineDetail     *GroupLineDetail     `json:"GroupLineDetail,omitempty"`
 }
 
-func (i *Line) SetSalesItemLineDetail(item *models.CartItem) {
+func (i *Line) SetSalesItemLineDetail(item *models.OrderItem) {
 	detail := &SalesItemLineDetail{
 		ItemRef: Reference{
 			Value: item.ProductID,

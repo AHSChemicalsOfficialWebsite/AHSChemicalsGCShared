@@ -20,7 +20,7 @@ var (
 
 type PurchaseOrder struct {
 	ID                  string
-	Customer            *models.CustomerRequest
+	Customer            *models.Customer
 	SpecialInstructions string
 	TableValues         [][]string
 	TaxRate             string
@@ -45,7 +45,7 @@ func NewPurchaseOrder(o *models.Order) *PurchaseOrder {
 	return purchaseOrder
 }
 
-func (p *PurchaseOrder) getTableValues(items []*models.CartItem) {
+func (p *PurchaseOrder) getTableValues(items []*models.OrderItem) {
 	tableValues := make([][]string, 0)
 	for _, item := range items {
 		tableValues = append(tableValues, []string{

@@ -10,31 +10,19 @@ import (
 
 var illegalCharsRegex = regexp.MustCompile(`[<>[\]{}^*~|\\]`)
 
-func ValidateOrder(o *models.Order) error {
-	if o.Uid == "" {
-		return ErrNoUserID
+func ValidateOrderRequest(o *models.OrderRequest) error {
+	if o.CustomerID == ""{
+		return ErrCustomerIDRequired
 	}
 	if len(o.Items) == 0 {
-		return ErrNoItems
-	}
-	if o.Customer == nil {
-		return ErrNoCustomerFound
-	}
-	if !o.Customer.IsActive{
-		return ErrCustomerInactive
+		return ErrOrderItemsRequired
 	}
 	for _, item := range o.Items {
-		if item.Quantity == 0 {
-			return ErrItemZeroQty
-		}
 		if item.ProductID == "" {
-			return ErrItemNoProductID
+			return ErrProductIDRequired
 		}
-		if item.Product == nil {
-			return ErrItemNoProduct
-		}
-		if !item.Product.IsActive{
-			return ErrProductInactive
+		if item.Quantity == 0 {
+			return ErrOrderItemQuantityRequired
 		}
 	}
 	return validateSpecialInstructions(o.SpecialInstructions)
@@ -77,4 +65,28 @@ func CanCancelOrder(originalOrder *models.Order) error {
     default:
         return nil
     }
+}
+
+func AreEqualPrices(a, b []*models.OrderItem) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Price != b[i].Price {
+			return false
+		}
+	}
+	return true
+}
+
+func AreEqualQuantities(a, b []*models.OrderItem) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i].Quantity != b[i].Quantity {
+			return false
+		}
+	}
+	return true
 }

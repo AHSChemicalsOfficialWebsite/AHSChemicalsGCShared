@@ -112,20 +112,21 @@ func EnsureProductPricesForCustomer(ctx context.Context, customer *models.Custom
 // Returns:
 //   - map of product id to price
 //   - error
-func GetProductPricesFromCustomerID(ctx context.Context, customerID string) (map[string]float64, error) {
-
-	docs, err := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).Where("customerId", "==", customerID).Documents(ctx).GetAll()
-	if err != nil {
-		return nil, err
-	}
-	pricesMap := make(map[string]float64) //Map of product id to price
-	for _, doc := range docs {
-		var pppc models.ProductPricePerCustomer
-		err := doc.DataTo(&pppc)
-		if err != nil {
-			return nil, err
-		}
-		pricesMap[pppc.ProductID] = pppc.Price
-	}
-	return pricesMap, nil
+func GetProductPricesFromCustomerID(ctx context.Context, customerID string, productIDs []string) (map[string]float64, error) {
+    docs, err := firebase.FirestoreClient.Collection(firebase.ProductsPricesPerCustCollection).
+        Where("customerId", "==", customerID).
+        Where("productId", "in", productIDs).
+        Documents(ctx).GetAll()
+    if err != nil {
+        return nil, err
+    }
+    pricesMap := make(map[string]float64)
+    for _, doc := range docs {
+        var pppc models.ProductPricePerCustomer
+        if err := doc.DataTo(&pppc); err != nil {
+            return nil, err
+        }
+        pricesMap[pppc.ProductID] = pppc.Price
+    }
+    return pricesMap, nil
 }

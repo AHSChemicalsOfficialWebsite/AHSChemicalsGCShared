@@ -27,10 +27,10 @@ func CreateMockProduct() *models.Product {
 	}
 }
 
-func CreateMockOrderItems(numberOfItems int) []*models.CartItem {
-	items := make([]*models.CartItem, numberOfItems)
+func CreateMockOrderItems(numberOfItems int) []*models.OrderItem {
+	items := make([]*models.OrderItem, numberOfItems)
 	for i := range numberOfItems {
-		items[i] = &models.CartItem{
+		items[i] = &models.OrderItem{
 			Product:  CreateMockProduct(),
 			Quantity: 5,
 			Price:    129.99,

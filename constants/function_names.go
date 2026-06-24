@@ -16,7 +16,6 @@ const (
 	QuickBooksSyncProducts                   = "quickbooks-sync-products"
 	QuickBooksWebHook                        = "quickbooks-webhook"
 	QuickbooksWebHookEntityProcessor         = "quickbooks-webhook-entity-processor"
-	SyncProductPricesPerCustomer             = "sync-products-prices-per-customer"
 	UpdateOrder                              = "update-order"
 	UpdateProductInventory                   = "update-product-inventory"
 	QRScannedUnlock                          = "qr-scanned-unlock"
@@ -77,9 +76,6 @@ var Endpoints = map[string]ServiceEndpoint{
 	},
 	QuickbooksWebHookEntityProcessor: {
 		Port: "4009",
-	},
-	SyncProductPricesPerCustomer: {
-		Port: "4010",
 	},
 	QRScannedUnlock: {
 		Port: "4011",
